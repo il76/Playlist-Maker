@@ -1,19 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    android:id="@+id/main"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#3772E7"
+        android:paddingBottom="@dimen/pdg_root"
+        android:paddingLeft="@dimen/pdg_root"
+        android:paddingRight="@dimen/pdg_root"
+        android:paddingTop="@dimen/size_zero_dp"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="@dimen/pdg_root"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textFontWeight="500"
+            android:textSize="@dimen/fs_btn" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_zero_dp"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/btn_margin"
+                android:layout_marginBottom="@dimen/btn_margin"
+                app:icon="@drawable/icon_search"
+                android:text="@string/button_search"
+                app:iconGravity="textStart"
+                app:iconPadding="@dimen/btn_icon_pdg"
+                app:iconTint="@color/black"
+                app:cornerRadius="@dimen/cr_btn"
+                android:textSize="@dimen/fs_btn"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/white"
+                android:textAllCaps="false"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_zero_dp"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/btn_margin"
+                android:layout_marginBottom="@dimen/btn_margin"
+                app:icon="@drawable/icon_media"
+                android:text="@string/button_media"
+                app:iconGravity="textStart"
+                app:iconPadding="@dimen/btn_icon_pdg"
+                app:iconTint="@color/black"
+                app:cornerRadius="@dimen/cr_btn"
+                android:textSize="@dimen/fs_btn"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/white"
+                android:textAllCaps="false"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_zero_dp"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/btn_margin"
+                android:layout_marginBottom="@dimen/btn_margin"
+                app:icon="@drawable/icon_settings"
+                android:text="@string/button_settings"
+                app:iconGravity="textStart"
+                app:iconPadding="@dimen/btn_icon_pdg"
+                app:iconTint="@color/black"
+                app:cornerRadius="@dimen/cr_btn"
+                android:textSize="@dimen/fs_btn"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/white"
+                android:textAllCaps="false"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

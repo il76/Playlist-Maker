@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fs_btn">22sp</dimen>
+    <dimen name="cr_btn">16dp</dimen>
+    <dimen name="btn_icon_pdg">10sp</dimen>
+    <dimen name="btn_margin">8dp</dimen>
+    <dimen name="size_zero_dp">0dp</dimen>
+    <dimen name="pdg_root">16dp</dimen>
+</resources>
