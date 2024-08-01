@@ -46,6 +46,7 @@
                 android:textColor="@color/black"
                 android:backgroundTint="@color/white"
                 android:textAllCaps="false"
+                android:id="@+id/button_search"
                 />
             <Button
                 android:layout_width="match_parent"
@@ -63,6 +64,7 @@
                 android:textColor="@color/black"
                 android:backgroundTint="@color/white"
                 android:textAllCaps="false"
+                android:id="@+id/button_media"
                 />
 
             <Button
@@ -72,7 +74,6 @@
                 android:layout_marginBottom="@dimen/btn_margin"
                 android:layout_weight="1"
                 android:backgroundTint="@color/white"
-                android:onClick="btnSettingsClick"
                 android:text="@string/button_settings"
                 android:textAllCaps="false"
                 android:textColor="@color/black"
@@ -82,6 +83,7 @@
                 app:iconGravity="textStart"
                 app:iconPadding="@dimen/btn_icon_pdg"
                 app:iconTint="@color/black"
+                android:id="@+id/button_settings"
 
                 />
         </LinearLayout>
