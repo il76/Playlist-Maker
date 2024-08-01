@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#3772E7"
+        android:background="@color/background_main"
         android:paddingBottom="@dimen/pdg_root"
         android:paddingLeft="@dimen/pdg_root"
         android:paddingRight="@dimen/pdg_root"
@@ -84,7 +84,6 @@
                 app:iconPadding="@dimen/btn_icon_pdg"
                 app:iconTint="@color/black"
                 android:id="@+id/button_settings"
-
                 />
         </LinearLayout>
     </LinearLayout>

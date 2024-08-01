@@ -8,4 +8,11 @@
     <dimen name="pdg_root">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="settings_btn_text">16sp</dimen>
+    <dimen name="header_height">56dp</dimen>
+    <dimen name="header_padding">4dp</dimen>
+    <dimen name="header_image_layout_size">48dp</dimen>
+    <dimen name="header_image_padding">12dp</dimen>
+    <dimen name="header_text_leftpadding">12dp</dimen>
+    <dimen name="settings_icon_height">24dp</dimen>
+    <dimen name="settings_item_container_padding">21dp</dimen>
 </resources>
