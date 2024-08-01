@@ -6,4 +6,6 @@
     <dimen name="btn_margin">8dp</dimen>
     <dimen name="size_zero_dp">0dp</dimen>
     <dimen name="pdg_root">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="settings_btn_text">16sp</dimen>
 </resources>

@@ -64,22 +64,25 @@
                 android:backgroundTint="@color/white"
                 android:textAllCaps="false"
                 />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/size_zero_dp"
-                android:layout_weight="1"
                 android:layout_marginTop="@dimen/btn_margin"
                 android:layout_marginBottom="@dimen/btn_margin"
-                app:icon="@drawable/icon_settings"
+                android:layout_weight="1"
+                android:backgroundTint="@color/white"
+                android:onClick="btnSettingsClick"
                 android:text="@string/button_settings"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="@dimen/fs_btn"
+                app:cornerRadius="@dimen/cr_btn"
+                app:icon="@drawable/icon_settings"
                 app:iconGravity="textStart"
                 app:iconPadding="@dimen/btn_icon_pdg"
                 app:iconTint="@color/black"
-                app:cornerRadius="@dimen/cr_btn"
-                android:textSize="@dimen/fs_btn"
-                android:textColor="@color/black"
-                android:backgroundTint="@color/white"
-                android:textAllCaps="false"
+
                 />
         </LinearLayout>
     </LinearLayout>
