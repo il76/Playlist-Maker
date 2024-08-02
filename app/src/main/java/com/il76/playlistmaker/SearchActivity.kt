@@ -19,7 +19,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val buttonBack = findViewById<MaterialToolbar>(R.id.activity_search_toolbar)
-        buttonBack.setNavigationOnClickListener() {
+        buttonBack.setNavigationOnClickListener {
             this.finish()
         }
 

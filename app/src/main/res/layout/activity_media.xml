@@ -5,21 +5,14 @@
     android:orientation="vertical"
     android:background="@color/white"
     android:id="@+id/activity_media"
-
     >
+
     <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/activity_media_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="0dp"
         app:navigationIcon="@drawable/icon_back"
-        android:id="@+id/activity_media_toolbar"
-        >
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/button_media"
-            android:textColor="@color/black"
-            android:gravity="start|center"
-            android:textFontWeight="500"
-            android:textSize="@dimen/fs_btn" />
-    </com.google.android.material.appbar.MaterialToolbar>
+        app:title="@string/button_media"
+        app:titleTextAppearance="@style/Toolbar.TitleText" />
 </LinearLayout>

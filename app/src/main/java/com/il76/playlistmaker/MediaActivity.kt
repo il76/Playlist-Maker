@@ -19,7 +19,7 @@ class MediaActivity : AppCompatActivity() {
         }
 
         val buttonBack = findViewById<MaterialToolbar>(R.id.activity_media_toolbar)
-        buttonBack.setNavigationOnClickListener() {
+        buttonBack.setNavigationOnClickListener {
             this.finish()
         }
 
