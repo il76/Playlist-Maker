@@ -5,4 +5,6 @@
     <color name="background_main">#3772E7</color>
     <color name="switcher_thumb">#FFCECFD2</color>
     <color name="switcher_track">#FFF0F1F3</color>
+    <color name="main_icon_fill">#FF1A1B22</color>
+    <color name="settings_icon_fill">#FFAEAFB4</color>
 </resources>
