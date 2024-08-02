@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/white"
     android:backgroundTint="@color/white"
     android:id="@+id/activity_settings"
     >
+    <!--
+    Пока оставил старый вариант, он соответствует фигме. Компонент Toolbar не смог подогнать по отступам
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/header_height"
         android:orientation="horizontal"
         android:padding="@dimen/header_padding"
         >
-
         <ImageView
             android:layout_width="@dimen/header_image_layout_size"
             android:layout_height="@dimen/header_image_layout_size"
@@ -25,101 +28,44 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingLeft="@dimen/header_text_leftpadding"
+            android:paddingHorizontal="@dimen/header_text_leftpadding"
             android:text="@string/button_settings"
             android:textColor="@color/black"
-            android:gravity="left|center"
+            android:gravity="start|center"
             android:textFontWeight="500"
             android:textSize="@dimen/fs_btn" />
     </LinearLayout>
-    <LinearLayout
+    <!--
+    Как кастомизировать размер иконки? Она на вид чуть крупнее, чем в фигме
+    -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/themeSwitcher"
+        android:text="@string/settings_button_darktheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/pdg_root">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/settings_item_container_padding"
-            android:paddingBottom="@dimen/settings_item_container_padding"
-            android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/settings_button_darktheme"
-                android:textSize="@dimen/settings_btn_text"
-            />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/settings_icon_height"
-                android:layout_gravity="end"
-                android:src="@drawable/icon_dark_disabled"
-                android:contentDescription="@string/settings_button_darktheme"/>
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/settings_item_container_padding"
-            android:paddingBottom="@dimen/settings_item_container_padding"
-            android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/settings_button_share"
-                android:textSize="@dimen/settings_btn_text"
-                />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/settings_icon_height"
-                android:layout_gravity="end"
-                android:src="@drawable/icon_share"
-                android:contentDescription="@string/settings_button_share"/>
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/settings_item_container_padding"
-            android:paddingBottom="@dimen/settings_item_container_padding"
-            android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/settings_button_support"
-                android:textSize="@dimen/settings_btn_text"
-                />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/settings_icon_height"
-                android:layout_gravity="end"
-                android:src="@drawable/icon_support"
-                android:contentDescription="@string/settings_button_support"/>
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/settings_item_container_padding"
-            android:paddingBottom="@dimen/settings_item_container_padding"
-            android:gravity="center">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/settings_button_user_agreement"
-                android:textSize="@dimen/settings_btn_text"
-                />
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/settings_icon_height"
-                android:layout_gravity="end"
-                android:src="@drawable/icon_user_agreement"
-                android:contentDescription="@string/settings_button_user_agreement"/>
-        </FrameLayout>
-    </LinearLayout>
+        style="@style/settings_switch"
+        app:thumbTint="@color/switcher_thumb"
+        app:trackTint="@color/switcher_track"
+        />
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_button_share"
+        android:drawableEnd="@drawable/icon_share"
+        style="@style/settings_row"
+        />
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_button_support"
+        android:drawableEnd="@drawable/icon_support"
+        style="@style/settings_row"
+        />
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_button_user_agreement"
+        android:drawableEnd="@drawable/icon_user_agreement"
+        style="@style/settings_row"
+        />
 </LinearLayout>
