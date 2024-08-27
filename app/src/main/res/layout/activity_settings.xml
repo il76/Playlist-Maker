@@ -15,7 +15,7 @@
         app:title="@string/button_settings"
         app:titleTextAppearance="@style/Toolbar.TitleText" />
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/themeSwitcher"
+        android:id="@+id/SettingsThemeSwitcher"
         android:text="@string/settings_button_darktheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,6 +24,7 @@
         app:trackTint="@color/switcher_track"
         />
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/SettingsShareApp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_button_share"
@@ -31,6 +32,7 @@
         style="@style/settings_row"
         />
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/SettingsWriteSupport"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_button_support"
@@ -38,6 +40,7 @@
         style="@style/settings_row"
         />
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/SettingsUserAgreement"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_button_user_agreement"

@@ -50,4 +50,11 @@
     <string name="settings_button_support">Написать в поддержку</string>
     <string name="settings_button_user_agreement">Пользовательское соглашение</string>
     <string name="button_back">Назад</string>
+    <string name="share_app_text">https://practicum.yandex.ru/android-developer/</string>
+    <string name="settings_email_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="settings_email_text">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="settings_email_recipient">webms@9111.ru</string>
+    <string name="settings_ua_link">https://yandex.ru/legal/practicum_offer/</string>
+    <string name="action_not_supported">Действие не поддерживается</string>
+
 </resources>
