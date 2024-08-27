@@ -1,12 +1,12 @@
 package com.il76.playlistmaker
 
 import android.os.Bundle
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
@@ -20,7 +20,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val buttonBack = findViewById<ImageView>(R.id.settings_back_button)
+        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_settings_toolbar)
         buttonBack.setOnClickListener {
             this.finish()
         }
@@ -29,6 +29,7 @@ class SettingsActivity : AppCompatActivity() {
         val switcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
         switcher.setOnCheckedChangeListener {_, isChecked ->
             if (isChecked) {
+                //setTheme(R.style.)
                 // переключаем системную тему
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             } else {

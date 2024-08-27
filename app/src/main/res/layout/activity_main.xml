@@ -13,8 +13,8 @@
         android:layout_marginVertical="10dp"
 
         android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textFontWeight="500"
+        style="@style/HeaderMain"
+
         android:textSize="@dimen/fs_btn" />
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,32 +27,19 @@
         <Button
             app:icon="@drawable/icon_search"
             android:text="@string/button_search"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/btn_icon_pdg"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/cr_btn"
             style="@style/MainPageButton"
             android:id="@+id/button_search"
             />
         <Button
             app:icon="@drawable/icon_media"
             android:text="@string/button_media"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/btn_icon_pdg"
-            app:iconTint="@color/black"
-            app:cornerRadius="@dimen/cr_btn"
             style="@style/MainPageButton"
             android:id="@+id/button_media"
             />
-
         <Button
-            style="@style/MainPageButton"
-            android:text="@string/button_settings"
-            app:cornerRadius="@dimen/cr_btn"
             app:icon="@drawable/icon_settings"
-            app:iconGravity="textStart"
-            app:iconPadding="@dimen/btn_icon_pdg"
-            app:iconTint="@color/black"
+            android:text="@string/button_settings"
+            style="@style/MainPageButton"
             android:id="@+id/button_settings"
             />
     </LinearLayout>
