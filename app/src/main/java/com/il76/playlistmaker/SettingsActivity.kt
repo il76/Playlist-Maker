@@ -3,7 +3,6 @@ package com.il76.playlistmaker
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -37,7 +36,7 @@ class SettingsActivity : AppCompatActivity() {
             intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app_text))
             intent.setType("text/plain")
             if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent);
+                startActivity(intent)
             } else {
                 Toast.makeText(this, getString(R.string.action_not_supported), Toast.LENGTH_SHORT).show()
             }
@@ -65,7 +64,7 @@ class SettingsActivity : AppCompatActivity() {
             val webpage: Uri = Uri.parse(getString(R.string.settings_ua_link))
             val intent = Intent(Intent.ACTION_VIEW, webpage)
             if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent);
+                startActivity(intent)
             } else {
                 Toast.makeText(this, getString(R.string.action_not_supported), Toast.LENGTH_SHORT).show()
             }
