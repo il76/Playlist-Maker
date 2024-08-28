@@ -24,13 +24,13 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // назад
         val buttonBack = findViewById<MaterialToolbar>(R.id.activity_search_toolbar)
         buttonBack.setNavigationOnClickListener {
             this.finish()
         }
 
-
+        // поисковая форма
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         val clearButton = findViewById<ImageView>(R.id.search_icon_clear)
         clearButton.setOnClickListener {
@@ -41,17 +41,37 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val searchTextWatcher = object: TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                searchValue = s.toString()
             }
 
-            override fun afterTextChanged(s: Editable?) {
-            }
+            override fun afterTextChanged(s: Editable?) {}
         }
 
         inputEditText.addTextChangedListener(searchTextWatcher)
+    }
+
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        searchValue = savedInstanceState.getString(SEARCH_QUERY, DEFAULT_QUERY)
+        val inputEditText = findViewById<EditText>(R.id.search_edit_text)
+        inputEditText.setText(searchValue)
+    }
+
+
+    private var searchValue: String = ""
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SEARCH_QUERY, searchValue)
+    }
+
+    companion object {
+        const val SEARCH_QUERY = "SEARCH_QUERY"
+        const val DEFAULT_QUERY = ""
     }
 }
