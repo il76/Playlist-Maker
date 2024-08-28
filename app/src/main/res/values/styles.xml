@@ -12,7 +12,7 @@
         <item name="android:textColor">@color/settings_text</item>
         <item name="android:paddingHorizontal">100dp</item>
     </style>
-    <style name="MainPageButton" parent="@style/Widget.Material3.Button.UnelevatedButton">
+    <style name="MainPageButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/size_zero_dp</item>
         <item name="android:layout_weight">1</item>
