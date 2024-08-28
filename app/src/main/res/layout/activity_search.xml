@@ -8,11 +8,54 @@
     android:id="@+id/activity_search"
     >
     <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/activity_search_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:navigationIcon="@drawable/icon_back"
-        android:id="@+id/activity_search_toolbar"
-        app:titleTextAppearance="@style/Toolbar.TitleText"
         app:title="@string/button_search"
-        />
+        app:titleTextAppearance="@style/Toolbar.TitleText" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_editview"
+        android:backgroundTint="@color/search_edit_bg"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        >
+        <EditText
+            android:id="@+id/search_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+
+            android:layout_marginVertical="8dp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="12dp"
+            android:hint="@string/button_search"
+            android:inputType="text"
+            android:maxLines="1"
+            android:drawableStart="@drawable/icon_search"
+            android:textCursorDrawable="@drawable/eitview_cursor"
+            android:drawableTint="@color/search_edit_main"
+            android:drawablePadding="8dp"
+            android:textColor="@color/search_edit_main"
+            android:textColorHint="@color/search_edit_main"
+            android:background="@null"
+
+            android:fontFamily="@font/ys_display_medium"
+            android:textFontWeight="400"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            />
+        <ImageView
+            android:id="@+id/search_icon_clear"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:visibility="gone"
+
+            android:layout_marginHorizontal="20dp"
+            />
+    </LinearLayout>
 </LinearLayout>

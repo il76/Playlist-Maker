@@ -12,4 +12,6 @@
     <color name="main_icon_fill">#FF1A1B22</color>
     <color name="settings_icon_fill">#FFFFFFFF</color>
     <color name="back_icon_fill">#FFFFFFFF</color>
+    <color name="search_edit_main">#FF1A1B22</color>
+    <color name="search_edit_bg">#FFFFFFFF</color>
 </resources>
