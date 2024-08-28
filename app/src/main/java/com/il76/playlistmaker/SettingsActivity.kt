@@ -1,5 +1,6 @@
 package com.il76.playlistmaker
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -44,17 +45,16 @@ class SettingsActivity : AppCompatActivity() {
 
         val buttonWrite = findViewById<MaterialTextView>(R.id.SettingsWriteSupport)
         buttonWrite.setOnClickListener {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "*/*"
-                //setData (Uri.parse("mailto:")) //нам нужны только почтовые приложения. Не работает?
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                // type = "*/*"
+                setData (Uri.parse("mailto:")) //нам нужны только почтовые приложения
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("il@9111.ru"))
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.settings_email_subject))
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.settings_email_text))
-
             }
-            if (intent.resolveActivity(packageManager) != null) {
+            try {
                 startActivity(intent)
-            } else {
+            } catch (e: ActivityNotFoundException) {
                 Toast.makeText(this, getString(R.string.action_not_supported), Toast.LENGTH_SHORT).show()
             }
         }
@@ -63,9 +63,10 @@ class SettingsActivity : AppCompatActivity() {
         buttonUA.setOnClickListener {
             val webpage: Uri = Uri.parse(getString(R.string.settings_ua_link))
             val intent = Intent(Intent.ACTION_VIEW, webpage)
-            if (intent.resolveActivity(packageManager) != null) {
+            // intent.resolveActivity(packageManager) != null // не работает?
+            try {
                 startActivity(intent)
-            } else {
+            } catch (e: ActivityNotFoundException) {
                 Toast.makeText(this, getString(R.string.action_not_supported), Toast.LENGTH_SHORT).show()
             }
         }
