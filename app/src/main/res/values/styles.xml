@@ -27,7 +27,6 @@
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">@dimen/fs_btn</item>
         <item name="android:textColor">?attr/colorPrimary</item>>
-        <item name="android:paddingHorizontal">100dp</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
     <style name="MainPageButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
