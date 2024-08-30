@@ -24,6 +24,7 @@
         android:background="@drawable/rounded_editview"
         android:backgroundTint="@color/search_edit_bg"
         >
+<!--        отдельный ImageView сделан, чтобы не создавать вторую иконку нужного размера. если иконку повесить как drawable к EditText - будет отклонение от дизайна-->
         <ImageView
             android:layout_width="@dimen/settings_icon_height"
             android:layout_height="@dimen/settings_icon_height"
