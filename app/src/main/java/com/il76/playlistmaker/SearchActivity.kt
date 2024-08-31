@@ -57,7 +57,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        searchValue = savedInstanceState.getString(SEARCH_QUERY, DEFAULT_QUERY)
+        searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         inputEditText.setText(searchValue)
     }
@@ -71,7 +71,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val SEARCH_QUERY = "SEARCH_QUERY"
-        const val DEFAULT_QUERY = ""
+        private const val SEARCH_QUERY = "SEARCH_QUERY"
     }
 }

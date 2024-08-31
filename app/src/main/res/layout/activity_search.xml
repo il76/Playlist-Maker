@@ -47,7 +47,7 @@
             android:maxLines="1"
             android:paddingHorizontal="36dp"
             android:paddingVertical="0dp"
-            android:textColor="@color/search_edit_main"
+            android:textColor="@color/main_icon_fill"
             android:textColorHint="@color/search_edit_main"
             android:textCursorDrawable="@drawable/eitview_cursor"
 
