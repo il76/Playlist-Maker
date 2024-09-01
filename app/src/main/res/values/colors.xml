@@ -4,7 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="settings_text">#FF000000</color>
     <color name="background_main">#FF3772E7</color>
-    <color name="background_settings">#FFFFFFFF</color>
+    <color name="background_secondary">#FFFFFFFF</color>
     <color name="switcher_thumb">#FFCECFD2</color>
     <color name="switcher_track">#FFF0F1F3</color>
     <color name="clear_icon_fill">#FFAEAFB4</color>

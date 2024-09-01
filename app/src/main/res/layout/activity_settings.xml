@@ -4,6 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/activity_settings"
+    android:background="@color/background_secondary"
+    android:backgroundTint="@color/background_secondary"
     >
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/activity_settings_toolbar"
@@ -15,24 +17,24 @@
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/SettingsThemeSwitcher"
         android:text="@string/settings_button_darktheme"
-        style="@style/settings_switch"
+        style="@style/SettingsSwitch"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/SettingsShareApp"
         android:text="@string/settings_button_share"
         android:drawableEnd="@drawable/icon_share"
-        style="@style/settings_row"
+        style="@style/SettingsRow"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/SettingsWriteSupport"
         android:text="@string/settings_button_support"
         android:drawableEnd="@drawable/icon_support"
-        style="@style/settings_row"
+        style="@style/SettingsRow"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/SettingsUserAgreement"
         android:text="@string/settings_button_user_agreement"
         android:drawableEnd="@drawable/icon_user_agreement"
-        style="@style/settings_row"
+        style="@style/SettingsRow"
         />
 </LinearLayout>

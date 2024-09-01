@@ -4,8 +4,8 @@
     android:id="@+id/activity_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_settings"
-    android:backgroundTint="@color/background_settings"
+    android:background="@color/background_secondary"
+    android:backgroundTint="@color/background_secondary"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -28,12 +28,12 @@
         <ImageView
             android:layout_width="@dimen/settings_icon_height"
             android:layout_height="@dimen/settings_icon_height"
-            android:padding="3dp"
             android:layout_gravity="center|start"
-            android:layout_marginHorizontal="10dp"
+            android:layout_marginHorizontal="12dp"
+            android:padding="3dp"
             android:src="@drawable/icon_search"
-            app:tint="@color/search_edit_main"
-            />
+            app:tint="@color/search_edit_main" />
+
         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
@@ -49,17 +49,17 @@
             android:paddingVertical="0dp"
             android:textColor="@color/main_icon_fill"
             android:textColorHint="@color/search_edit_main"
-            android:textCursorDrawable="@drawable/eitview_cursor"
 
+            android:textCursorDrawable="@drawable/eitview_cursor"
             android:textSize="@dimen/settings_btn_text" />
 
         <ImageView
             android:id="@+id/search_icon_clear"
-            android:layout_width="@dimen/settings_icon_height"
-            android:layout_height="@dimen/settings_icon_height"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:layout_gravity="center|end"
-            android:layout_marginHorizontal="20dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_marginHorizontal="12dp"
+            android:src="@drawable/icon_clear"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>
