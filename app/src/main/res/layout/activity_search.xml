@@ -1,18 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_settings"
-    android:backgroundTint="@color/background_settings"
-    android:id="@+id/activity_search"
-    >
+    android:background="@color/background_secondary"
+    android:backgroundTint="@color/background_secondary"
+    android:orientation="vertical">
+
     <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/activity_search_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:navigationIcon="@drawable/icon_back"
-        android:id="@+id/activity_search_toolbar"
-        app:titleTextAppearance="@style/Toolbar.TitleText"
         app:title="@string/button_search"
-        />
+        app:titleTextAppearance="@style/Toolbar.TitleText" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/rounded_editview"
+        android:backgroundTint="@color/search_edit_bg"
+        >
+<!--        отдельный ImageView сделан, чтобы не создавать вторую иконку нужного размера. если иконку повесить как drawable к EditText - будет отклонение от дизайна-->
+        <ImageView
+            android:layout_width="@dimen/settings_icon_height"
+            android:layout_height="@dimen/settings_icon_height"
+            android:layout_gravity="center|start"
+            android:layout_marginHorizontal="12dp"
+            android:padding="3dp"
+            android:src="@drawable/icon_search"
+            app:tint="@color/search_edit_main" />
+
+        <EditText
+            android:id="@+id/search_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="@null"
+
+            android:drawableTint="@color/search_edit_main"
+            android:fontFamily="@font/ys_display_regular"
+            android:hint="@string/button_search"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingHorizontal="36dp"
+            android:paddingVertical="0dp"
+            android:textColor="@color/main_icon_fill"
+            android:textColorHint="@color/search_edit_main"
+
+            android:textCursorDrawable="@drawable/eitview_cursor"
+            android:textSize="@dimen/settings_btn_text" />
+
+        <ImageView
+            android:id="@+id/search_icon_clear"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center|end"
+            android:layout_marginHorizontal="12dp"
+            android:src="@drawable/icon_clear"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout>

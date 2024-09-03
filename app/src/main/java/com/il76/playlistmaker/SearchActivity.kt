@@ -1,6 +1,13 @@
 package com.il76.playlistmaker
 
+import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -17,11 +24,53 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // назад
         val buttonBack = findViewById<MaterialToolbar>(R.id.activity_search_toolbar)
         buttonBack.setNavigationOnClickListener {
             this.finish()
         }
 
+        // поисковая форма
+        val inputEditText = findViewById<EditText>(R.id.search_edit_text)
+        val clearButton = findViewById<ImageView>(R.id.search_icon_clear)
+        clearButton.setOnClickListener {
+            inputEditText.setText("")
+            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            val view = this.currentFocus
+            inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
+        }
+
+        val searchTextWatcher = object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+                searchValue = s.toString()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        }
+
+        inputEditText.addTextChangedListener(searchTextWatcher)
+    }
+
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
+        val inputEditText = findViewById<EditText>(R.id.search_edit_text)
+        inputEditText.setText(searchValue)
+    }
+
+
+    private var searchValue: String = ""
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SEARCH_QUERY, searchValue)
+    }
+
+    companion object {
+        private const val SEARCH_QUERY = "SEARCH_QUERY"
     }
 }

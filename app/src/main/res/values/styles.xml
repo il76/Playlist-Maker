@@ -1,37 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textFontWeight">500</item>
-        <item name="android:textSize">@dimen/fs_btn</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:paddingHorizontal">100dp</item>
+<!--    Памятка по шрифтам -->
+    <style name="Font100">
+        <item name="android:fontFamily">@font/ys_display_thin</item>
     </style>
-
-    <style name="MainPageButton">
+    <style name="Font300">
+        <item name="android:fontFamily">@font/ys_display_light</item>
+    </style>
+    <style name="Font400">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+    <style name="Font500">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+    <style name="Font600">
+        <item name="android:fontFamily">@font/ys_display_bold</item>
+    </style>
+    <style name="Font700">
+        <item name="android:fontFamily">@font/ys_display_heavy</item>
+    </style>
+<!--    Основные стили -->
+    <style name="HeaderMain" parent="Font400">
+        <item name="android:textSize">@dimen/fs_btn</item>
+        <item name="android:textColor">@color/main_header</item>
+    </style>
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">@dimen/fs_btn</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+    <style name="MainPageButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/size_zero_dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginVertical">@dimen/btn_margin</item>
         <item name="android:textSize">@dimen/fs_btn</item>
+<!--        атрибуты ?attr/colorPrimary я отсюда убрал - кнопки одинаковые в обеих темах. Но в ТЗ написано их использовать - этот момент я не понимаю, зачем так-->
         <item name="android:textColor">@color/black</item>>
         <item name="android:backgroundTint">@color/white</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">@dimen/btn_icon_pdg</item>
+        <item name="iconTint">@color/black</item>
+        <item name="cornerRadius">@dimen/cr_btn</item>
     </style>
-    <style name="settings_switch">
+    <style name="SettingsSwitch" parent="Font400">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">@dimen/pdg_root</item>
         <item name="android:layout_marginHorizontal">@dimen/pdg_root</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingVertical">@dimen/settings_item_container_padding</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>>
         <item name="android:textSize">@dimen/settings_btn_text</item>
         <item name="android:thumbTintMode">screen</item>
+        <item name="thumbTint">@color/switcher_thumb</item>
+        <item name="trackTint">@color/switcher_track</item>
     </style>
-    <style name="settings_row">
+    <style name="SettingsRow" parent="Font400">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:drawableEnd">@drawable/icon_share</item>
         <item name="android:paddingVertical">@dimen/settings_item_container_padding</item>
         <item name="android:paddingHorizontal">@dimen/pdg_root</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>>
         <item name="android:textSize">@dimen/settings_btn_text</item>
-        <item name="android:fontWeight">500</item>
+    </style>
+    <style name="SearchIconClear">
+        <item name="android:layout_width">16dp</item>
+        <item name="android:layout_height">16dp</item>
+        <item name="android:layout_gravity">center|end</item>
+        <item name="android:layout_marginHorizontal">12dp</item>
     </style>
 </resources>

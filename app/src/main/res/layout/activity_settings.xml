@@ -3,69 +3,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background_settings"
-    android:backgroundTint="@color/background_settings"
     android:id="@+id/activity_settings"
+    android:background="@color/background_secondary"
+    android:backgroundTint="@color/background_secondary"
     >
-    <!--
-    Пока оставил старый вариант, он соответствует фигме. Компонент Toolbar не смог подогнать по отступам
-    -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/header_height"
-        android:orientation="horizontal"
-        android:padding="@dimen/header_padding"
-        >
-        <ImageView
-            android:layout_width="@dimen/header_image_layout_size"
-            android:layout_height="@dimen/header_image_layout_size"
-            android:padding="@dimen/header_image_padding"
-            android:src="@drawable/icon_back"
-            android:tooltipText="@string/button_back"
-            android:contentDescription="@string/button_back"
-            android:id="@+id/settings_back_button"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingHorizontal="@dimen/header_text_leftpadding"
-            android:text="@string/button_settings"
-            android:textColor="@color/settings_text"
-            android:gravity="start|center"
-            android:textFontWeight="500"
-            android:textSize="@dimen/fs_btn" />
-    </LinearLayout>
-    <!--
-    Как кастомизировать размер иконки? Она на вид чуть крупнее, чем в фигме
-    -->
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/themeSwitcher"
-        android:text="@string/settings_button_darktheme"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/activity_settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/settings_switch"
-        app:thumbTint="@color/switcher_thumb"
-        app:trackTint="@color/switcher_track"
+        app:navigationIcon="@drawable/icon_back"
+        app:title="@string/button_settings"
+        app:titleTextAppearance="@style/Toolbar.TitleText" />
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/SettingsThemeSwitcher"
+        android:text="@string/settings_button_darktheme"
+        style="@style/SettingsSwitch"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/SettingsShareApp"
         android:text="@string/settings_button_share"
         android:drawableEnd="@drawable/icon_share"
-        style="@style/settings_row"
+        style="@style/SettingsRow"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/SettingsWriteSupport"
         android:text="@string/settings_button_support"
         android:drawableEnd="@drawable/icon_support"
-        style="@style/settings_row"
+        style="@style/SettingsRow"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/SettingsUserAgreement"
         android:text="@string/settings_button_user_agreement"
         android:drawableEnd="@drawable/icon_user_agreement"
-        style="@style/settings_row"
+        style="@style/SettingsRow"
         />
 </LinearLayout>
