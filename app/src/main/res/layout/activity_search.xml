@@ -34,7 +34,7 @@
             android:src="@drawable/icon_search"
             app:tint="@color/search_edit_main" />
 
-        <EditText
+         <EditText
             android:id="@+id/search_edit_text"
             android:layout_width="match_parent"
             android:layout_height="36dp"
@@ -66,8 +66,8 @@
         android:id="@+id/track_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="8dp"
+        android:layout_marginHorizontal="@dimen/pdg_root"
+        android:layout_marginVertical="@dimen/pdg_root"
         >
 
     </androidx.recyclerview.widget.RecyclerView>

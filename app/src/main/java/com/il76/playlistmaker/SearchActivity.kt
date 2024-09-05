@@ -18,7 +18,7 @@ import com.google.android.material.appbar.MaterialToolbar
 
 class SearchActivity : AppCompatActivity() {
 
-    val trackList = arrayListOf<Track>()
+    private val trackList = arrayListOf<Track>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +68,9 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-
+    /**
+     * Наполняем список треков тестовыми значениями
+     */
     private fun fillMockTracks() {
         val track1 = Track()
         with(track1) {
@@ -110,6 +112,14 @@ class SearchActivity : AppCompatActivity() {
             artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
         }
         trackList.add(track5)
+        val track6 = Track()
+        with(track6) {
+            trackName = "Invalid track with a very very very very very very very very very very long name"
+            artistName = "Invalid artist with a  very very very very long name"
+            trackTime = "00:00"
+            artworkUrl100 = ""
+        }
+        trackList.add(track6)
     }
 
 

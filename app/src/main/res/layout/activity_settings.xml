@@ -34,7 +34,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/SettingsUserAgreement"
         android:text="@string/settings_button_user_agreement"
-        android:drawableEnd="@drawable/icon_user_agreement"
+        android:drawableEnd="@drawable/icon_arrow_right"
         style="@style/SettingsRow"
         />
 </LinearLayout>
