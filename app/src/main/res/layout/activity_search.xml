@@ -62,4 +62,13 @@
             android:src="@drawable/icon_clear"
             android:visibility="gone" />
     </FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/track_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp"
+        >
+
+    </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>
