@@ -2,9 +2,7 @@ package com.il76.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -39,6 +37,13 @@ class SearchActivity : AppCompatActivity() {
 
         // поисковая форма
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
+        inputEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                // ВЫПОЛНЯЙТЕ ПОИСКОВЫЙ ЗАПРОС ЗДЕСЬ
+                true
+            }
+            false
+        }
         val clearButton = findViewById<ImageView>(R.id.search_icon_clear)
         clearButton.setOnClickListener {
             inputEditText.setText("")

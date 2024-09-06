@@ -49,6 +49,7 @@
             android:paddingVertical="0dp"
             android:textColor="@color/main_icon_fill"
             android:textColorHint="@color/search_edit_main"
+            android:imeOptions="actionDone"
 
             android:textCursorDrawable="@drawable/eitview_cursor"
             android:textSize="@dimen/settings_btn_text" />
