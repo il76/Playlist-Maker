@@ -1,20 +1,22 @@
 package com.il76.playlistmaker
 
+import com.google.gson.annotations.SerializedName
+
 data class Track (
     /**
      * Название композиции
      */
-    var trackName: String = "",
+    val trackName: String = "",
     /**
      * Имя исполнителя
      */
-    var artistName: String = "",
+    val artistName: String = "",
     /**
      * Продолжительность трека
      */
-    var trackTime: String = "",
+    @SerializedName("trackTimeMillis") val trackTime: String = "",
     /**
      * Ссылка на изображение обложки
      */
-    var artworkUrl100: String = ""
+    val artworkUrl100: String = ""
 )

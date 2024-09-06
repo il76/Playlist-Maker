@@ -2,10 +2,12 @@ package com.il76.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,10 +17,21 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 class SearchActivity : AppCompatActivity() {
 
+    private var searchValue: String = ""
+
     private val trackList = arrayListOf<Track>()
+
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://itunes.apple.com")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,19 +65,12 @@ class SearchActivity : AppCompatActivity() {
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
             val recyclerView = findViewById<RecyclerView>(R.id.track_list)
             recyclerView.removeAllViewsInLayout()
+            recyclerView.isVisible = false
+            val searchError = findViewById<LinearLayout>(R.id.search_error)
+            searchError.isVisible = true
+
         }
 
-//        val searchTextWatcher = object: TextWatcher {
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                clearButton.isVisible = !s.isNullOrEmpty()
-//                searchValue = s.toString()
-//            }
-//
-//            override fun afterTextChanged(s: Editable?) {}
-//        }
-//      inputEditText.addTextChangedListener(searchTextWatcher)
         inputEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
                 clearButton.isVisible = !s.isNullOrEmpty()
@@ -125,9 +131,6 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         inputEditText.setText(searchValue)
     }
-
-
-    private var searchValue: String = ""
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
