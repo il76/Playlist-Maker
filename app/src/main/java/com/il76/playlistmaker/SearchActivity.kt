@@ -12,6 +12,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -43,20 +45,27 @@ class SearchActivity : AppCompatActivity() {
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             val view = this.currentFocus
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
+            val recyclerView = findViewById<RecyclerView>(R.id.track_list)
+            recyclerView.removeAllViewsInLayout()
         }
 
-        val searchTextWatcher = object: TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+//        val searchTextWatcher = object: TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+//
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                clearButton.isVisible = !s.isNullOrEmpty()
+//                searchValue = s.toString()
+//            }
+//
+//            override fun afterTextChanged(s: Editable?) {}
+//        }
+//      inputEditText.addTextChangedListener(searchTextWatcher)
+        inputEditText.addTextChangedListener(
+            onTextChanged = { s, _, _, _ ->
+                clearButton.isVisible = !s.isNullOrEmpty()
                 searchValue = s.toString()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        }
-
-        inputEditText.addTextChangedListener(searchTextWatcher)
+            },
+        )
 
         fillMockTracks()
 
