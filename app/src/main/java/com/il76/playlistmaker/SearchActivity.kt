@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -68,6 +69,10 @@ class SearchActivity : AppCompatActivity() {
             recyclerView.isVisible = false
             val searchError = findViewById<LinearLayout>(R.id.search_error)
             searchError.isVisible = true
+            val searchRefresh = findViewById<Button>(R.id.search_refresh)
+            searchRefresh.isVisible = true // для состояния "сетевая ошибка
+            //searchRefresh.isVisible = false // для состояния "ничего не найдено"
+
 
         }
 
