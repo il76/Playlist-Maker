@@ -3,11 +3,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="settings_text">#FFFFFFFF</color>
-    <color name="background_main">#FF000000</color>
-    <color name="background_settings">#FF000000</color>
+    <color name="background_main">#FF1A1B22</color>
+    <color name="background_secondary">#FF1A1B22</color>
     <color name="switcher_thumb">#FF3772E7</color>
     <color name="switcher_track">#FF5A6887</color>
+    <color name="clear_icon_fill">#FF1A1B22</color>
+    <color name="main_header">#FFFFFFFF</color>
     <color name="main_icon_fill">#FF1A1B22</color>
     <color name="settings_icon_fill">#FFFFFFFF</color>
     <color name="back_icon_fill">#FFFFFFFF</color>
+    <color name="search_edit_main">#FF1A1B22</color>
+    <color name="search_edit_bg">#FFFFFFFF</color>
 </resources>

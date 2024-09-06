@@ -14,4 +14,6 @@
     <dimen name="header_text_leftpadding">12dp</dimen>
     <dimen name="settings_icon_height">24dp</dimen>
     <dimen name="settings_item_container_padding">21dp</dimen>
+    <dimen name="track_cover_size">45dp</dimen>
+    <dimen name="track_cover_border_radius">2</dimen>
 </resources>
