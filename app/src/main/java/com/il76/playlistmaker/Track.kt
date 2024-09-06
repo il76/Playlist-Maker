@@ -1,20 +1,20 @@
 package com.il76.playlistmaker
 
-class Track {
+data class Track (
     /**
      * Название композиции
      */
-    var trackName: String = ""
+    var trackName: String = "",
     /**
      * Имя исполнителя
      */
-    var artistName: String = ""
+    var artistName: String = "",
     /**
      * Продолжительность трека
      */
-    var trackTime: String = ""
+    var trackTime: String = "",
     /**
      * Ссылка на изображение обложки
      */
     var artworkUrl100: String = ""
-}
+)
