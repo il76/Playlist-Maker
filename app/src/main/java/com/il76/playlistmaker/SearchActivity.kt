@@ -204,6 +204,7 @@ class SearchActivity : AppCompatActivity() {
         searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         inputEditText.setText(searchValue)
+        doSearch()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
