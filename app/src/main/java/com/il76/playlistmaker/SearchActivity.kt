@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -24,9 +25,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-import java.text.SimpleDateFormat
-import java.util.Locale
-
 
 class SearchActivity : AppCompatActivity() {
 
@@ -35,7 +33,7 @@ class SearchActivity : AppCompatActivity() {
     private val trackList = arrayListOf<Track>()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com")
+        .baseUrl("https://itun1es.apple.com")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -61,7 +59,12 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val trackApiService = retrofit.create<TrackAPIService>()
                 trackApiService.getTracks(inputEditText.text.toString()).enqueue(object : Callback<TracksList> {
+                    val searchError = findViewById<LinearLayout>(R.id.search_error)
+                    val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
+                    val searchImage = findViewById<ImageView>(R.id.search_error_image)
+                    val searchErrorText = findViewById<TextView>(R.id.search_error_text)
                     override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
+
                         // Получили ответ от сервера
                         if (response.isSuccessful) {
                             // Наш запрос был удачным, получаем наши объекты
@@ -70,12 +73,23 @@ class SearchActivity : AppCompatActivity() {
                             for (item in body?.results!!) {
                                 trackList.add(item)
                             }
+                            if (trackList.size == 0) {
+                                searchError.isVisible = true
+                                searchRefresh.isVisible = false
+                                searchImage.setImageResource(R.drawable.search_nothing_found)
+                                searchErrorText.text = getText(R.string.search_nothing_found)
+                                //searchImage.setImageDrawable(applicationContext.getDrawable(R.drawable.search_nothing_found))
+                            } else {
+                                searchError.isVisible = false
+                            }
                             trackAdapter.notifyDataSetChanged()
-                            Log.d("pm", body?.results.toString())
+
                         } else {
                             // Сервер отклонил наш запрос с ошибкой
-                            val errorJson = response.errorBody()?.string()
-                            Log.e("pm", errorJson.toString())
+                            searchError.isVisible = true
+                            searchRefresh.isVisible = true
+                            searchImage.setImageResource(R.drawable.search_network_error)
+                            searchErrorText.text = getText(R.string.search_network_error)
                         }
                     }
 
@@ -83,13 +97,13 @@ class SearchActivity : AppCompatActivity() {
                         // Не смогли присоединиться к серверу
                         // Выводим ошибку в лог, что-то пошло не так
                         t.printStackTrace()
+                        searchError.isVisible = true
+                        searchRefresh.isVisible = true
+                        searchImage.setImageResource(R.drawable.search_network_error)
+                        searchErrorText.text = getText(R.string.search_network_error)
                     }
                 })
-
-
-
-
-                true
+                // true
             }
             false
         }
@@ -102,13 +116,6 @@ class SearchActivity : AppCompatActivity() {
             val recyclerView = findViewById<RecyclerView>(R.id.track_list)
             recyclerView.removeAllViewsInLayout()
             recyclerView.isVisible = false
-            val searchError = findViewById<LinearLayout>(R.id.search_error)
-            searchError.isVisible = true
-            val searchRefresh = findViewById<Button>(R.id.search_refresh)
-            searchRefresh.isVisible = true // для состояния "сетевая ошибка
-            //searchRefresh.isVisible = false // для состояния "ничего не найдено"
-
-
         }
 
         inputEditText.addTextChangedListener(
@@ -117,15 +124,12 @@ class SearchActivity : AppCompatActivity() {
                 searchValue = s.toString()
             },
         )
-        inputEditText.setText("Hello")
 
         fillMockTracks()
 
         recyclerView = findViewById<RecyclerView>(R.id.track_list)
         trackAdapter = TrackAdapter(trackList)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        //trackAdapter.
-
         recyclerView.adapter = trackAdapter
 
     }

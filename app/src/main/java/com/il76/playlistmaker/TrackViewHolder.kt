@@ -1,7 +1,6 @@
 package com.il76.playlistmaker
 
 import android.content.Context
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
