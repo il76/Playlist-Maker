@@ -2,7 +2,7 @@ package com.il76.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -18,8 +18,14 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class SearchActivity : AppCompatActivity() {
@@ -53,7 +59,36 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                // ВЫПОЛНЯЙТЕ ПОИСКОВЫЙ ЗАПРОС ЗДЕСЬ
+                val trackApiService = retrofit.create<TrackAPIService>()
+                trackApiService.getTracks(inputEditText.text.toString()).enqueue(object : Callback<TracksList> {
+                    override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
+                        // Получили ответ от сервера
+                        if (response.isSuccessful) {
+                            // Наш запрос был удачным, получаем наши объекты
+                            val body = response.body()
+                            trackList.clear()
+                            for (item in body?.results!!) {
+                                trackList.add(item)
+                            }
+                            trackAdapter.notifyDataSetChanged()
+                            Log.d("pm", body?.results.toString())
+                        } else {
+                            // Сервер отклонил наш запрос с ошибкой
+                            val errorJson = response.errorBody()?.string()
+                            Log.e("pm", errorJson.toString())
+                        }
+                    }
+
+                    override fun onFailure(call: Call<TracksList>, t: Throwable) {
+                        // Не смогли присоединиться к серверу
+                        // Выводим ошибку в лог, что-то пошло не так
+                        t.printStackTrace()
+                    }
+                })
+
+
+
+
                 true
             }
             false
@@ -82,16 +117,21 @@ class SearchActivity : AppCompatActivity() {
                 searchValue = s.toString()
             },
         )
+        inputEditText.setText("Hello")
 
         fillMockTracks()
 
-        val recyclerView = findViewById<RecyclerView>(R.id.track_list)
+        recyclerView = findViewById<RecyclerView>(R.id.track_list)
+        trackAdapter = TrackAdapter(trackList)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        //trackAdapter.
 
-        val trackAdapter = TrackAdapter(trackList)
         recyclerView.adapter = trackAdapter
 
     }
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var trackAdapter: TrackAdapter
+
 
     /**
      * Наполняем список треков тестовыми значениями

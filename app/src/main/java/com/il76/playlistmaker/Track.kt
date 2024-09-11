@@ -14,9 +14,9 @@ data class Track (
     /**
      * Продолжительность трека
      */
-    @SerializedName("trackTimeMillis") val trackTime: String = "",
+    @SerializedName("trackTimeMillis") var trackTime: String = "",
     /**
      * Ссылка на изображение обложки
      */
-    val artworkUrl100: String = ""
+    val artworkUrl100: String = "",
 )
