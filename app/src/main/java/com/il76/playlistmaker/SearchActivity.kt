@@ -58,18 +58,23 @@ class SearchActivity : AppCompatActivity() {
                 val searchImage = findViewById<ImageView>(R.id.search_error_image)
                 val searchErrorText = findViewById<TextView>(R.id.search_error_text)
                 when (status) {
-                    ErrorStatus.NONE -> searchError.isVisible = false
+                    ErrorStatus.NONE -> {
+                        searchError.isVisible = false
+                        recyclerView.isVisible = true
+                    }
                     ErrorStatus.ERROR_NET -> {
                         searchError.isVisible = true
                         searchRefresh.isVisible = true
                         searchImage.setImageResource(R.drawable.search_network_error)
                         searchErrorText.text = getText(R.string.search_network_error)
+                        recyclerView.isVisible = false
                     }
                     ErrorStatus.EMPTY_RESULT -> {
                         searchError.isVisible = true
                         searchRefresh.isVisible = false
                         searchImage.setImageResource(R.drawable.search_nothing_found)
                         searchErrorText.text = getText(R.string.search_nothing_found)
+                        recyclerView.isVisible = false
                     }
                 }
             }
