@@ -30,21 +30,7 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         track.text = model.trackName
         artist.text = "" // без этой строчки едет вёрстка в строке с исполнителем
         artist.text = model.artistName
-        // не нашёл готовой встроенной функции
-        // сделано для совместимости с форматом списка по умолчанию.
-        // Потом можно будет удалить, если удалить значения по умолчанию или привести их к Long
-        fun String.isNumericString(): Boolean {
-            val v = toIntOrNull()
-            return when(v) {
-                null -> false
-                else -> true
-            }
-        }
-        if (model.trackTime.isNumericString()) {
-            time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
-        } else {
-            time.text = model.trackTime
-        }
+        time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {
