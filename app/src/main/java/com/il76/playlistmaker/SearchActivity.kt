@@ -2,7 +2,6 @@ package com.il76.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -37,11 +36,74 @@ class SearchActivity : AppCompatActivity() {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var trackAdapter: TrackAdapter
+
     /**
      * Статусы результатов поиска
      */
-    enum class ErrorStatus {
+    private enum class ErrorStatus {
         NONE, ERROR_NET, EMPTY_RESULT
+    }
+
+    private fun doSearch() {
+        val trackApiService = retrofit.create<TrackAPIService>()
+        trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksList> {
+            /**
+             * Отображение или скрытие информации об отсутствии поисковой выдачи
+             */
+            private fun displayError(status: ErrorStatus) {
+                val searchError = findViewById<LinearLayout>(R.id.search_error)
+                val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
+                val searchImage = findViewById<ImageView>(R.id.search_error_image)
+                val searchErrorText = findViewById<TextView>(R.id.search_error_text)
+                when (status) {
+                    ErrorStatus.NONE -> searchError.isVisible = false
+                    ErrorStatus.ERROR_NET -> {
+                        searchError.isVisible = true
+                        searchRefresh.isVisible = true
+                        searchImage.setImageResource(R.drawable.search_network_error)
+                        searchErrorText.text = getText(R.string.search_network_error)
+                    }
+                    ErrorStatus.EMPTY_RESULT -> {
+                        searchError.isVisible = true
+                        searchRefresh.isVisible = false
+                        searchImage.setImageResource(R.drawable.search_nothing_found)
+                        searchErrorText.text = getText(R.string.search_nothing_found)
+                    }
+                }
+            }
+
+            override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
+
+                // Получили ответ от сервера
+                if (response.isSuccessful) {
+                    // Наш запрос был удачным, получаем наши объекты
+                    val body = response.body()
+                    trackList.clear()
+                    for (item in body?.results!!) {
+                        trackList.add(item)
+                    }
+                    if (trackList.size == 0) {
+                        displayError(ErrorStatus.EMPTY_RESULT)
+                    } else {
+                        displayError(ErrorStatus.NONE)
+                    }
+                    trackAdapter.notifyDataSetChanged()
+
+                } else {
+                    // Сервер отклонил наш запрос с ошибкой
+                    displayError(ErrorStatus.ERROR_NET)
+                }
+            }
+
+            override fun onFailure(call: Call<TracksList>, t: Throwable) {
+                // Не смогли присоединиться к серверу
+                // Выводим ошибку в лог, что-то пошло не так
+                t.printStackTrace()
+                displayError(ErrorStatus.ERROR_NET)
+            }
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,64 +125,8 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val trackApiService = retrofit.create<TrackAPIService>()
-                trackApiService.getTracks(inputEditText.text.toString()).enqueue(object : Callback<TracksList> {
-                    /**
-                     * Отображение или скрытие информации об отсутствии поисковой выдачи
-                     */
-                    private fun displayError(status: ErrorStatus) {
-                        val searchError = findViewById<LinearLayout>(R.id.search_error)
-                        val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
-                        val searchImage = findViewById<ImageView>(R.id.search_error_image)
-                        val searchErrorText = findViewById<TextView>(R.id.search_error_text)
-                        when (status) {
-                            ErrorStatus.NONE -> searchError.isVisible = false
-                            ErrorStatus.ERROR_NET -> {
-                                searchError.isVisible = true
-                                searchRefresh.isVisible = true
-                                searchImage.setImageResource(R.drawable.search_network_error)
-                                searchErrorText.text = getText(R.string.search_network_error)
-                            }
-                            ErrorStatus.EMPTY_RESULT -> {
-                                searchError.isVisible = true
-                                searchRefresh.isVisible = false
-                                searchImage.setImageResource(R.drawable.search_nothing_found)
-                                searchErrorText.text = getText(R.string.search_nothing_found)
-                            }
-                        }
-                    }
-
-                    override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
-
-                        // Получили ответ от сервера
-                        if (response.isSuccessful) {
-                            // Наш запрос был удачным, получаем наши объекты
-                            val body = response.body()
-                            trackList.clear()
-                            for (item in body?.results!!) {
-                                trackList.add(item)
-                            }
-                            if (trackList.size == 0) {
-                                displayError(ErrorStatus.EMPTY_RESULT)
-                            } else {
-                                displayError(ErrorStatus.NONE)
-                            }
-                            trackAdapter.notifyDataSetChanged()
-
-                        } else {
-                            // Сервер отклонил наш запрос с ошибкой
-                            displayError(ErrorStatus.ERROR_NET)
-                        }
-                    }
-
-                    override fun onFailure(call: Call<TracksList>, t: Throwable) {
-                        // Не смогли присоединиться к серверу
-                        // Выводим ошибку в лог, что-то пошло не так
-                        t.printStackTrace()
-                        displayError(ErrorStatus.ERROR_NET)
-                    }
-                })
-                // true
+                doSearch()
+                true
             }
             false
         }
@@ -149,10 +155,12 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = trackAdapter
 
-    }
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var trackAdapter: TrackAdapter
+        val retrySearch = findViewById<Button>(R.id.search_error_refresh)
+        retrySearch.setOnClickListener {
+            doSearch()
+        }
 
+    }
 
     /**
      * Наполняем список треков тестовыми значениями
