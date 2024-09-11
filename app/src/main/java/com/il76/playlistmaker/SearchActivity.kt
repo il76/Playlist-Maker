@@ -33,10 +33,16 @@ class SearchActivity : AppCompatActivity() {
     private val trackList = arrayListOf<Track>()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itun1es.apple.com")
+        .baseUrl("https://itunes.apple.com")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+    /**
+     * Статусы результатов поиска
+     */
+    enum class ErrorStatus {
+        NONE, ERROR_NET, EMPTY_RESULT
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +65,31 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val trackApiService = retrofit.create<TrackAPIService>()
                 trackApiService.getTracks(inputEditText.text.toString()).enqueue(object : Callback<TracksList> {
-                    val searchError = findViewById<LinearLayout>(R.id.search_error)
-                    val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
-                    val searchImage = findViewById<ImageView>(R.id.search_error_image)
-                    val searchErrorText = findViewById<TextView>(R.id.search_error_text)
+                    /**
+                     * Отображение или скрытие информации об отсутствии поисковой выдачи
+                     */
+                    private fun displayError(status: ErrorStatus) {
+                        val searchError = findViewById<LinearLayout>(R.id.search_error)
+                        val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
+                        val searchImage = findViewById<ImageView>(R.id.search_error_image)
+                        val searchErrorText = findViewById<TextView>(R.id.search_error_text)
+                        when (status) {
+                            ErrorStatus.NONE -> searchError.isVisible = false
+                            ErrorStatus.ERROR_NET -> {
+                                searchError.isVisible = true
+                                searchRefresh.isVisible = true
+                                searchImage.setImageResource(R.drawable.search_network_error)
+                                searchErrorText.text = getText(R.string.search_network_error)
+                            }
+                            ErrorStatus.EMPTY_RESULT -> {
+                                searchError.isVisible = true
+                                searchRefresh.isVisible = false
+                                searchImage.setImageResource(R.drawable.search_nothing_found)
+                                searchErrorText.text = getText(R.string.search_nothing_found)
+                            }
+                        }
+                    }
+
                     override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
 
                         // Получили ответ от сервера
@@ -74,22 +101,15 @@ class SearchActivity : AppCompatActivity() {
                                 trackList.add(item)
                             }
                             if (trackList.size == 0) {
-                                searchError.isVisible = true
-                                searchRefresh.isVisible = false
-                                searchImage.setImageResource(R.drawable.search_nothing_found)
-                                searchErrorText.text = getText(R.string.search_nothing_found)
-                                //searchImage.setImageDrawable(applicationContext.getDrawable(R.drawable.search_nothing_found))
+                                displayError(ErrorStatus.EMPTY_RESULT)
                             } else {
-                                searchError.isVisible = false
+                                displayError(ErrorStatus.NONE)
                             }
                             trackAdapter.notifyDataSetChanged()
 
                         } else {
                             // Сервер отклонил наш запрос с ошибкой
-                            searchError.isVisible = true
-                            searchRefresh.isVisible = true
-                            searchImage.setImageResource(R.drawable.search_network_error)
-                            searchErrorText.text = getText(R.string.search_network_error)
+                            displayError(ErrorStatus.ERROR_NET)
                         }
                     }
 
@@ -97,10 +117,7 @@ class SearchActivity : AppCompatActivity() {
                         // Не смогли присоединиться к серверу
                         // Выводим ошибку в лог, что-то пошло не так
                         t.printStackTrace()
-                        searchError.isVisible = true
-                        searchRefresh.isVisible = true
-                        searchImage.setImageResource(R.drawable.search_network_error)
-                        searchErrorText.text = getText(R.string.search_network_error)
+                        displayError(ErrorStatus.ERROR_NET)
                     }
                 })
                 // true
