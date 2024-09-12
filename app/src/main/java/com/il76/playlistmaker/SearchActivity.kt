@@ -45,39 +45,42 @@ class SearchActivity : AppCompatActivity() {
     private enum class ErrorStatus {
         NONE, ERROR_NET, EMPTY_RESULT
     }
-
+    /**
+     * Отображение или скрытие информации об отсутствии поисковой выдачи
+     */
+    private fun displayError(status: ErrorStatus) {
+        val searchError = findViewById<LinearLayout>(R.id.search_error)
+        val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
+        val searchImage = findViewById<ImageView>(R.id.search_error_image)
+        val searchErrorText = findViewById<TextView>(R.id.search_error_text)
+        when (status) {
+            ErrorStatus.NONE -> {
+                searchError.isVisible = false
+                recyclerView.isVisible = true
+            }
+            ErrorStatus.ERROR_NET -> {
+                searchError.isVisible = true
+                searchRefresh.isVisible = true
+                searchImage.setImageResource(R.drawable.search_network_error)
+                searchErrorText.text = getText(R.string.search_network_error)
+                recyclerView.isVisible = false
+            }
+            ErrorStatus.EMPTY_RESULT -> {
+                searchError.isVisible = true
+                searchRefresh.isVisible = false
+                searchImage.setImageResource(R.drawable.search_nothing_found)
+                searchErrorText.text = getText(R.string.search_nothing_found)
+                recyclerView.isVisible = false
+            }
+        }
+    }
     private fun doSearch() {
+        if (searchValue.isNullOrEmpty()) {
+            return
+        }
         val trackApiService = retrofit.create<TrackAPIService>()
         trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksList> {
-            /**
-             * Отображение или скрытие информации об отсутствии поисковой выдачи
-             */
-            private fun displayError(status: ErrorStatus) {
-                val searchError = findViewById<LinearLayout>(R.id.search_error)
-                val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
-                val searchImage = findViewById<ImageView>(R.id.search_error_image)
-                val searchErrorText = findViewById<TextView>(R.id.search_error_text)
-                when (status) {
-                    ErrorStatus.NONE -> {
-                        searchError.isVisible = false
-                        recyclerView.isVisible = true
-                    }
-                    ErrorStatus.ERROR_NET -> {
-                        searchError.isVisible = true
-                        searchRefresh.isVisible = true
-                        searchImage.setImageResource(R.drawable.search_network_error)
-                        searchErrorText.text = getText(R.string.search_network_error)
-                        recyclerView.isVisible = false
-                    }
-                    ErrorStatus.EMPTY_RESULT -> {
-                        searchError.isVisible = true
-                        searchRefresh.isVisible = false
-                        searchImage.setImageResource(R.drawable.search_nothing_found)
-                        searchErrorText.text = getText(R.string.search_nothing_found)
-                        recyclerView.isVisible = false
-                    }
-                }
-            }
+
 
             override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
 
@@ -141,15 +144,16 @@ class SearchActivity : AppCompatActivity() {
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             val view = this.currentFocus
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
-            val recyclerView = findViewById<RecyclerView>(R.id.track_list)
-            recyclerView.removeAllViewsInLayout()
-            recyclerView.isVisible = false
+            displayError(ErrorStatus.NONE)
         }
 
         inputEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
                 clearButton.isVisible = !s.isNullOrEmpty()
                 searchValue = s.toString()
+                if (s.isNullOrEmpty()) {
+                    displayError(ErrorStatus.NONE)
+                }
             },
         )
 

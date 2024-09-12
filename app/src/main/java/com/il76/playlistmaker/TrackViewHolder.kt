@@ -30,7 +30,12 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         track.text = model.trackName
         artist.text = "" // без этой строчки едет вёрстка в строке с исполнителем
         artist.text = model.artistName
-        time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
+        if (!model.trackTime.isNullOrEmpty()) {
+            time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
+        } else {
+            time.text = ""
+        }
+
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {
