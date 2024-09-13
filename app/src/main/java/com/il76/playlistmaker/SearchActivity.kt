@@ -145,6 +145,8 @@ class SearchActivity : AppCompatActivity() {
             val view = this.currentFocus
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
             displayError(ErrorStatus.NONE)
+            trackList.clear()
+            trackAdapter.notifyDataSetChanged()
         }
 
         inputEditText.addTextChangedListener(
