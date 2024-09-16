@@ -28,8 +28,8 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
             .into(cover)
 
         track.text = model.trackName
-        artist.text = "" // без этой строчки едет вёрстка в строке с исполнителем
         artist.text = model.artistName
+        artist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем. В эмуляторе норм, на реальном устройстве с 31 API без неё едет вёрстка
         if (!model.trackTime.isNullOrEmpty()) {
             time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
         } else {
