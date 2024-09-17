@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val cover: ImageView = itemView.findViewById(R.id.track_list_cover)
@@ -27,7 +29,13 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
         track.text = model.trackName
         artist.text = model.artistName
-        time.text = model.trackTime
+        artist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем. В эмуляторе норм, на реальном устройстве с 31 API без неё едет вёрстка
+        if (!model.trackTime.isNullOrEmpty()) {
+            time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
+        } else {
+            time.text = ""
+        }
+
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {

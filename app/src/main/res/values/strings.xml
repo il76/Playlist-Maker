@@ -22,5 +22,8 @@
     <string name="track_title_placeholder">Название трека</string>
     <string name="track_artist_placeholder">Исполнитель</string>
     <string name="track_time_placeholder">00:00</string>
+    <string name="search_nothing_found">Ничего не нашлось</string>
+    <string name="search_network_error">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="search_refresh">Обновить</string>
 
 </resources>
