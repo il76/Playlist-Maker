@@ -22,15 +22,13 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
             .load(model.artworkUrl100)
             .placeholder(R.drawable.search_cover_placeholder)
             .centerInside()
-            //R.dimen.track_cover_border_radius.toFloat() - не работает?
-            // Изображение полностью скругляется вне зависимости от того, что туда писать и с какой единицей измерения
-            .transform(RoundedCorners(dpToPx(2f, itemView.context)))
+            .transform(RoundedCorners(dpToPx(itemView.context.resources.getFloat(R.dimen.track_cover_border_radius), itemView.context)))
             .into(cover)
 
         track.text = model.trackName
         artist.text = model.artistName
-        artist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем. В эмуляторе норм, на реальном устройстве с 31 API без неё едет вёрстка
-        if (!model.trackTime.isNullOrEmpty()) {
+        artist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем
+        if (model.trackTime.isNotEmpty()) {
             time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
         } else {
             time.text = ""
