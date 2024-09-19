@@ -73,14 +73,9 @@ class SettingsActivity : AppCompatActivity() {
 
         //обрабатываем переключатель темы
         val switcher = findViewById<SwitchMaterial>(R.id.SettingsThemeSwitcher)
+        switcher.isChecked = (applicationContext as App).darkTheme
         switcher.setOnCheckedChangeListener {_, isChecked ->
-            if (isChecked) {
-                //setTheme(R.style.)
-                // переключаем системную тему
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
+            (applicationContext as App).switchTheme(isChecked)
         }
     }
 
