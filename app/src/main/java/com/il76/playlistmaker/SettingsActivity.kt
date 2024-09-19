@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
+import com.il76.playlistmaker.App.Prefs.DARK_THEME_ENABLED
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +76,10 @@ class SettingsActivity : AppCompatActivity() {
         val switcher = findViewById<SwitchMaterial>(R.id.SettingsThemeSwitcher)
         switcher.isChecked = (applicationContext as App).darkTheme
         switcher.setOnCheckedChangeListener {_, isChecked ->
-            (applicationContext as App).switchTheme(isChecked)
+            with((applicationContext as App)) {
+                switchTheme(isChecked)
+                sharedPrefs.edit().putBoolean(DARK_THEME_ENABLED, isChecked).apply()
+            }
         }
     }
 
