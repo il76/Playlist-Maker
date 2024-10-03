@@ -19,4 +19,8 @@ data class Track (
      * Ссылка на изображение обложки
      */
     val artworkUrl100: String = "",
+    /**
+     * Внутренний id трека
+     */
+    val trackId: Int = 0
 )

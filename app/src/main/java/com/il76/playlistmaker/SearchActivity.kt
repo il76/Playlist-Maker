@@ -171,6 +171,13 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
+    fun toggleSearchHistory(visibility: Boolean) {
+        val historyTitle = findViewById<TextView>(R.id.search_history_title)
+        historyTitle.isVisible = visibility
+        val historyClear = findViewById<Button>(R.id.search_history_clear)
+        historyClear.isVisible = visibility
+    }
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
