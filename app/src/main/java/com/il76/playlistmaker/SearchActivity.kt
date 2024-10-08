@@ -38,6 +38,7 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
+    private lateinit var historyClear: Button
 
     /**
      * Статусы результатов поиска
@@ -138,6 +139,7 @@ class SearchActivity : AppCompatActivity() {
             }
             false
         }
+
         val clearButton = findViewById<ImageView>(R.id.search_icon_clear)
         clearButton.setOnClickListener {
             inputEditText.setText("")
@@ -148,9 +150,14 @@ class SearchActivity : AppCompatActivity() {
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
         }
-
+        // обработчик фокуса на текстовое поле. Включаем кнопки только если есть фокус и пустой текст
+        inputEditText.setOnFocusChangeListener { _, hasFocus ->
+            toggleSearchHistory(hasFocus && inputEditText.text.isNullOrEmpty())
+        }
         inputEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
+                // Включаем историю при пустом тексте и отключаем при непустом
+                toggleSearchHistory(s.isNullOrEmpty())
                 clearButton.isVisible = !s.isNullOrEmpty()
                 searchValue = s.toString()
                 if (s.isNullOrEmpty()) {
@@ -168,14 +175,26 @@ class SearchActivity : AppCompatActivity() {
         retrySearch.setOnClickListener {
             doSearch()
         }
+        historyClear = findViewById<Button>(R.id.search_history_clear)
+        historyClear.setOnClickListener {
+            App.instance.trackListHistory.clear()
+            toggleSearchHistory(false)
+        }
 
     }
 
-    fun toggleSearchHistory(visibility: Boolean) {
+    /**
+     * Переключатель видимости заголовка истории поиска и кнопки очистки
+     */
+    private fun toggleSearchHistory(visibility: Boolean) {
+        var isVisible = visibility
+        if (App.instance.trackListHistory.isEmpty()) {
+            isVisible = false // нет истории - нет истории
+        }
         val historyTitle = findViewById<TextView>(R.id.search_history_title)
-        historyTitle.isVisible = visibility
-        val historyClear = findViewById<Button>(R.id.search_history_clear)
-        historyClear.isVisible = visibility
+        historyTitle.isVisible = isVisible
+
+        historyClear.isVisible = isVisible
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
