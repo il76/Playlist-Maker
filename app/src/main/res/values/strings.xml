@@ -27,5 +27,6 @@
     <string name="search_refresh">Обновить</string>
     <string name="search_history_title">Вы искали</string>
     <string name="search_history_clear">Очистить историю</string>
+    <string name="no_track_id">Нет id у трека</string>
 
 </resources>

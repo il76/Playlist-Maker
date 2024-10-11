@@ -34,8 +34,11 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         }
 
         itemView.setOnClickListener {
-
-            Toast.makeText(itemView.context, model.trackId.toString(), Toast.LENGTH_SHORT).show()
+            if (model.trackId > 0) {
+                App.instance.putToHistory(model)
+            } else {
+                Toast.makeText(itemView.context, itemView.context.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
+            }
         }
 
     }

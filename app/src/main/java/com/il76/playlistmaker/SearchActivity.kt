@@ -1,6 +1,7 @@
 package com.il76.playlistmaker
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -35,6 +36,8 @@ class SearchActivity : AppCompatActivity() {
         .baseUrl("https://itunes.apple.com")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
+    // private lateinit var spListener: SharedPreferences.OnSharedPreferenceChangeListener
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
@@ -76,7 +79,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
     private fun doSearch() {
-        if (searchValue.isNullOrEmpty()) {
+        if (searchValue.isEmpty()) {
             return
         }
         val trackApiService = retrofit.create<TrackAPIService>()
@@ -149,6 +152,7 @@ class SearchActivity : AppCompatActivity() {
             displayError(ErrorStatus.NONE)
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
+            toggleSearchHistory(true)
         }
         // обработчик фокуса на текстовое поле. Включаем кнопки только если есть фокус и пустой текст
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
@@ -177,10 +181,25 @@ class SearchActivity : AppCompatActivity() {
         }
         historyClear = findViewById<Button>(R.id.search_history_clear)
         historyClear.setOnClickListener {
-            App.instance.trackListHistory.clear()
+            App.instance.clearHistory()
+            trackList.clear()
             toggleSearchHistory(false)
+            trackAdapter.notifyDataSetChanged()
         }
+        toggleSearchHistory(false)
 
+//        Пока вроде он не нужен
+//        spListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+//            if (key == App.TRACKS_SEARCH_HISTORY) {
+//                val fact = App.instance.sharedPrefs?.getString(App.TRACKS_SEARCH_HISTORY, null)
+//                if (fact != null) {
+//                    adapter.facts.add(0, createFactFromJson(fact))
+//                    adapter.notifyItemInserted(0)
+//                }
+//            }
+//        }
+
+//        App.instance.sharedPrefs.registerOnSharedPreferenceChangeListener(spListener)
     }
 
     /**
@@ -195,6 +214,16 @@ class SearchActivity : AppCompatActivity() {
         historyTitle.isVisible = isVisible
 
         historyClear.isVisible = isVisible
+
+        if (isVisible && App.instance.trackListHistory.size > 0) {
+            trackList.clear()
+            trackList.addAll(App.instance.trackListHistory.reversed())
+            trackAdapter.notifyDataSetChanged()
+        } else if (!isVisible && trackList.size > 0) {
+//            trackList.clear()
+//            trackAdapter.notifyDataSetChanged()
+        }
+
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
