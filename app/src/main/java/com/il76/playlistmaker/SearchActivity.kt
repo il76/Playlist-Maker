@@ -188,18 +188,6 @@ class SearchActivity : AppCompatActivity() {
         }
         toggleSearchHistory(false)
 
-//        Пока вроде он не нужен
-//        spListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-//            if (key == App.TRACKS_SEARCH_HISTORY) {
-//                val fact = App.instance.sharedPrefs?.getString(App.TRACKS_SEARCH_HISTORY, null)
-//                if (fact != null) {
-//                    adapter.facts.add(0, createFactFromJson(fact))
-//                    adapter.notifyItemInserted(0)
-//                }
-//            }
-//        }
-
-//        App.instance.sharedPrefs.registerOnSharedPreferenceChangeListener(spListener)
     }
 
     /**

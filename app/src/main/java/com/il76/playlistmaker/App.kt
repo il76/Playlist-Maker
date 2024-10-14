@@ -22,14 +22,6 @@ class App : Application() {
 
     lateinit var sharedPrefs: SharedPreferences
 
-    companion object {
-        const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
-        const val DARK_THEME_ENABLED = "dark_theme_enabled"
-        const val TRACKS_SEARCH_HISTORY = "tracks_search_history"
-        lateinit var instance: App
-            private set
-    }
-
     override fun onCreate() {
         super.onCreate()
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
@@ -49,5 +41,13 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+    }
+
+    companion object {
+        const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
+        const val DARK_THEME_ENABLED = "dark_theme_enabled"
+        const val TRACKS_SEARCH_HISTORY = "tracks_search_history"
+        lateinit var instance: App
+            private set
     }
 }
