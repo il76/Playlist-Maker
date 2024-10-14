@@ -10,7 +10,6 @@ class TrackAdapter(private val tracks: ArrayList<Track>) : RecyclerView.Adapter<
     private lateinit var clickListener:OnItemClickListener
 
     interface OnItemClickListener{
-        // inter face for auto loading itemClick and longItemClick
         fun onItemClick(position: Int, view: View)
     }
 

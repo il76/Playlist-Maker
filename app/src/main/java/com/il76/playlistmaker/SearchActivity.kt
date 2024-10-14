@@ -1,7 +1,6 @@
 package com.il76.playlistmaker
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -40,8 +39,6 @@ class SearchActivity : AppCompatActivity() {
         .baseUrl("https://itunes.apple.com")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-
-    // private lateinit var spListener: SharedPreferences.OnSharedPreferenceChangeListener
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
@@ -183,6 +180,11 @@ class SearchActivity : AppCompatActivity() {
                 override fun onItemClick(position: Int, view: View) {
                     if (trackList[position].trackId > 0) {
                         trackSearchHistory.addElement(trackList[position])
+                        if (historyClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
+                            trackList.clear()
+                            trackList.addAll(trackSearchHistory.trackListHistory.reversed())
+                            trackAdapter.notifyDataSetChanged()
+                        }
                     } else {
                         Toast.makeText(applicationContext, applicationContext.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
                     }
