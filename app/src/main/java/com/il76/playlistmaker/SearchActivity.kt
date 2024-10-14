@@ -208,8 +208,8 @@ class SearchActivity : AppCompatActivity() {
             trackList.addAll(App.instance.trackListHistory.reversed())
             trackAdapter.notifyDataSetChanged()
         } else if (!isVisible && trackList.size > 0) {
-//            trackList.clear()
-//            trackAdapter.notifyDataSetChanged()
+            trackList.clear()
+            trackAdapter.notifyDataSetChanged()
         }
 
     }
