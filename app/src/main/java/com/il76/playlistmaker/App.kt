@@ -8,18 +8,6 @@ class App : Application() {
 
     var darkTheme = false
 
-    val trackListHistory = arrayListOf<Track>()
-
-    lateinit var trackSearchHistory: TrackSearchHistory
-
-    fun clearHistory() {
-        trackSearchHistory.clear()
-    }
-
-    fun putToHistory(track: Track) {
-        trackSearchHistory.addElement(track)
-    }
-
     lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreate() {
@@ -28,8 +16,6 @@ class App : Application() {
         darkTheme = sharedPrefs.getBoolean(DARK_THEME_ENABLED,AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)
         switchTheme(darkTheme)
         instance = this //чтобы обращаться к свойствам класса снаружи
-        trackSearchHistory = TrackSearchHistory(sharedPrefs)
-        trackSearchHistory.loadFromPreferences()
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {

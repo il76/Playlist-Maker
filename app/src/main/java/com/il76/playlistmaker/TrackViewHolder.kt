@@ -10,11 +10,16 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+class TrackViewHolder(itemView: View, listener: TrackAdapter.OnItemClickListener): RecyclerView.ViewHolder(itemView) {
     private val cover: ImageView = itemView.findViewById(R.id.track_list_cover)
     private val track: TextView = itemView.findViewById(R.id.track_list_track)
     private val artist: TextView = itemView.findViewById(R.id.track_list_artist)
     private val time: TextView = itemView.findViewById(R.id.track_list_time)
+    init {
+        itemView.setOnClickListener {
+            listener.onItemClick(adapterPosition, itemView)
+        }
+    }
 
     fun bind(model: Track) {
         Glide.with(itemView)
@@ -32,14 +37,5 @@ class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         } else {
             time.text = ""
         }
-
-        itemView.setOnClickListener {
-            if (model.trackId > 0) {
-                App.instance.putToHistory(model)
-            } else {
-                Toast.makeText(itemView.context, itemView.context.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
-            }
-        }
-
     }
 }

@@ -3,6 +3,7 @@ package com.il76.playlistmaker
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -10,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -31,6 +33,8 @@ class SearchActivity : AppCompatActivity() {
     private var searchValue: String = ""
 
     private val trackList = arrayListOf<Track>()
+
+    private lateinit var trackSearchHistory: TrackSearchHistory
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com")
@@ -78,6 +82,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun doSearch() {
         if (searchValue.isEmpty()) {
             return
@@ -127,6 +132,7 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        trackSearchHistory = TrackSearchHistory(App.instance.sharedPrefs)
         // назад
         val buttonBack = findViewById<MaterialToolbar>(R.id.activity_search_toolbar)
         buttonBack.setNavigationOnClickListener {
@@ -172,6 +178,17 @@ class SearchActivity : AppCompatActivity() {
 
         recyclerView = findViewById<RecyclerView>(R.id.track_list)
         trackAdapter = TrackAdapter(trackList)
+        trackAdapter.onClickListener(
+            object : TrackAdapter.OnItemClickListener {
+                override fun onItemClick(position: Int, view: View) {
+                    if (trackList[position].trackId > 0) {
+                        trackSearchHistory.addElement(trackList[position])
+                    } else {
+                        Toast.makeText(applicationContext, applicationContext.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = trackAdapter
 
@@ -181,7 +198,7 @@ class SearchActivity : AppCompatActivity() {
         }
         historyClear = findViewById<Button>(R.id.search_history_clear)
         historyClear.setOnClickListener {
-            App.instance.clearHistory()
+            trackSearchHistory.clear()
             trackList.clear()
             toggleSearchHistory(false)
             trackAdapter.notifyDataSetChanged()
@@ -195,7 +212,7 @@ class SearchActivity : AppCompatActivity() {
      */
     private fun toggleSearchHistory(visibility: Boolean) {
         var isVisible = visibility
-        if (App.instance.trackListHistory.isEmpty()) {
+        if (trackSearchHistory.trackListHistory.isEmpty()) {
             isVisible = false // нет истории - нет истории
         }
         val historyTitle = findViewById<TextView>(R.id.search_history_title)
@@ -203,9 +220,9 @@ class SearchActivity : AppCompatActivity() {
 
         historyClear.isVisible = isVisible
 
-        if (isVisible && App.instance.trackListHistory.size > 0) {
+        if (isVisible && trackSearchHistory.trackListHistory.size > 0) {
             trackList.clear()
-            trackList.addAll(App.instance.trackListHistory.reversed())
+            trackList.addAll(trackSearchHistory.trackListHistory.reversed())
             trackAdapter.notifyDataSetChanged()
         } else if (!isVisible && trackList.size > 0) {
             trackList.clear()

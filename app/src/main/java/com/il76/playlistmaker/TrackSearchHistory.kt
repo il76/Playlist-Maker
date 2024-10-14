@@ -1,20 +1,23 @@
 package com.il76.playlistmaker
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.il76.playlistmaker.App.Companion.TRACKS_SEARCH_HISTORY
 
 data class TrackSearchHistory(val sp: SharedPreferences) {
-
-    private fun saveToPreferences() {
-        sp.edit().putString(TRACKS_SEARCH_HISTORY, Gson().toJson(App.instance.trackListHistory)).apply()
+    val trackListHistory = arrayListOf<Track>()
+    init {
+        loadFromPreferences()
     }
 
-    fun loadFromPreferences() {
+
+    private fun saveToPreferences() {
+        sp.edit().putString(TRACKS_SEARCH_HISTORY, Gson().toJson(trackListHistory)).apply()
+    }
+
+    private fun loadFromPreferences() {
         val json = sp.getString(TRACKS_SEARCH_HISTORY,null)
-        Log.i("pls", json.toString())
         val itemType = object : TypeToken<ArrayList<Track>>() {}.type
 
         val arrayList: ArrayList<Track> = if (json != null) {
@@ -22,16 +25,16 @@ data class TrackSearchHistory(val sp: SharedPreferences) {
         } else {
             ArrayList()
         }
-        App.instance.trackListHistory.addAll(arrayList)
+        trackListHistory.addAll(arrayList)
     }
 
     fun clear() {
-        App.instance.trackListHistory.clear()
+        trackListHistory.clear()
         saveToPreferences()
     }
 
     fun addElement(track: Track) {
-        val iterator = App.instance.trackListHistory.iterator()
+        val iterator = trackListHistory.iterator()
         // ищем элемент в истории, если такой есть - удаляем, чтобы потом добавить
         while (iterator.hasNext()) {
             val element = iterator.next()
@@ -39,9 +42,9 @@ data class TrackSearchHistory(val sp: SharedPreferences) {
                 iterator.remove()
             }
         }
-        App.instance.trackListHistory.add(track)
-        if (App.instance.trackListHistory.size > 10) {
-            App.instance.trackListHistory.removeAt(0)
+        trackListHistory.add(track)
+        if (trackListHistory.size > 10) {
+            trackListHistory.removeAt(0)
         }
         saveToPreferences()
     }
