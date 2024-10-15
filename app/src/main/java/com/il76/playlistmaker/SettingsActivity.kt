@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
+import com.il76.playlistmaker.App.Companion.DARK_THEME_ENABLED
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,13 +74,11 @@ class SettingsActivity : AppCompatActivity() {
 
         //обрабатываем переключатель темы
         val switcher = findViewById<SwitchMaterial>(R.id.SettingsThemeSwitcher)
+        switcher.isChecked = (applicationContext as App).darkTheme
         switcher.setOnCheckedChangeListener {_, isChecked ->
-            if (isChecked) {
-                //setTheme(R.style.)
-                // переключаем системную тему
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            with((applicationContext as App)) {
+                switchTheme(isChecked)
+                sharedPrefs.edit().putBoolean(DARK_THEME_ENABLED, isChecked).apply()
             }
         }
     }
