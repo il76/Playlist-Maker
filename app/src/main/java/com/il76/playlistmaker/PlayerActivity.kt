@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 
 class PlayerActivity : AppCompatActivity() {
@@ -22,6 +23,11 @@ class PlayerActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_player_toolbar)
+        buttonBack.setNavigationOnClickListener {
+            this.finish()
         }
 
         val tvJson = findViewById<TextView>(R.id.jsonData)
