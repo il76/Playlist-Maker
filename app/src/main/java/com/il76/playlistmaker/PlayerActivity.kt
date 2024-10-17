@@ -33,7 +33,7 @@ class PlayerActivity : AppCompatActivity() {
         track = Gson().fromJson(json, Track::class.java)
         tvJson.text =
             "Трек: "+track.trackName + "\nИсполнитель: "+track.artistName + "\nВремя: " + track.trackTime +
-                    "\nОбложка: "+track.artworkUrl100 + "\nid: "+track.trackId + "\nАльбом: " + track.collectionName +
+                    "\nОбложка: "+track.getPoster(false) + "\nid: "+track.trackId + "\nАльбом: " + track.collectionName +
                     "\nГод: "+track.releaseDate + "\nЖанр: "+track.primaryGenreName + "\nСтрана: " + track.country
 
 

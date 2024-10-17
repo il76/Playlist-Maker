@@ -39,4 +39,12 @@ data class Track (
      * Страна исполнителя
      */
     val country: String = ""
-)
+) {
+    fun getPoster(thumb: Boolean = true): String {
+        if (thumb) {
+            return artworkUrl100
+        } else {
+            return artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
+        }
+    }
+}
