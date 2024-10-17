@@ -2,12 +2,14 @@ package com.il76.playlistmaker
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,9 +32,27 @@ class MainActivity : AppCompatActivity() {
         buttonSearch.setOnClickListener(btnClickListener)
 
         // лямбда
+//        val buttonMedia = findViewById<Button>(R.id.button_media)
+//        buttonMedia.setOnClickListener {
+//            val intent = Intent(this, MediaActivity::class.java)
+//            startActivity(intent)
+//        }
         val buttonMedia = findViewById<Button>(R.id.button_media)
         buttonMedia.setOnClickListener {
-            val intent = Intent(this, MediaActivity::class.java)
+            val intent = Intent(this, PlayerActivity::class.java)
+            val track = Track(
+                "Stayin' Alive",
+                "Bee Gees",
+                "4:10",
+                "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg",
+                123,
+                "Альбом",
+                "2004",
+                "Рок-н-ролл",
+                "Великобритания"
+                )
+            val json = Gson().toJson(track)
+            intent.putExtra("track", json)
             startActivity(intent)
         }
         // открываем настройки

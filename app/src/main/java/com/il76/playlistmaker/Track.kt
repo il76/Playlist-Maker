@@ -22,5 +22,21 @@ data class Track (
     /**
      * Внутренний id трека
      */
-    val trackId: Int = 0
+    val trackId: Int = 0,
+    /**
+     * Название альбома
+     */
+    val collectionName: String = "",
+    /**
+     * Год релиза трека
+     */
+    val releaseDate: String = "",
+    /**
+     * Жанр трека
+     */
+    val primaryGenreName: String = "",
+    /**
+     * Страна исполнителя
+     */
+    val country: String = ""
 )
