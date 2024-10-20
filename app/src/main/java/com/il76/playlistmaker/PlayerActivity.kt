@@ -47,6 +47,9 @@ class PlayerActivity : AppCompatActivity() {
         tvArtist.text = track.artistName
         val tvTime = findViewById<TextView>(R.id.trackTime)
         tvTime.text = track.getTime()
+        val tvTimeCurrent = findViewById<TextView>(R.id.trackCurrentTime)
+        tvTimeCurrent.text = track.getTime()
+
         val tvCollectionName = findViewById<TextView>(R.id.trackCollectionTitle)
         tvCollectionName.text = track.collectionName
         val tvYear = findViewById<TextView>(R.id.trackYear)

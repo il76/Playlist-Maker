@@ -5,6 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    android:backgroundTint="@color/background_secondary"
     tools:context=".PlayerActivity">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -42,6 +44,9 @@
         android:layout_marginBottom="12dp"
         tools:text="Трек"
         android:textSize="22sp"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/settings_text"
+        android:fontFamily="@font/ys_display_medium"
         app:layout_constraintTop_toBottomOf="@id/trackPoster" />
 
     <TextView
@@ -51,7 +56,10 @@
         android:layout_marginHorizontal="24dp"
         tools:text="Исполнитель"
         android:textSize="14sp"
+        android:textColor="@color/settings_text"
+        android:fontFamily="@font/ys_display_medium"
         app:layout_constraintTop_toBottomOf="@id/trackName"
+        android:layout_marginTop="12dp"
         tools:layout_editor_absoluteX="24dp" />
 
     <ImageView
@@ -73,6 +81,7 @@
         android:layout_marginTop="28dp"
         android:contentDescription="Воспроизвести"
         android:src="@drawable/icon_play"
+        android:textColor="@color/settings_text"
         app:layout_constraintEnd_toStartOf="@+id/buttonLike"
         app:layout_constraintStart_toEndOf="@+id/buttonPlaylistAdd"
         app:layout_constraintTop_toBottomOf="@+id/artistName" />
@@ -95,6 +104,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         tools:text="00:00"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize="14sp"
+        android:textColor="@color/player_info_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonPlay" />
