@@ -46,14 +46,15 @@ class PlayerActivity : AppCompatActivity() {
         val tvArtist = findViewById<TextView>(R.id.artistName)
         tvArtist.text = track.artistName
         val tvTime = findViewById<TextView>(R.id.trackTime)
-        tvTime.text = track.trackTime
-//        val tvJson = findViewById<TextView>(R.id.jsonData)
-
-//        tvJson.text =
-//            "Трек: "+track.trackName + "\nИсполнитель: "+track.artistName + "\nВремя: " + track.trackTime +
-//                    "\nОбложка: "+track.getPoster(false) + "\nid: "+track.trackId + "\nАльбом: " + track.collectionName +
-//                    "\nГод: "+track.releaseDate + "\nЖанр: "+track.primaryGenreName + "\nСтрана: " + track.country
-
+        tvTime.text = track.getTime()
+        val tvCollectionName = findViewById<TextView>(R.id.trackCollectionName)
+        tvCollectionName.text = track.collectionName
+        val tvYear = findViewById<TextView>(R.id.trackYear)
+        tvYear.text = track.getReleaseYear()
+        val tvGenre = findViewById<TextView>(R.id.trackGenre)
+        tvGenre.text = track.primaryGenreName
+        val tvCountry = findViewById<TextView>(R.id.trackCountry)
+        tvCountry.text = track.country
 
     }
 }

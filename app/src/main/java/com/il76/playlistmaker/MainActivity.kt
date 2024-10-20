@@ -43,11 +43,11 @@ class MainActivity : AppCompatActivity() {
             val track = Track(
                 "Stayin' Alive",
                 "Bee Gees",
-                "4:10",
+                "322223",
                 "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg",
                 123,
                 "Альбом",
-                "2004",
+                "2017-06-23T12:00:00Z",
                 "Рок-н-ролл",
                 "Великобритания"
                 )

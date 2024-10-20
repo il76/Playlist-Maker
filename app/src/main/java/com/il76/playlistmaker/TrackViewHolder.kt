@@ -31,10 +31,6 @@ class TrackViewHolder(itemView: View, listener: TrackAdapter.OnItemClickListener
         track.text = model.trackName
         artist.text = model.artistName
         artist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем
-        if (model.trackTime.isNotEmpty()) {
-            time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime.toLong())
-        } else {
-            time.text = ""
-        }
+        time.text = model.getTime()
     }
 }

@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="12dp"
-        android:text="Трек"
+        tools:text="Трек"
         android:textSize="22sp"
         app:layout_constraintTop_toBottomOf="@id/trackPoster" />
 
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:text="Исполнитель"
+        tools:text="Исполнитель"
         android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@id/trackName"
         tools:layout_editor_absoluteX="24dp" />
@@ -90,13 +90,70 @@
         app:layout_constraintTop_toBottomOf="@+id/artistName" />
 
     <TextView
-        android:id="@+id/trackTime"
+        android:id="@+id/trackCurrentTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="00:00"
+        tools:text="00:00"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonPlay" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trackCurrentTime">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/trackTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_time"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/trackCollectionName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/track_collection_name"
+        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/trackCountry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/track_country"
+        app:layout_constraintTop_toBottomOf="@id/trackGenre"
+
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/trackGenre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/track_genre"
+        app:layout_constraintTop_toBottomOf="@id/trackYear"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/trackYear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/track_year"
+        app:layout_constraintTop_toBottomOf="@id/trackCollectionName"
+        tools:layout_editor_absoluteX="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
