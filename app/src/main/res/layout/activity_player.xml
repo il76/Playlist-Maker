@@ -104,6 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trackCurrentTime">
@@ -111,49 +112,111 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
             <TextView
-                android:id="@+id/trackTime"
-                android:layout_width="match_parent"
+                android:id="@+id/trackTimeTitle"
+                style="@style/PlayerDetailsRow.Name"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/track_time"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/trackTime"
+                style="@style/PlayerDetailsRow.Value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/track_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/trackTimeTitle"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/trackCollectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_collection_name"
+                style="@style/PlayerDetailsRow.Name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackTime"
+                tools:layout_editor_absoluteX="0dp" />
+            <TextView
+                android:id="@+id/trackCollectionNameTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_collection_name"
+                style="@style/PlayerDetailsRow.Value"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackTime"
+                tools:layout_editor_absoluteX="0dp" />
+
+
+
+            <TextView
+                android:id="@+id/trackYearTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_year"
+                style="@style/PlayerDetailsRow.Name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackCollectionTitle"
+                tools:layout_editor_absoluteX="0dp" />
+            <TextView
+                android:id="@+id/trackYear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_year"
+                style="@style/PlayerDetailsRow.Value"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackCollectionTitle"
+                tools:layout_editor_absoluteX="0dp" />
+
+
+
+            <TextView
+                android:id="@+id/trackGenreTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_genre"
+                style="@style/PlayerDetailsRow.Name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackYear"
+                tools:layout_editor_absoluteX="0dp" />
+            <TextView
+                android:id="@+id/trackGenre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_genre"
+                style="@style/PlayerDetailsRow.Value"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackYear"
+                tools:layout_editor_absoluteX="0dp" />
+
+
+            <TextView
+                android:id="@+id/trackCountryTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_country"
+                style="@style/PlayerDetailsRow.Name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackGenre"
+                tools:layout_editor_absoluteX="0dp" />
+            <TextView
+                android:id="@+id/trackCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_country"
+                style="@style/PlayerDetailsRow.Value"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/trackGenre"
+                tools:layout_editor_absoluteX="0dp" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <TextView
-        android:id="@+id/trackCollectionName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/track_collection_name"
-        app:layout_constraintTop_toBottomOf="@+id/nestedScrollView"
-        tools:layout_editor_absoluteX="0dp" />
 
-    <TextView
-        android:id="@+id/trackCountry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/track_country"
-        app:layout_constraintTop_toBottomOf="@id/trackGenre"
-
-        tools:layout_editor_absoluteX="0dp" />
-
-    <TextView
-        android:id="@+id/trackGenre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/track_genre"
-        app:layout_constraintTop_toBottomOf="@id/trackYear"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <TextView
-        android:id="@+id/trackYear"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/track_year"
-        app:layout_constraintTop_toBottomOf="@id/trackCollectionName"
-        tools:layout_editor_absoluteX="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
