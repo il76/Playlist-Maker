@@ -226,7 +226,11 @@
                 app:layout_constraintTop_toBottomOf="@id/trackGenre"
                 tools:layout_editor_absoluteX="0dp" />
 
-
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/groupCollection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="trackCollectionNameTitle,trackCollectionTitle"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

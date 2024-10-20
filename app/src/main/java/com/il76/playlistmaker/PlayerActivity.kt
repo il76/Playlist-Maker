@@ -5,8 +5,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.Group
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
@@ -50,8 +52,15 @@ class PlayerActivity : AppCompatActivity() {
         val tvTimeCurrent = findViewById<TextView>(R.id.trackCurrentTime)
         tvTimeCurrent.text = track.getTime()
 
-        val tvCollectionName = findViewById<TextView>(R.id.trackCollectionTitle)
-        tvCollectionName.text = track.collectionName
+        val groupCollection = findViewById<Group>(R.id.groupCollection)
+        if (track.collectionName.isNotEmpty()) {
+            val tvCollectionName = findViewById<TextView>(R.id.trackCollectionTitle)
+            tvCollectionName.text = track.collectionName
+            groupCollection.isVisible = true
+        } else {
+            groupCollection.isVisible = false
+        }
+
         val tvYear = findViewById<TextView>(R.id.trackYear)
         tvYear.text = track.getReleaseYear()
         val tvGenre = findViewById<TextView>(R.id.trackGenre)
