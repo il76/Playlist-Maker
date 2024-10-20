@@ -1,13 +1,14 @@
 package com.il76.playlistmaker
 
-import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 
@@ -30,17 +31,28 @@ class PlayerActivity : AppCompatActivity() {
             this.finish()
         }
 
-        val tvJson = findViewById<TextView>(R.id.jsonData)
-        //val intent = intent
         val json = intent.getStringExtra("track")
-//        Toast.makeText(this, json, Toast.LENGTH_SHORT).show()
-//        tvJson.text = "adsgj s;lkejfg lk;szdgjf sdkljgls;kd jg;lkdsjg;lksdj g;lsdjg ;lkdsfg"
-        tvJson.text = json
         track = Gson().fromJson(json, Track::class.java)
-        tvJson.text =
-            "Трек: "+track.trackName + "\nИсполнитель: "+track.artistName + "\nВремя: " + track.trackTime +
-                    "\nОбложка: "+track.getPoster(false) + "\nid: "+track.trackId + "\nАльбом: " + track.collectionName +
-                    "\nГод: "+track.releaseDate + "\nЖанр: "+track.primaryGenreName + "\nСтрана: " + track.country
+
+        val ivPoster = findViewById<ImageView>(R.id.trackPoster)
+        Glide.with(ivPoster)
+            .load(track.getPoster(false))
+            .placeholder(R.drawable.search_cover_placeholder)
+            .centerInside()
+            .transform(RoundedCorners(ivPoster.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
+            .into(ivPoster)
+        val tvName = findViewById<TextView>(R.id.trackName)
+        tvName.text = track.trackName
+        val tvArtist = findViewById<TextView>(R.id.artistName)
+        tvArtist.text = track.artistName
+        val tvTime = findViewById<TextView>(R.id.trackTime)
+        tvTime.text = track.trackTime
+//        val tvJson = findViewById<TextView>(R.id.jsonData)
+
+//        tvJson.text =
+//            "Трек: "+track.trackName + "\nИсполнитель: "+track.artistName + "\nВремя: " + track.trackTime +
+//                    "\nОбложка: "+track.getPoster(false) + "\nid: "+track.trackId + "\nАльбом: " + track.collectionName +
+//                    "\nГод: "+track.releaseDate + "\nЖанр: "+track.primaryGenreName + "\nСтрана: " + track.country
 
 
     }
