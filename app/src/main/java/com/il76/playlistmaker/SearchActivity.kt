@@ -1,6 +1,7 @@
 package com.il76.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -20,6 +21,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -185,6 +187,11 @@ class SearchActivity : AppCompatActivity() {
                             trackList.addAll(trackSearchHistory.trackListHistory.reversed())
                             trackAdapter.notifyDataSetChanged()
                         }
+                        val json = Gson().toJson(trackList[position])
+                        val intent = Intent(applicationContext, PlayerActivity::class.java)
+                        intent.putExtra("track", json)
+                        startActivity(intent)
+
                     } else {
                         Toast.makeText(applicationContext, applicationContext.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
                     }

@@ -28,5 +28,10 @@
     <string name="search_history_title">Вы искали</string>
     <string name="search_history_clear">Очистить историю</string>
     <string name="no_track_id">Нет id у трека</string>
+    <string name="track_time">Длительность</string>
+    <string name="track_collection_name">Альбом</string>
+    <string name="track_year">Год</string>
+    <string name="track_genre">Жанр</string>
+    <string name="track_country">Страна</string>
 
 </resources>

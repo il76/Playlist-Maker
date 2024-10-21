@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="player_info_name">#FFAEAFB4</color>
     <color name="settings_text">#FFFFFFFF</color>
     <color name="background_main">#FF1A1B22</color>
     <color name="background_secondary">#FF1A1B22</color>
@@ -14,4 +15,7 @@
     <color name="back_icon_fill">#FFFFFFFF</color>
     <color name="search_edit_main">#FF1A1B22</color>
     <color name="search_edit_bg">#FFFFFFFF</color>
+    <color name="player_icon_bg">#FF535459</color>
+    <color name="player_icon_play">#FFFFFFFF</color>
+    <color name="player_icon_play_inner">#FF000000</color>
 </resources>
