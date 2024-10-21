@@ -54,7 +54,7 @@ class PlayerActivity : AppCompatActivity() {
 
         val groupCollection = findViewById<Group>(R.id.groupCollection)
         if (track.collectionName.isNotEmpty()) {
-            val tvCollectionName = findViewById<TextView>(R.id.trackCollectionTitle)
+            val tvCollectionName = findViewById<TextView>(R.id.trackCollection)
             tvCollectionName.text = track.collectionName
             groupCollection.isVisible = true
         } else {
