@@ -15,4 +15,7 @@
     <color name="back_icon_fill">#FFFFFFFF</color>
     <color name="search_edit_main">#FF1A1B22</color>
     <color name="search_edit_bg">#FFFFFFFF</color>
+    <color name="player_icon_bg">#FF535459</color>
+    <color name="player_icon_play">#FFFFFFFF</color>
+    <color name="player_icon_play_inner">#FF000000</color>
 </resources>
