@@ -16,4 +16,5 @@
     <dimen name="settings_item_container_padding">21dp</dimen>
     <dimen name="track_cover_size">45dp</dimen>
     <dimen name="track_cover_border_radius">2dp</dimen>
+    <dimen name="track_cover_border_radius_player">8dp</dimen>
 </resources>
