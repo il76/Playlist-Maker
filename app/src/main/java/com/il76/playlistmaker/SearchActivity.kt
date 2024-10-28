@@ -3,6 +3,9 @@ package com.il76.playlistmaker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -23,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
+import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,6 +50,45 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var historyClear: Button
+    private lateinit var clearButton: ImageView
+
+    private var isClickAllowed = true
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val searchRunnable = Runnable { searchRequest() }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+
+    private var _binding: ActivitySearchBinding? = null
+    private val binding
+        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun searchRequest() {
+        val s = binding.searchEditText.text
+        Log.i("pls", s.toString())
+        // Включаем историю при пустом тексте и отключаем при непустом
+        toggleSearchHistory(s.isNullOrEmpty())
+        clearButton.isVisible = !s.isNullOrEmpty()
+        searchValue = s.toString()
+        if (s.isNullOrEmpty()) {
+            displayError(ErrorStatus.NONE)
+        }
+
+    }
 
     /**
      * Статусы результатов поиска
@@ -128,6 +171,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        _binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_search)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_search)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -151,7 +195,7 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        val clearButton = findViewById<ImageView>(R.id.search_icon_clear)
+        clearButton = findViewById<ImageView>(R.id.search_icon_clear)
         clearButton.setOnClickListener {
             inputEditText.setText("")
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -168,6 +212,7 @@ class SearchActivity : AppCompatActivity() {
         }
         inputEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
+                // searchDebounce()
                 // Включаем историю при пустом тексте и отключаем при непустом
                 toggleSearchHistory(s.isNullOrEmpty())
                 clearButton.isVisible = !s.isNullOrEmpty()
@@ -183,20 +228,26 @@ class SearchActivity : AppCompatActivity() {
         trackAdapter.onClickListener(
             object : TrackAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int, view: View) {
-                    if (trackList[position].trackId > 0) {
-                        trackSearchHistory.addElement(trackList[position])
-                        if (historyClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
-                            trackList.clear()
-                            trackList.addAll(trackSearchHistory.trackListHistory.reversed())
-                            trackAdapter.notifyDataSetChanged()
-                        }
-                        val json = Gson().toJson(trackList[position])
-                        val intent = Intent(applicationContext, PlayerActivity::class.java)
-                        intent.putExtra("track", json)
-                        startActivity(intent)
+                    if (clickDebounce()) {
+                        if (trackList[position].trackId > 0) {
+                            trackSearchHistory.addElement(trackList[position])
+                            if (historyClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
+                                trackList.clear()
+                                trackList.addAll(trackSearchHistory.trackListHistory.reversed())
+                                trackAdapter.notifyDataSetChanged()
+                            }
+                            val json = Gson().toJson(trackList[position])
+                            val intent = Intent(applicationContext, PlayerActivity::class.java)
+                            intent.putExtra("track", json)
+                            startActivity(intent)
 
-                    } else {
-                        Toast.makeText(applicationContext, applicationContext.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(
+                                applicationContext,
+                                applicationContext.getString(R.string.no_track_id),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
@@ -258,5 +309,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
