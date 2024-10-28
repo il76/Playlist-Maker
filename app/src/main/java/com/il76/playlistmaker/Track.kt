@@ -41,7 +41,11 @@ data class Track (
     /**
      * Страна исполнителя
      */
-    val country: String = ""
+    val country: String = "",
+    /**
+     * Аудиопоток
+     */
+    val previewUrl: String = ""
 ) {
     fun getPoster(thumb: Boolean = true): String {
         if (thumb) {

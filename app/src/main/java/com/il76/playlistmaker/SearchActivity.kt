@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -87,11 +88,13 @@ class SearchActivity : AppCompatActivity() {
             return
         }
         val trackApiService = retrofit.create<TrackAPIService>()
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        progressBar.isVisible = true
         trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksList> {
 
 
             override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
-
+                progressBar.isVisible = false
                 // Получили ответ от сервера
                 if (response.isSuccessful) {
                     // Наш запрос был удачным, получаем наши объекты

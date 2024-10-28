@@ -74,6 +74,13 @@
         android:layout_gravity="center"
         android:text="@string/search_history_title"
         style="@style/SearchHistoryTitle"/>
+    <ProgressBar android:id="@+id/progressBar"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="140dp"
+        android:indeterminateTint="@color/progressbar_tint"
+        android:visibility="gone"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/track_list"
         android:layout_width="match_parent"
