@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -78,16 +77,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchRequest() {
-        val s = binding.searchEditText.text
-        Log.i("pls", s.toString())
         // Включаем историю при пустом тексте и отключаем при непустом
-        toggleSearchHistory(s.isNullOrEmpty())
-        clearButton.isVisible = !s.isNullOrEmpty()
-        searchValue = s.toString()
-        if (s.isNullOrEmpty()) {
+        toggleSearchHistory(searchValue.isEmpty())
+        clearButton.isVisible = searchValue.isNotEmpty()
+        if (searchValue.isEmpty()) {
             displayError(ErrorStatus.NONE)
+        } else {
+            doSearch()
         }
-
     }
 
     /**
@@ -189,6 +186,7 @@ class SearchActivity : AppCompatActivity() {
         val inputEditText = findViewById<EditText>(R.id.search_edit_text)
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                handler.removeCallbacks(searchRunnable)
                 doSearch()
                 true
             }
@@ -212,14 +210,8 @@ class SearchActivity : AppCompatActivity() {
         }
         inputEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
-                // searchDebounce()
-                // Включаем историю при пустом тексте и отключаем при непустом
-                toggleSearchHistory(s.isNullOrEmpty())
-                clearButton.isVisible = !s.isNullOrEmpty()
                 searchValue = s.toString()
-                if (s.isNullOrEmpty()) {
-                    displayError(ErrorStatus.NONE)
-                }
+                searchDebounce()
             },
         )
 
