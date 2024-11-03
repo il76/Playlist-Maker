@@ -222,13 +222,16 @@ class SearchActivity : AppCompatActivity() {
                 override fun onItemClick(position: Int, view: View) {
                     if (clickDebounce()) {
                         if (trackList[position].trackId > 0) {
-                            trackSearchHistory.addElement(trackList[position])
-                            if (historyClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
-                                trackList.clear()
-                                trackList.addAll(trackSearchHistory.trackListHistory.reversed())
-                                trackAdapter.notifyDataSetChanged()
-                            }
-                            val json = Gson().toJson(trackList[position])
+                            val elem = trackList[position]
+                            trackSearchHistory.addElement(elem)
+//                          Если перестраивать - долгое ожидание запуска следующей активити.
+//                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
+//                            if (historyClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
+//                                trackList.clear()
+//                                trackList.addAll(trackSearchHistory.trackListHistory.reversed())
+//                                trackAdapter.notifyDataSetChanged()
+//                            }
+                            val json = Gson().toJson(elem)
                             val intent = Intent(applicationContext, PlayerActivity::class.java)
                             intent.putExtra("track", json)
                             startActivity(intent)

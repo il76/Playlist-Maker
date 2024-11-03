@@ -1,5 +1,6 @@
 package com.il76.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,13 +19,31 @@ class PlayerActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
+    /**
+     * Данные о треке, прилетают с экрана поиска
+     */
     private var track = Track()
 
-    private var isPlaying = false
 
+    /**
+     * Поставлен ли лайк
+     */
     private var isLiked = false
 
+    /**
+     * Добавлено ли в плейлист
+     */
     private var isPlaylisted = false
+
+    /**
+     * Плеер
+     */
+    private var mediaPlayer = MediaPlayer()
+
+    /**
+     * Текущее состояние плеера
+     */
+    private var playerState = STATE_DEFAULT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +64,7 @@ class PlayerActivity : AppCompatActivity() {
         fillTrackInfo()
 
         binding.buttonPlay.setOnClickListener {
-            if (isPlaying) {
-                binding.buttonPlay.setImageResource(R.drawable.icon_play)
-            } else {
-                binding.buttonPlay.setImageResource(R.drawable.icon_pause)
-            }
-            isPlaying = !isPlaying
+            playbackControl()
         }
         binding.buttonPlaylistAdd.setOnClickListener {
             if (isPlaylisted) {
@@ -68,6 +82,8 @@ class PlayerActivity : AppCompatActivity() {
             }
             isLiked = !isLiked
         }
+
+        preparePlayer()
     }
 
     /**
@@ -97,6 +113,82 @@ class PlayerActivity : AppCompatActivity() {
             trackYear.text = track.getReleaseYear()
             trackGenre.text = track.primaryGenreName
             trackCountry.text = track.country
+            buttonPlay.isEnabled = false
         }
+    }
+
+    /**
+     * Инициализация плеера
+     */
+    private fun preparePlayer() {
+        mediaPlayer.setDataSource(track.previewUrl)
+        mediaPlayer.prepareAsync()
+        // готовы воспроизводить
+        mediaPlayer.setOnPreparedListener {
+            binding.buttonPlay.isEnabled = true
+            binding.buttonPlay.setImageResource(R.drawable.icon_play)
+            playerState = STATE_PREPARED
+        }
+        // завершили воспроизведение
+        mediaPlayer.setOnCompletionListener {
+            binding.buttonPlay.setImageResource(R.drawable.icon_play)
+            playerState = STATE_PREPARED
+        }
+    }
+
+    /**
+     * Запуск
+     */
+    private fun startPlayer() {
+        mediaPlayer.start()
+        binding.buttonPlay.setImageResource(R.drawable.icon_pause)
+        playerState = STATE_PLAYING
+    }
+
+    /**
+     * Пауза
+     */
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        binding.buttonPlay.setImageResource(R.drawable.icon_play)
+        playerState = STATE_PAUSED
+    }
+
+    /**
+     * Старт-стоп
+     */
+    private fun playbackControl() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    /**
+     * Свернули приложение
+     */
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    /**
+     * Закрыли активити или всё приложение
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
+    }
+
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
     }
 }
