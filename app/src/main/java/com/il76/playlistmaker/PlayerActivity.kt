@@ -2,6 +2,9 @@ package com.il76.playlistmaker
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +15,8 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.gson.Gson
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -44,6 +49,8 @@ class PlayerActivity : AppCompatActivity() {
      * Текущее состояние плеера
      */
     private var playerState = STATE_DEFAULT
+
+    val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,6 +140,8 @@ class PlayerActivity : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener {
             binding.buttonPlay.setImageResource(R.drawable.icon_play)
             playerState = STATE_PREPARED
+            handler.removeCallbacksAndMessages(null)
+            binding.trackCurrentTime.text = "00:00"
         }
     }
 
@@ -143,6 +152,23 @@ class PlayerActivity : AppCompatActivity() {
         mediaPlayer.start()
         binding.buttonPlay.setImageResource(R.drawable.icon_pause)
         playerState = STATE_PLAYING
+
+        handler?.post(prepareCurrentTimeTask())
+    }
+
+    private fun prepareCurrentTimeTask(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                // Обновляем список в главном потоке
+                displayCurrentPosition()
+
+                // И снова планируем то же действие через TIME_REFRESH_INTERVAL секунд
+                handler?.postDelayed(
+                    this,
+                    TIME_REFRESH_INTERVAL,
+                )
+            }
+        }
     }
 
     /**
@@ -152,6 +178,7 @@ class PlayerActivity : AppCompatActivity() {
         mediaPlayer.pause()
         binding.buttonPlay.setImageResource(R.drawable.icon_play)
         playerState = STATE_PAUSED
+        handler.removeCallbacksAndMessages(null)
     }
 
     /**
@@ -168,6 +195,13 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun displayCurrentPosition() {
+        // Log.i("pls", "time")
+        binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+    }
+
+    private val displayCurrentPositionRunnable = Runnable { displayCurrentPosition() }
+
     /**
      * Свернули приложение
      */
@@ -181,6 +215,7 @@ class PlayerActivity : AppCompatActivity() {
      */
     override fun onDestroy() {
         super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
         mediaPlayer.release()
     }
 
@@ -190,5 +225,7 @@ class PlayerActivity : AppCompatActivity() {
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
+
+        private const val TIME_REFRESH_INTERVAL = 500L
     }
 }
