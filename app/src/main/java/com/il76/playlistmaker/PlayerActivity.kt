@@ -20,6 +20,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private var track = Track()
 
+    private var isPlaying = false
+
+    private var isLiked = false
+
+    private var isPlaylisted = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,6 +42,38 @@ class PlayerActivity : AppCompatActivity() {
             this.finish()
         }
 
+        fillTrackInfo()
+
+        binding.buttonPlay.setOnClickListener {
+            if (isPlaying) {
+                binding.buttonPlay.setImageResource(R.drawable.icon_play)
+            } else {
+                binding.buttonPlay.setImageResource(R.drawable.icon_pause)
+            }
+            isPlaying = !isPlaying
+        }
+        binding.buttonPlaylistAdd.setOnClickListener {
+            if (isPlaylisted) {
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
+            } else {
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
+            }
+            isPlaylisted = !isPlaylisted
+        }
+        binding.buttonLike.setOnClickListener {
+            if (isLiked) {
+                binding.buttonLike.setImageResource(R.drawable.icon_like)
+            } else {
+                binding.buttonLike.setImageResource(R.drawable.icon_like_active)
+            }
+            isLiked = !isLiked
+        }
+    }
+
+    /**
+     * Заполняем вью информацией о выбранном треке
+     */
+    private fun fillTrackInfo() {
         val json = intent.getStringExtra("track")
         track = Gson().fromJson(json, Track::class.java)
 
