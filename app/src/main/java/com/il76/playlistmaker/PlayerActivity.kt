@@ -4,7 +4,6 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -141,7 +140,7 @@ class PlayerActivity : AppCompatActivity() {
             binding.buttonPlay.setImageResource(R.drawable.icon_play)
             playerState = STATE_PREPARED
             handler.removeCallbacksAndMessages(null)
-            binding.trackCurrentTime.text = "00:00"
+            binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
         }
     }
 
@@ -153,7 +152,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.buttonPlay.setImageResource(R.drawable.icon_pause)
         playerState = STATE_PLAYING
 
-        handler?.post(prepareCurrentTimeTask())
+        handler.post(prepareCurrentTimeTask())
     }
 
     private fun prepareCurrentTimeTask(): Runnable {
@@ -163,7 +162,7 @@ class PlayerActivity : AppCompatActivity() {
                 displayCurrentPosition()
 
                 // И снова планируем то же действие через TIME_REFRESH_INTERVAL секунд
-                handler?.postDelayed(
+                handler.postDelayed(
                     this,
                     TIME_REFRESH_INTERVAL,
                 )
@@ -196,11 +195,8 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun displayCurrentPosition() {
-        // Log.i("pls", "time")
         binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
     }
-
-    private val displayCurrentPositionRunnable = Runnable { displayCurrentPosition() }
 
     /**
      * Свернули приложение
