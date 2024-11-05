@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.gson.Gson
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -97,7 +96,7 @@ class PlayerActivity : AppCompatActivity() {
      */
     private fun fillTrackInfo() {
         val json = intent.getStringExtra("track")
-        track = Gson().fromJson(json, Track::class.java)
+        track = App.instance.gson.fromJson(json, Track::class.java)
 
         with(binding) {
             Glide.with(trackPoster)
@@ -174,7 +173,6 @@ class PlayerActivity : AppCompatActivity() {
      * Пауза
      */
     private fun pausePlayer() {
-        mediaPlayer.pause()
         binding.buttonPlay.setImageResource(R.drawable.icon_play)
         playerState = STATE_PAUSED
         handler.removeCallbacksAndMessages(null)
@@ -194,6 +192,9 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Обновляем текущее время
+     */
     private fun displayCurrentPosition() {
         binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
     }

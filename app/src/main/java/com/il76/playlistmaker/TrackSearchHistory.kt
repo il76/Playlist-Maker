@@ -1,7 +1,6 @@
 package com.il76.playlistmaker
 
 import android.content.SharedPreferences
-import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.il76.playlistmaker.App.Companion.TRACKS_SEARCH_HISTORY
 
@@ -13,7 +12,7 @@ data class TrackSearchHistory(val sp: SharedPreferences) {
 
 
     private fun saveToPreferences() {
-        sp.edit().putString(TRACKS_SEARCH_HISTORY, Gson().toJson(trackListHistory)).apply()
+        sp.edit().putString(TRACKS_SEARCH_HISTORY, App.instance.gson.toJson(trackListHistory)).apply()
     }
 
     private fun loadFromPreferences() {
@@ -21,7 +20,7 @@ data class TrackSearchHistory(val sp: SharedPreferences) {
         val itemType = object : TypeToken<ArrayList<Track>>() {}.type
 
         val arrayList: ArrayList<Track> = if (json != null) {
-            Gson().fromJson(json, itemType)
+            App.instance.gson.fromJson(json, itemType)
         } else {
             ArrayList()
         }
