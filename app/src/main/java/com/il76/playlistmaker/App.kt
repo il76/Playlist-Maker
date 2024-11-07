@@ -2,11 +2,15 @@ package com.il76.playlistmaker
 
 import android.app.Application
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.gson.Gson
 
 class App : Application() {
 
     var darkTheme = false
+
+    val gson = Gson()
 
     lateinit var sharedPrefs: SharedPreferences
 
@@ -27,6 +31,13 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+    }
+
+    /**
+     * Унифицированное логирование
+     */
+    fun log(message: String) {
+        Log.i("pls", message)
     }
 
     companion object {

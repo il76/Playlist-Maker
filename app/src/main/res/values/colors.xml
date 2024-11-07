@@ -18,4 +18,6 @@
     <color name="player_icon_bg">#FFC5C6C7</color>
     <color name="player_icon_play">#FF000000</color>
     <color name="player_icon_play_inner">#FFFFFFFF</color>
+    <color name="progressbar_tint">#FF3772E7</color>
+
 </resources>

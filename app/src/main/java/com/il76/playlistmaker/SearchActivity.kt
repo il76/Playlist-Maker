@@ -1,27 +1,23 @@
 package com.il76.playlistmaker
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.gson.Gson
+import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,7 +31,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val trackList = arrayListOf<Track>()
 
-    private lateinit var trackSearchHistory: TrackSearchHistory
+    private val trackSearchHistory = TrackSearchHistory(App.instance.sharedPrefs)
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com")
@@ -44,7 +40,41 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
-    private lateinit var historyClear: Button
+
+    private var isClickAllowed = true
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val searchRunnable = Runnable { searchRequest() }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private var _binding: ActivitySearchBinding? = null
+    private val binding
+        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun searchRequest() {
+        // Включаем историю при пустом тексте и отключаем при непустом
+        toggleSearchHistory(searchValue.isEmpty())
+        binding.searchIconClear.isVisible = searchValue.isNotEmpty()
+        if (searchValue.isEmpty()) {
+            displayError(ErrorStatus.NONE)
+        } else {
+            doSearch()
+        }
+    }
 
     /**
      * Статусы результатов поиска
@@ -56,27 +86,23 @@ class SearchActivity : AppCompatActivity() {
      * Отображение или скрытие информации об отсутствии поисковой выдачи
      */
     private fun displayError(status: ErrorStatus) {
-        val searchError = findViewById<LinearLayout>(R.id.search_error)
-        val searchRefresh = findViewById<Button>(R.id.search_error_refresh)
-        val searchImage = findViewById<ImageView>(R.id.search_error_image)
-        val searchErrorText = findViewById<TextView>(R.id.search_error_text)
         when (status) {
             ErrorStatus.NONE -> {
-                searchError.isVisible = false
+                binding.searchError.isVisible = false
                 recyclerView.isVisible = true
             }
             ErrorStatus.ERROR_NET -> {
-                searchError.isVisible = true
-                searchRefresh.isVisible = true
-                searchImage.setImageResource(R.drawable.search_network_error)
-                searchErrorText.text = getText(R.string.search_network_error)
+                binding.searchError.isVisible = true
+                binding.searchErrorRefresh.isVisible = true
+                binding.searchErrorImage.setImageResource(R.drawable.search_network_error)
+                binding.searchErrorText.text = getText(R.string.search_network_error)
                 recyclerView.isVisible = false
             }
             ErrorStatus.EMPTY_RESULT -> {
-                searchError.isVisible = true
-                searchRefresh.isVisible = false
-                searchImage.setImageResource(R.drawable.search_nothing_found)
-                searchErrorText.text = getText(R.string.search_nothing_found)
+                binding.searchError.isVisible = true
+                binding.searchErrorRefresh.isVisible = false
+                binding.searchErrorImage.setImageResource(R.drawable.search_nothing_found)
+                binding.searchErrorText.text = getText(R.string.search_nothing_found)
                 recyclerView.isVisible = false
             }
         }
@@ -87,11 +113,12 @@ class SearchActivity : AppCompatActivity() {
             return
         }
         val trackApiService = retrofit.create<TrackAPIService>()
+        binding.progressBar.isVisible = true
         trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksList> {
 
 
             override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
-
+                binding.progressBar.isVisible = false
                 // Получили ответ от сервера
                 if (response.isSuccessful) {
                     // Наш запрос был удачным, получаем наши объекты
@@ -125,33 +152,32 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
+        _binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_search)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        trackSearchHistory = TrackSearchHistory(App.instance.sharedPrefs)
+
         // назад
-        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_search_toolbar)
-        buttonBack.setNavigationOnClickListener {
+        binding.activitySearchToolbar.setNavigationOnClickListener {
             this.finish()
         }
 
         // поисковая форма
-        val inputEditText = findViewById<EditText>(R.id.search_edit_text)
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
+        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                handler.removeCallbacks(searchRunnable)
                 doSearch()
                 true
             }
             false
         }
 
-        val clearButton = findViewById<ImageView>(R.id.search_icon_clear)
-        clearButton.setOnClickListener {
-            inputEditText.setText("")
-            val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        binding.searchIconClear.setOnClickListener {
+            binding.searchEditText.setText("")
+                val inputMethodManager = getSystemService<InputMethodManager>()
             val view = this.currentFocus
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
             displayError(ErrorStatus.NONE)
@@ -160,18 +186,13 @@ class SearchActivity : AppCompatActivity() {
             toggleSearchHistory(true)
         }
         // обработчик фокуса на текстовое поле. Включаем кнопки только если есть фокус и пустой текст
-        inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            toggleSearchHistory(hasFocus && inputEditText.text.isNullOrEmpty())
+        binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            toggleSearchHistory(hasFocus && binding.searchEditText.text.isNullOrEmpty())
         }
-        inputEditText.addTextChangedListener(
+        binding.searchEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
-                // Включаем историю при пустом тексте и отключаем при непустом
-                toggleSearchHistory(s.isNullOrEmpty())
-                clearButton.isVisible = !s.isNullOrEmpty()
                 searchValue = s.toString()
-                if (s.isNullOrEmpty()) {
-                    displayError(ErrorStatus.NONE)
-                }
+                searchDebounce()
             },
         )
 
@@ -180,20 +201,29 @@ class SearchActivity : AppCompatActivity() {
         trackAdapter.onClickListener(
             object : TrackAdapter.OnItemClickListener {
                 override fun onItemClick(position: Int, view: View) {
-                    if (trackList[position].trackId > 0) {
-                        trackSearchHistory.addElement(trackList[position])
-                        if (historyClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
-                            trackList.clear()
-                            trackList.addAll(trackSearchHistory.trackListHistory.reversed())
-                            trackAdapter.notifyDataSetChanged()
-                        }
-                        val json = Gson().toJson(trackList[position])
-                        val intent = Intent(applicationContext, PlayerActivity::class.java)
-                        intent.putExtra("track", json)
-                        startActivity(intent)
+                    if (clickDebounce()) {
+                        if (trackList[position].trackId > 0) {
+                            val elem = trackList[position]
+                            trackSearchHistory.addElement(elem)
+//                          Если перестраивать - долгое ожидание запуска следующей активити.
+//                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
+                            if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
+                                trackList.clear()
+                                trackList.addAll(trackSearchHistory.trackListHistory.reversed())
+                                trackAdapter.notifyDataSetChanged()
+                            }
+                            val json = App.instance.gson.toJson(elem)
+                            val intent = Intent(applicationContext, PlayerActivity::class.java)
+                            intent.putExtra("track", json)
+                            startActivity(intent)
 
-                    } else {
-                        Toast.makeText(applicationContext, applicationContext.getString(R.string.no_track_id), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(
+                                applicationContext,
+                                applicationContext.getString(R.string.no_track_id),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }
@@ -201,12 +231,10 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = trackAdapter
 
-        val retrySearch = findViewById<Button>(R.id.search_error_refresh)
-        retrySearch.setOnClickListener {
+        binding.searchErrorRefresh.setOnClickListener {
             doSearch()
         }
-        historyClear = findViewById<Button>(R.id.search_history_clear)
-        historyClear.setOnClickListener {
+        binding.searchHistoryClear.setOnClickListener {
             trackSearchHistory.clear()
             trackList.clear()
             toggleSearchHistory(false)
@@ -224,10 +252,8 @@ class SearchActivity : AppCompatActivity() {
         if (trackSearchHistory.trackListHistory.isEmpty()) {
             isVisible = false // нет истории - нет истории
         }
-        val historyTitle = findViewById<TextView>(R.id.search_history_title)
-        historyTitle.isVisible = isVisible
-
-        historyClear.isVisible = isVisible
+        binding.searchHistoryTitle.isVisible = isVisible
+        binding.searchHistoryClear.isVisible = isVisible
 
         if (isVisible && trackSearchHistory.trackListHistory.size > 0) {
             trackList.clear()
@@ -243,8 +269,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
-        val inputEditText = findViewById<EditText>(R.id.search_edit_text)
-        inputEditText.setText(searchValue)
+        binding.searchEditText.setText(searchValue)
         doSearch()
     }
 
@@ -255,5 +280,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

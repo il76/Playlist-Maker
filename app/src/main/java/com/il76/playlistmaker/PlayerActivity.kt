@@ -1,27 +1,60 @@
 package com.il76.playlistmaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.TextView
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.Group
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.gson.Gson
+import com.il76.playlistmaker.databinding.ActivityPlayerBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
 
+    private var _binding: ActivityPlayerBinding? = null
+    private val binding
+        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+    /**
+     * Данные о треке, прилетают с экрана поиска
+     */
     private var track = Track()
+
+
+    /**
+     * Поставлен ли лайк
+     */
+    private var isLiked = false
+
+    /**
+     * Добавлено ли в плейлист
+     */
+    private var isPlaylisted = false
+
+    /**
+     * Плеер
+     */
+    private var mediaPlayer = MediaPlayer()
+
+    /**
+     * Текущее состояние плеера
+     */
+    private var playerState = STATE_DEFAULT
+
+    val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_player)
+        _binding = ActivityPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -33,40 +66,163 @@ class PlayerActivity : AppCompatActivity() {
             this.finish()
         }
 
-        val json = intent.getStringExtra("track")
-        track = Gson().fromJson(json, Track::class.java)
+        fillTrackInfo()
 
-        val ivPoster = findViewById<ImageView>(R.id.trackPoster)
-        Glide.with(ivPoster)
-            .load(track.getPoster(false))
-            .placeholder(R.drawable.search_cover_placeholder)
-            .centerInside()
-            .transform(RoundedCorners(ivPoster.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
-            .into(ivPoster)
-        val tvName = findViewById<TextView>(R.id.trackName)
-        tvName.text = track.trackName
-        val tvArtist = findViewById<TextView>(R.id.artistName)
-        tvArtist.text = track.artistName
-        val tvTime = findViewById<TextView>(R.id.trackTime)
-        tvTime.text = track.getTime()
-        val tvTimeCurrent = findViewById<TextView>(R.id.trackCurrentTime)
-        tvTimeCurrent.text = track.getTime()
-
-        val groupCollection = findViewById<Group>(R.id.groupCollection)
-        if (track.collectionName.isNotEmpty()) {
-            val tvCollectionName = findViewById<TextView>(R.id.trackCollection)
-            tvCollectionName.text = track.collectionName
-            groupCollection.isVisible = true
-        } else {
-            groupCollection.isVisible = false
+        binding.buttonPlay.setOnClickListener {
+            playbackControl()
+        }
+        binding.buttonPlaylistAdd.setOnClickListener {
+            if (isPlaylisted) {
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
+            } else {
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
+            }
+            isPlaylisted = !isPlaylisted
+        }
+        binding.buttonLike.setOnClickListener {
+            if (isLiked) {
+                binding.buttonLike.setImageResource(R.drawable.icon_like)
+            } else {
+                binding.buttonLike.setImageResource(R.drawable.icon_like_active)
+            }
+            isLiked = !isLiked
         }
 
-        val tvYear = findViewById<TextView>(R.id.trackYear)
-        tvYear.text = track.getReleaseYear()
-        val tvGenre = findViewById<TextView>(R.id.trackGenre)
-        tvGenre.text = track.primaryGenreName
-        val tvCountry = findViewById<TextView>(R.id.trackCountry)
-        tvCountry.text = track.country
+        preparePlayer()
+    }
 
+    /**
+     * Заполняем вью информацией о выбранном треке
+     */
+    private fun fillTrackInfo() {
+        val json = intent.getStringExtra("track")
+        track = App.instance.gson.fromJson(json, Track::class.java)
+
+        with(binding) {
+            Glide.with(trackPoster)
+                .load(track.getPoster(false))
+                .placeholder(R.drawable.search_cover_placeholder)
+                .centerInside()
+                .transform(RoundedCorners(trackPoster.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
+                .into(trackPoster)
+            trackName.text = track.trackName
+            artistName.text = track.artistName
+            trackTime.text = track.getTime()
+            trackCurrentTime.text = track.getTime()
+            if (track.collectionName.isNotEmpty()) {
+                trackCollection.text = track.collectionName
+                groupCollection.isVisible = true
+            } else {
+                groupCollection.isVisible = false
+            }
+            trackYear.text = track.getReleaseYear()
+            trackGenre.text = track.primaryGenreName
+            trackCountry.text = track.country
+            buttonPlay.isEnabled = false
+        }
+    }
+
+    /**
+     * Инициализация плеера
+     */
+    private fun preparePlayer() {
+        mediaPlayer.setDataSource(track.previewUrl)
+        mediaPlayer.prepareAsync()
+        // готовы воспроизводить
+        mediaPlayer.setOnPreparedListener {
+            binding.buttonPlay.isEnabled = true
+            binding.buttonPlay.setImageResource(R.drawable.icon_play)
+            playerState = STATE_PREPARED
+        }
+        // завершили воспроизведение
+        mediaPlayer.setOnCompletionListener {
+            binding.buttonPlay.setImageResource(R.drawable.icon_play)
+            playerState = STATE_PREPARED
+            handler.removeCallbacksAndMessages(null)
+            binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
+        }
+    }
+
+    /**
+     * Запуск
+     */
+    private fun startPlayer() {
+        mediaPlayer.start()
+        binding.buttonPlay.setImageResource(R.drawable.icon_pause)
+        playerState = STATE_PLAYING
+
+        handler.post(prepareCurrentTimeTask())
+    }
+
+    private fun prepareCurrentTimeTask(): Runnable {
+        return object : Runnable {
+            override fun run() {
+                // Обновляем список в главном потоке
+                displayCurrentPosition()
+
+                // И снова планируем то же действие через TIME_REFRESH_INTERVAL секунд
+                handler.postDelayed(
+                    this,
+                    TIME_REFRESH_INTERVAL,
+                )
+            }
+        }
+    }
+
+    /**
+     * Пауза
+     */
+    private fun pausePlayer() {
+        binding.buttonPlay.setImageResource(R.drawable.icon_play)
+        playerState = STATE_PAUSED
+        handler.removeCallbacksAndMessages(null)
+    }
+
+    /**
+     * Старт-стоп
+     */
+    private fun playbackControl() {
+        when(playerState) {
+            STATE_PLAYING -> {
+                pausePlayer()
+            }
+            STATE_PREPARED, STATE_PAUSED -> {
+                startPlayer()
+            }
+        }
+    }
+
+    /**
+     * Обновляем текущее время
+     */
+    private fun displayCurrentPosition() {
+        binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+    }
+
+    /**
+     * Свернули приложение
+     */
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    /**
+     * Закрыли активити или всё приложение
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
+        mediaPlayer.release()
+    }
+
+
+    companion object {
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
+
+        private const val TIME_REFRESH_INTERVAL = 500L
     }
 }
