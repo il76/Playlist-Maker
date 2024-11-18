@@ -1,4 +1,4 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.domain.models
 
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat

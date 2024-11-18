@@ -1,4 +1,4 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.ui.player
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -12,7 +12,10 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.appbar.MaterialToolbar
+import com.il76.playlistmaker.application.App
+import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
+import com.il76.playlistmaker.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 

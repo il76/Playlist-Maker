@@ -1,4 +1,4 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.ui.search
 
 import android.content.Intent
 import android.os.Bundle
@@ -17,7 +17,14 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.il76.playlistmaker.application.App
+import com.il76.playlistmaker.R
+import com.il76.playlistmaker.data.network.TrackAPIService
+import com.il76.playlistmaker.domain.api.TrackSearchHistory
+import com.il76.playlistmaker.domain.api.TracksList
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
+import com.il76.playlistmaker.domain.models.Track
+import com.il76.playlistmaker.ui.player.PlayerActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

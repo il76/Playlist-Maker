@@ -1,8 +1,10 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.domain.api
 
 import android.content.SharedPreferences
 import com.google.gson.reflect.TypeToken
-import com.il76.playlistmaker.App.Companion.TRACKS_SEARCH_HISTORY
+import com.il76.playlistmaker.application.App
+import com.il76.playlistmaker.application.App.Companion.TRACKS_SEARCH_HISTORY
+import com.il76.playlistmaker.domain.models.Track
 
 data class TrackSearchHistory(val sp: SharedPreferences) {
     val trackListHistory = arrayListOf<Track>()
