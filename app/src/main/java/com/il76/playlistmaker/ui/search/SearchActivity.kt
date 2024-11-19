@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.application.App
 import com.il76.playlistmaker.R
+import com.il76.playlistmaker.data.dto.TracksSearchResponse
 import com.il76.playlistmaker.data.network.TrackAPIService
 import com.il76.playlistmaker.domain.api.TrackSearchHistory
 import com.il76.playlistmaker.domain.api.TracksList
@@ -121,10 +122,10 @@ class SearchActivity : AppCompatActivity() {
         }
         val trackApiService = retrofit.create<TrackAPIService>()
         binding.progressBar.isVisible = true
-        trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksList> {
+        trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksSearchResponse> {
 
 
-            override fun onResponse(call: Call<TracksList>, response: Response<TracksList>) {
+            override fun onResponse(call: Call<TracksSearchResponse>, response: Response<TracksSearchResponse>) {
                 binding.progressBar.isVisible = false
                 // Получили ответ от сервера
                 if (response.isSuccessful) {
@@ -132,7 +133,7 @@ class SearchActivity : AppCompatActivity() {
                     val body = response.body()
                     trackList.clear()
                     for (item in body?.results!!) {
-                        trackList.add(item)
+                        //trackList.add(item)
                     }
                     if (trackList.size == 0) {
                         displayError(ErrorStatus.EMPTY_RESULT)
@@ -147,7 +148,7 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<TracksList>, t: Throwable) {
+            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
                 // Не смогли присоединиться к серверу
                 // Выводим ошибку в лог, что-то пошло не так
                 t.printStackTrace()
