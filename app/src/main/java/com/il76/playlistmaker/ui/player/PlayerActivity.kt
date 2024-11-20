@@ -103,22 +103,22 @@ class PlayerActivity : AppCompatActivity() {
 
         with(binding) {
             Glide.with(trackPoster)
-                .load(track.getPoster(false))
+                .load(track.poster)
                 .placeholder(R.drawable.search_cover_placeholder)
                 .centerInside()
                 .transform(RoundedCorners(trackPoster.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
                 .into(trackPoster)
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = track.getTime()
-            trackCurrentTime.text = track.getTime()
+            trackTime.text = track.trackTime
+            trackCurrentTime.text = track.trackTime
             if (track.collectionName.isNotEmpty()) {
                 trackCollection.text = track.collectionName
                 groupCollection.isVisible = true
             } else {
                 groupCollection.isVisible = false
             }
-            trackYear.text = track.getReleaseYear()
+            trackYear.text = track.releaseYear
             trackGenre.text = track.primaryGenreName
             trackCountry.text = track.country
             buttonPlay.isEnabled = false

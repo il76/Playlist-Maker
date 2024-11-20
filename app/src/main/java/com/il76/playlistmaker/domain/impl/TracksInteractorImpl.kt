@@ -8,7 +8,7 @@ class TracksInteractorImpl(private val repository: TracksRepository) : TracksInt
 
     private val executor = Executors.newCachedThreadPool()
 
-    override fun searchMovies(term: String, consumer: TracksInteractor.TracksConsumer) {
+    override fun searchTracks(term: String, consumer: TracksInteractor.TracksConsumer) {
         executor.execute {
             consumer.consume(repository.searchTracks(term))
         }

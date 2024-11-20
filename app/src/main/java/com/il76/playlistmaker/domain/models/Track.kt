@@ -1,9 +1,6 @@
 package com.il76.playlistmaker.domain.models
 
 import com.google.gson.annotations.SerializedName
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 data class Track (
     /**
@@ -45,34 +42,13 @@ data class Track (
     /**
      * Аудиопоток
      */
-    val previewUrl: String = ""
-) {
-    fun getPoster(thumb: Boolean = true): String {
-        if (thumb) {
-            return artworkUrl100
-        } else {
-            return artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
-        }
-    }
-
+    val previewUrl: String = "",
     /**
-     * Форматированная длительность трека
+     * Крупная картинка для плеера
      */
-    fun getTime(): String {
-        if (trackTime.isNotEmpty()) {
-            return SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTime.toLong())
-        } else {
-            return ""
-        }
-    }
-
+    val poster: String = "",
     /**
-     * Год выпуска из исходной даты в ISO формате
+     * Годл выпуска
      */
-    fun getReleaseYear(): String {
-        val isoDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        val date: Date = isoDateFormat.parse(releaseDate)
-        val yearDateFormat = SimpleDateFormat("yyyy")
-        return yearDateFormat.format(date)
-    }
-}
+    val releaseYear: String = ""
+)
