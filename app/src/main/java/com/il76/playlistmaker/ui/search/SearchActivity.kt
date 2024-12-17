@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -164,7 +165,7 @@ class SearchActivity : AppCompatActivity() {
         enableEdgeToEdge()
         _binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_search)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.activitySearch) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -209,7 +210,7 @@ class SearchActivity : AppCompatActivity() {
             },
         )
 
-        recyclerView = findViewById<RecyclerView>(R.id.track_list)
+        recyclerView = binding.trackList
         trackAdapter = TrackAdapter(trackList)
         trackAdapter.onClickListener(
             object : TrackAdapter.OnItemClickListener {

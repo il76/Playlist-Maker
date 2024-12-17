@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.gson.Gson
+import com.il76.playlistmaker.Creator
 
 class App : Application() {
 
@@ -16,6 +17,8 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Creator.initApplication(this)
+
         sharedPrefs = getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, MODE_PRIVATE)
         darkTheme = sharedPrefs.getBoolean(DARK_THEME_ENABLED,AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_NO)
         switchTheme(darkTheme)

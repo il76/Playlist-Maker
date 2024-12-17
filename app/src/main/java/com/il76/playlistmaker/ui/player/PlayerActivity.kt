@@ -58,14 +58,13 @@ class PlayerActivity : AppCompatActivity() {
         enableEdgeToEdge()
         _binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.activityPlayer) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_player_toolbar)
-        buttonBack.setNavigationOnClickListener {
+        binding.activityPlayerToolbar.setNavigationOnClickListener {
             this.finish()
         }
 
