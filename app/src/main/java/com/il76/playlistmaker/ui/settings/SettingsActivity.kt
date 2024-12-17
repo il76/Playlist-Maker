@@ -9,16 +9,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.il76.playlistmaker.application.App
-import com.il76.playlistmaker.application.App.Companion.DARK_THEME_ENABLED
+import com.il76.playlistmaker.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySettingsBinding
+import com.il76.playlistmaker.domain.models.ThemeSettings
 
 class SettingsActivity : AppCompatActivity() {
 
     private var _binding: ActivitySettingsBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+
+    private val settingsInteractor = Creator.provideSettingsInteractor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,12 +77,10 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         //обрабатываем переключатель темы
-        binding.SettingsThemeSwitcher.isChecked = (applicationContext as App).darkTheme
+        binding.SettingsThemeSwitcher.isChecked = settingsInteractor.getThemeSettings().isDark
         binding.SettingsThemeSwitcher.setOnCheckedChangeListener {_, isChecked ->
-            with((applicationContext as App)) {
-                switchTheme(isChecked)
-                sharedPrefs.edit().putBoolean(DARK_THEME_ENABLED, isChecked).apply()
-            }
+            settingsInteractor.switchTheme(ThemeSettings(isChecked))
+            settingsInteractor.saveThemeSettings(ThemeSettings(isChecked))
         }
     }
 

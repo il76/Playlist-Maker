@@ -42,7 +42,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val trackList = arrayListOf<Track>()
 
-    private val trackSearchHistory = TrackSearchHistory(App.instance.sharedPrefs)
+    private val trackSearchHistory = TrackSearchHistory(Creator.provideSharedPreferences())
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com")
@@ -226,7 +226,7 @@ class SearchActivity : AppCompatActivity() {
                                 trackList.addAll(trackSearchHistory.trackListHistory.reversed())
                                 trackAdapter.notifyDataSetChanged()
                             }
-                            val json = App.instance.gson.toJson(elem)
+                            val json = Creator.provideGson().toJson(elem)
                             val intent = Intent(applicationContext, PlayerActivity::class.java)
                             intent.putExtra("track", json)
                             startActivity(intent)
