@@ -1,6 +1,5 @@
 package com.il76.playlistmaker.ui.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,14 +14,14 @@ import com.il76.playlistmaker.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
 import com.il76.playlistmaker.domain.models.Track
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
 
     private var _binding: ActivityPlayerBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+    private val playerInteractor = Creator.provideMediaPlayerInteractor()
 
     /**
      * Данные о треке, прилетают с экрана поиска
@@ -39,11 +38,6 @@ class PlayerActivity : AppCompatActivity() {
      * Добавлено ли в плейлист
      */
     private var isPlaylisted = false
-
-    /**
-     * Плеер
-     */
-    private var mediaPlayer = MediaPlayer()
 
     /**
      * Текущее состояние плеера
@@ -127,28 +121,27 @@ class PlayerActivity : AppCompatActivity() {
      * Инициализация плеера
      */
     private fun preparePlayer() {
-        mediaPlayer.setDataSource(track.previewUrl)
-        mediaPlayer.prepareAsync()
-        // готовы воспроизводить
-        mediaPlayer.setOnPreparedListener {
-            binding.buttonPlay.isEnabled = true
-            binding.buttonPlay.setImageResource(R.drawable.icon_play)
-            playerState = STATE_PREPARED
-        }
-        // завершили воспроизведение
-        mediaPlayer.setOnCompletionListener {
-            binding.buttonPlay.setImageResource(R.drawable.icon_play)
-            playerState = STATE_PREPARED
-            handler.removeCallbacksAndMessages(null)
-            binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
-        }
+        playerInteractor.init(
+            dataSource = track.previewUrl,
+            onPreparedListener = {
+               binding.buttonPlay.isEnabled = true
+               binding.buttonPlay.setImageResource(R.drawable.icon_play)
+               playerState = STATE_PREPARED
+            },
+            onCompletionListener = {
+                binding.buttonPlay.setImageResource(R.drawable.icon_play)
+                playerState = STATE_PREPARED
+                handler.removeCallbacksAndMessages(null)
+                binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
+            }
+        )
     }
 
     /**
      * Запуск
      */
     private fun startPlayer() {
-        mediaPlayer.start()
+        playerInteractor.start()
         binding.buttonPlay.setImageResource(R.drawable.icon_pause)
         playerState = STATE_PLAYING
 
@@ -197,7 +190,7 @@ class PlayerActivity : AppCompatActivity() {
      * Обновляем текущее время
      */
     private fun displayCurrentPosition() {
-        binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+        binding.trackCurrentTime.text = playerInteractor.getCurrentTime()
     }
 
     /**
@@ -214,7 +207,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
-        mediaPlayer.release()
+        playerInteractor.release()
     }
 
 

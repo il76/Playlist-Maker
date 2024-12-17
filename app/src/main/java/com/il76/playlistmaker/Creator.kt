@@ -3,21 +3,23 @@ package com.il76.playlistmaker
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaPlayer
 import com.google.gson.Gson
 import com.il76.playlistmaker.application.App.Companion.PLAYLIST_MAKER_PREFERENCES
+import com.il76.playlistmaker.data.MediaPlayerInteractorImpl
 import com.il76.playlistmaker.data.SettingsInteractorImpl
 import com.il76.playlistmaker.data.TracksRepositoryImpl
 import com.il76.playlistmaker.data.network.RetrofitNetworkClient
+import com.il76.playlistmaker.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.domain.api.SettingsInteractor
 import com.il76.playlistmaker.domain.api.TracksInteractor
 import com.il76.playlistmaker.domain.api.TracksRepository
 import com.il76.playlistmaker.domain.impl.TracksInteractorImpl
 
 object Creator {
-    //private
-     lateinit var application: Application
+    private lateinit var application: Application
 
-     private val gson = Gson()
+    private val gson = Gson()
 
     fun initApplication(application: Application) {
         this.application = application
@@ -46,6 +48,10 @@ object Creator {
 
     fun provideGson(): Gson {
         return gson
+    }
+
+    fun provideMediaPlayerInteractor(): MediaPlayerInteractor {
+        return MediaPlayerInteractorImpl(MediaPlayer())
     }
 
 }
