@@ -19,23 +19,11 @@ import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.Creator
-import com.il76.playlistmaker.application.App
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.data.dto.TracksSearchResponse
-import com.il76.playlistmaker.data.network.TrackAPIService
-import com.il76.playlistmaker.domain.api.TrackSearchHistory
-import com.il76.playlistmaker.domain.api.TracksList
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import com.il76.playlistmaker.domain.api.TracksInteractor
-import com.il76.playlistmaker.domain.api.TracksRepository
 import com.il76.playlistmaker.domain.models.Track
 import com.il76.playlistmaker.ui.player.PlayerActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
 class SearchActivity : AppCompatActivity() {
 
