@@ -1,24 +1,17 @@
-package com.il76.playlistmaker.domain.api
+package com.il76.playlistmaker.data
 
 import android.content.SharedPreferences
 import com.google.gson.reflect.TypeToken
 import com.il76.playlistmaker.Creator
-import com.il76.playlistmaker.data.TracksHistoryRepositoryImpl.Companion.TRACKS_SEARCH_HISTORY
+import com.il76.playlistmaker.domain.api.TracksHistoryRepository
 import com.il76.playlistmaker.domain.models.Track
 
-data class TrackSearchHistory(val sp: SharedPreferences) {
-    val trackListHistory = arrayListOf<Track>()
-    init {
-        loadFromPreferences()
-    }
+class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : TracksHistoryRepository {
 
+    private val trackListHistory = arrayListOf<Track>()
 
-    private fun saveToPreferences() {
-        sp.edit().putString(TRACKS_SEARCH_HISTORY, Creator.provideGson().toJson(trackListHistory)).apply()
-    }
-
-    private fun loadFromPreferences() {
-        val json = sp.getString(TRACKS_SEARCH_HISTORY,null)
+    override fun getTracks(): List<Track> {
+        val json = sharedPreferences.getString(TRACKS_SEARCH_HISTORY,null)
         val itemType = object : TypeToken<ArrayList<Track>>() {}.type
 
         val arrayList: ArrayList<Track> = if (json != null) {
@@ -27,14 +20,10 @@ data class TrackSearchHistory(val sp: SharedPreferences) {
             ArrayList()
         }
         trackListHistory.addAll(arrayList)
+        return trackListHistory
     }
 
-    fun clear() {
-        trackListHistory.clear()
-        saveToPreferences()
-    }
-
-    fun addElement(track: Track) {
+    override fun addTrack(track: Track) {
         val iterator = trackListHistory.iterator()
         // ищем элемент в истории, если такой есть - удаляем, чтобы потом добавить
         while (iterator.hasNext()) {
@@ -47,6 +36,20 @@ data class TrackSearchHistory(val sp: SharedPreferences) {
         if (trackListHistory.size > 10) {
             trackListHistory.removeAt(0)
         }
-        saveToPreferences()
+        saveHistory()
     }
+
+    override fun clearHistory() {
+        trackListHistory.clear()
+        saveHistory()
+    }
+
+    override fun saveHistory() {
+        sharedPreferences.edit().putString(TRACKS_SEARCH_HISTORY, Creator.provideGson().toJson(trackListHistory)).apply()
+    }
+
+    companion object {
+        const val TRACKS_SEARCH_HISTORY = "tracks_search_history"
+    }
+
 }

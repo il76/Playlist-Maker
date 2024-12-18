@@ -5,15 +5,18 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaPlayer
 import com.google.gson.Gson
-import com.il76.playlistmaker.application.App.Companion.PLAYLIST_MAKER_PREFERENCES
 import com.il76.playlistmaker.data.MediaPlayerInteractorImpl
 import com.il76.playlistmaker.data.SettingsInteractorImpl
+import com.il76.playlistmaker.data.TracksHistoryRepositoryImpl
 import com.il76.playlistmaker.data.TracksRepositoryImpl
 import com.il76.playlistmaker.data.network.RetrofitNetworkClient
 import com.il76.playlistmaker.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.domain.api.SettingsInteractor
+import com.il76.playlistmaker.domain.api.TracksHistoryInteractor
+import com.il76.playlistmaker.domain.api.TracksHistoryRepository
 import com.il76.playlistmaker.domain.api.TracksInteractor
 import com.il76.playlistmaker.domain.api.TracksRepository
+import com.il76.playlistmaker.domain.impl.TracksHistoryInteractorImpl
 import com.il76.playlistmaker.domain.impl.TracksInteractorImpl
 
 object Creator {
@@ -24,12 +27,11 @@ object Creator {
     fun initApplication(application: Application) {
         this.application = application
     }
-    //private
-     fun provideSharedPreferences(): SharedPreferences {
+    private fun provideSharedPreferences(): SharedPreferences {
         return application.getSharedPreferences(PLAYLIST_MAKER_PREFERENCES, Context.MODE_PRIVATE)
     }
 
-
+    //треки из сети
 
     private fun getTracksRepository(): TracksRepository {
         return TracksRepositoryImpl(RetrofitNetworkClient())
@@ -37,6 +39,16 @@ object Creator {
 
     fun provideTracksInteractor(): TracksInteractor {
         return TracksInteractorImpl(getTracksRepository())
+    }
+
+    //история поиска
+
+    private fun getTracksHistoryRepository(): TracksHistoryRepository {
+        return TracksHistoryRepositoryImpl(provideSharedPreferences())
+    }
+
+    fun provideTracksHistoryInteractor(): TracksHistoryInteractor {
+        return TracksHistoryInteractorImpl(getTracksHistoryRepository())
     }
 
     /**
@@ -53,5 +65,7 @@ object Creator {
     fun provideMediaPlayerInteractor(): MediaPlayerInteractor {
         return MediaPlayerInteractorImpl(MediaPlayer())
     }
+
+    private const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
 
 }

@@ -26,6 +26,7 @@ import com.il76.playlistmaker.data.network.TrackAPIService
 import com.il76.playlistmaker.domain.api.TrackSearchHistory
 import com.il76.playlistmaker.domain.api.TracksList
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
+import com.il76.playlistmaker.domain.api.TracksInteractor
 import com.il76.playlistmaker.domain.api.TracksRepository
 import com.il76.playlistmaker.domain.models.Track
 import com.il76.playlistmaker.ui.player.PlayerActivity
@@ -42,12 +43,9 @@ class SearchActivity : AppCompatActivity() {
 
     private val trackList = arrayListOf<Track>()
 
-    private val trackSearchHistory = TrackSearchHistory(Creator.provideSharedPreferences())
+    private val trackInteractorImpl = Creator.provideTracksInteractor()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    private val trackHistoryInteractorImpl = Creator.provideTracksHistoryInteractor()
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
@@ -88,12 +86,6 @@ class SearchActivity : AppCompatActivity() {
     }
 
     /**
-     * Статусы результатов поиска
-     */
-    private enum class ErrorStatus {
-        NONE, ERROR_NET, EMPTY_RESULT
-    }
-    /**
      * Отображение или скрытие информации об отсутствии поисковой выдачи
      */
     private fun displayError(status: ErrorStatus) {
@@ -123,41 +115,59 @@ class SearchActivity : AppCompatActivity() {
         if (searchValue.isEmpty()) {
             return
         }
-        val trackApiService = retrofit.create<TrackAPIService>()
-        binding.progressBar.isVisible = true
-        trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksSearchResponse> {
-
-
-            override fun onResponse(call: Call<TracksSearchResponse>, response: Response<TracksSearchResponse>) {
-                binding.progressBar.isVisible = false
-                // Получили ответ от сервера
-                if (response.isSuccessful) {
-                    // Наш запрос был удачным, получаем наши объекты
-                    val body = response.body()
-                    trackList.clear()
-                    for (item in body?.results!!) {
-                        //trackList.add(item)
+        trackInteractorImpl.searchTracks(searchValue,
+            object : TracksInteractor.TracksConsumer {
+                override fun consume(foundTracks: List<Track>) {
+                    handler.post {
+                        if (foundTracks.isNotEmpty()) {
+                            trackList.clear()
+                            trackList.addAll(foundTracks)
+                            displayError(ErrorStatus.NONE)
+                            trackAdapter.notifyDataSetChanged()
+                        } else {
+                            displayError(ErrorStatus.EMPTY_RESULT)
+                        }
+                        //TODO: displayError(ErrorStatus.ERROR_NET)
                     }
-                    if (trackList.size == 0) {
-                        displayError(ErrorStatus.EMPTY_RESULT)
-                    } else {
-                        displayError(ErrorStatus.NONE)
-                    }
-                    trackAdapter.notifyDataSetChanged()
-
-                } else {
-                    // Сервер отклонил наш запрос с ошибкой
-                    displayError(ErrorStatus.ERROR_NET)
                 }
             }
+        )
 
-            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
-                // Не смогли присоединиться к серверу
-                // Выводим ошибку в лог, что-то пошло не так
-                t.printStackTrace()
-                displayError(ErrorStatus.ERROR_NET)
-            }
-        })
+//        val trackApiService = retrofit.create<TrackAPIService>()
+//        binding.progressBar.isVisible = true
+//        trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksSearchResponse> {
+//
+//
+//            override fun onResponse(call: Call<TracksSearchResponse>, response: Response<TracksSearchResponse>) {
+//                binding.progressBar.isVisible = false
+//                // Получили ответ от сервера
+//                if (response.isSuccessful) {
+//                    // Наш запрос был удачным, получаем наши объекты
+//                    val body = response.body()
+//                    trackList.clear()
+//                    for (item in body?.results!!) {
+//                        //trackList.add(item)
+//                    }
+//                    if (trackList.size == 0) {
+//                        displayError(ErrorStatus.EMPTY_RESULT)
+//                    } else {
+//                        displayError(ErrorStatus.NONE)
+//                    }
+//                    trackAdapter.notifyDataSetChanged()
+//
+//                } else {
+//                    // Сервер отклонил наш запрос с ошибкой
+//                    displayError(ErrorStatus.ERROR_NET)
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
+//                // Не смогли присоединиться к серверу
+//                // Выводим ошибку в лог, что-то пошло не так
+//                t.printStackTrace()
+//                displayError(ErrorStatus.ERROR_NET)
+//            }
+//        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,9 +180,6 @@ class SearchActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        val tracksRepository = Creator.provideTracksInteractor()
-
 
         // назад
         binding.activitySearchToolbar.setNavigationOnClickListener {
@@ -218,12 +225,13 @@ class SearchActivity : AppCompatActivity() {
                     if (clickDebounce()) {
                         if (trackList[position].trackId > 0) {
                             val elem = trackList[position]
-                            trackSearchHistory.addElement(elem)
+                            trackHistoryInteractorImpl.addTrack(elem)
+
 //                          Если перестраивать - долгое ожидание запуска следующей активити.
 //                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
                             if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
                                 trackList.clear()
-                                trackList.addAll(trackSearchHistory.trackListHistory.reversed())
+                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
                                 trackAdapter.notifyDataSetChanged()
                             }
                             val json = Creator.provideGson().toJson(elem)
@@ -249,7 +257,7 @@ class SearchActivity : AppCompatActivity() {
             doSearch()
         }
         binding.searchHistoryClear.setOnClickListener {
-            trackSearchHistory.clear()
+            trackHistoryInteractorImpl.clearHistory()
             trackList.clear()
             toggleSearchHistory(false)
             trackAdapter.notifyDataSetChanged()
@@ -263,15 +271,15 @@ class SearchActivity : AppCompatActivity() {
      */
     private fun toggleSearchHistory(visibility: Boolean) {
         var isVisible = visibility
-        if (trackSearchHistory.trackListHistory.isEmpty()) {
+        if (trackHistoryInteractorImpl.getTracks().isEmpty()) {
             isVisible = false // нет истории - нет истории
         }
         binding.searchHistoryTitle.isVisible = isVisible
         binding.searchHistoryClear.isVisible = isVisible
 
-        if (isVisible && trackSearchHistory.trackListHistory.size > 0) {
+        if (isVisible && trackHistoryInteractorImpl.getTracks().isNotEmpty()) {
             trackList.clear()
-            trackList.addAll(trackSearchHistory.trackListHistory.reversed())
+            trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
             trackAdapter.notifyDataSetChanged()
         } else if (!isVisible && trackList.size > 0) {
             trackList.clear()
@@ -296,5 +304,11 @@ class SearchActivity : AppCompatActivity() {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
+    /**
+     * Статусы результатов поиска
+     */
+    private enum class ErrorStatus {
+        NONE, ERROR_NET, EMPTY_RESULT
     }
 }
