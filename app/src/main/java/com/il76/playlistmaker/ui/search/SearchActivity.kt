@@ -115,11 +115,14 @@ class SearchActivity : AppCompatActivity() {
         if (searchValue.isEmpty()) {
             return
         }
+        binding.progressBar.isVisible = true
         trackInteractorImpl.searchTracks(searchValue,
             object : TracksInteractor.TracksConsumer {
-                override fun consume(foundTracks: List<Track>) {
+                override fun consume(foundTracks: List<Track>?) {
                     handler.post {
-                        if (foundTracks.isNotEmpty()) {
+                        if (foundTracks == null) {
+                            displayError(ErrorStatus.ERROR_NET)
+                        } else if (foundTracks.isNotEmpty()) {
                             trackList.clear()
                             trackList.addAll(foundTracks)
                             displayError(ErrorStatus.NONE)
@@ -127,47 +130,10 @@ class SearchActivity : AppCompatActivity() {
                         } else {
                             displayError(ErrorStatus.EMPTY_RESULT)
                         }
-                        //TODO: displayError(ErrorStatus.ERROR_NET)
                     }
                 }
             }
         )
-
-//        val trackApiService = retrofit.create<TrackAPIService>()
-//        binding.progressBar.isVisible = true
-//        trackApiService.getTracks(searchValue).enqueue(object : Callback<TracksSearchResponse> {
-//
-//
-//            override fun onResponse(call: Call<TracksSearchResponse>, response: Response<TracksSearchResponse>) {
-//                binding.progressBar.isVisible = false
-//                // Получили ответ от сервера
-//                if (response.isSuccessful) {
-//                    // Наш запрос был удачным, получаем наши объекты
-//                    val body = response.body()
-//                    trackList.clear()
-//                    for (item in body?.results!!) {
-//                        //trackList.add(item)
-//                    }
-//                    if (trackList.size == 0) {
-//                        displayError(ErrorStatus.EMPTY_RESULT)
-//                    } else {
-//                        displayError(ErrorStatus.NONE)
-//                    }
-//                    trackAdapter.notifyDataSetChanged()
-//
-//                } else {
-//                    // Сервер отклонил наш запрос с ошибкой
-//                    displayError(ErrorStatus.ERROR_NET)
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<TracksSearchResponse>, t: Throwable) {
-//                // Не смогли присоединиться к серверу
-//                // Выводим ошибку в лог, что-то пошло не так
-//                t.printStackTrace()
-//                displayError(ErrorStatus.ERROR_NET)
-//            }
-//        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
