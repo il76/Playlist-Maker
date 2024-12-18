@@ -120,6 +120,7 @@ class SearchActivity : AppCompatActivity() {
             object : TracksInteractor.TracksConsumer {
                 override fun consume(foundTracks: List<Track>?) {
                     handler.post {
+                        binding.progressBar.isVisible = false
                         if (foundTracks == null) {
                             displayError(ErrorStatus.ERROR_NET)
                         } else if (foundTracks.isNotEmpty()) {

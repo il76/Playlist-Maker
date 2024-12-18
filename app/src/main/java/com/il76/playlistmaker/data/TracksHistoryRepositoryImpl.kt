@@ -19,6 +19,7 @@ class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
         } else {
             ArrayList()
         }
+        trackListHistory.clear()
         trackListHistory.addAll(arrayList)
         return trackListHistory
     }
