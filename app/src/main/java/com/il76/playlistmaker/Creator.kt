@@ -6,11 +6,13 @@ import android.content.SharedPreferences
 import android.media.MediaPlayer
 import com.google.gson.Gson
 import com.il76.playlistmaker.data.MediaPlayerInteractorImpl
+import com.il76.playlistmaker.data.MediaPlayerRepositoryImpl
 import com.il76.playlistmaker.data.SettingsInteractorImpl
 import com.il76.playlistmaker.data.TracksHistoryRepositoryImpl
 import com.il76.playlistmaker.data.TracksRepositoryImpl
 import com.il76.playlistmaker.data.network.RetrofitNetworkClient
 import com.il76.playlistmaker.domain.api.MediaPlayerInteractor
+import com.il76.playlistmaker.domain.api.MediaPlayerRepository
 import com.il76.playlistmaker.domain.api.SettingsInteractor
 import com.il76.playlistmaker.domain.api.TracksHistoryInteractor
 import com.il76.playlistmaker.domain.api.TracksHistoryRepository
@@ -62,8 +64,12 @@ object Creator {
         return gson
     }
 
-    fun provideMediaPlayerInteractor(): MediaPlayerInteractor {
-        return MediaPlayerInteractorImpl(MediaPlayer())
+    private fun getMediaPlayerRepository(player: MediaPlayer): MediaPlayerRepository {
+        return MediaPlayerRepositoryImpl(player)
+    }
+
+    fun provideMediaPlayerInteractor(player: MediaPlayer): MediaPlayerInteractor {
+        return MediaPlayerInteractorImpl(getMediaPlayerRepository(player))
     }
 
     private const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"

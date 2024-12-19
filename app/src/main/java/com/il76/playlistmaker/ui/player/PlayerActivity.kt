@@ -1,5 +1,6 @@
 package com.il76.playlistmaker.ui.player
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -21,7 +22,7 @@ class PlayerActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
-    private val playerInteractor = Creator.provideMediaPlayerInteractor()
+    private val playerInteractor = Creator.provideMediaPlayerInteractor(MediaPlayer())
 
     /**
      * Данные о треке, прилетают с экрана поиска

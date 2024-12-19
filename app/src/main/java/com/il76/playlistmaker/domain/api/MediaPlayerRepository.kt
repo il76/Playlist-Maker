@@ -1,6 +1,6 @@
 package com.il76.playlistmaker.domain.api
 
-interface MediaPlayerInteractor {
+interface MediaPlayerRepository {
     fun init(
         dataSource: String,
         onPreparedListener: () -> Unit,
@@ -10,5 +10,5 @@ interface MediaPlayerInteractor {
     fun stop()
     fun pause()
     fun release()
-    fun getCurrentTime(): String
+    fun getCurrentTime(): Int
 }
