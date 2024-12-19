@@ -1,7 +1,6 @@
 package com.il76.playlistmaker.application
 
 import android.app.Application
-import android.util.Log
 import com.il76.playlistmaker.Creator
 
 class App : Application() {

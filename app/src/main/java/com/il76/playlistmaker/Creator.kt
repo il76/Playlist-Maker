@@ -55,7 +55,7 @@ object Creator {
      * Настройки
      */
     fun provideSettingsInteractor(): SettingsInteractor {
-        return SettingsInteractorImpl(provideSharedPreferences())
+        return SettingsInteractorImpl(provideSharedPreferences(), application.applicationContext)
     }
 
     fun provideGson(): Gson {
