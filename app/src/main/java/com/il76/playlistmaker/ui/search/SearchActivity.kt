@@ -168,7 +168,13 @@ class SearchActivity : AppCompatActivity() {
         binding.searchEditText.addTextChangedListener(
             onTextChanged = { s, _, _, _ ->
                 searchValue = s.toString()
-                searchDebounce()
+                toggleSearchHistory(searchValue.isEmpty())
+                binding.searchIconClear.isVisible = searchValue.isNotEmpty()
+                if (searchValue.isEmpty()) {
+                    searchRequest()
+                } else {
+                    searchDebounce()
+                }
             },
         )
 
