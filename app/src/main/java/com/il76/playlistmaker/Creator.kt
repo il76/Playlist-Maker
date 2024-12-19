@@ -68,8 +68,8 @@ object Creator {
         return MediaPlayerRepositoryImpl(player)
     }
 
-    fun provideMediaPlayerInteractor(player: MediaPlayer): MediaPlayerInteractor {
-        return MediaPlayerInteractorImpl(getMediaPlayerRepository(player))
+    fun provideMediaPlayerInteractor(): MediaPlayerInteractor {
+        return MediaPlayerInteractorImpl(getMediaPlayerRepository(MediaPlayer()))
     }
 
     private const val PLAYLIST_MAKER_PREFERENCES = "playlist_maker_preferences"
