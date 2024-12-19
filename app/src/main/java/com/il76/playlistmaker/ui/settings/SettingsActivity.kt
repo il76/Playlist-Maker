@@ -1,4 +1,4 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.ui.settings
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -7,33 +7,39 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.textview.MaterialTextView
-import com.il76.playlistmaker.App.Companion.DARK_THEME_ENABLED
+import com.il76.playlistmaker.Creator
+import com.il76.playlistmaker.R
+import com.il76.playlistmaker.databinding.ActivitySettingsBinding
+import com.il76.playlistmaker.domain.models.ThemeSettings
 
 class SettingsActivity : AppCompatActivity() {
+
+    private var _binding: ActivitySettingsBinding? = null
+    private val binding
+        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+
+    private val settingsInteractor = Creator.provideSettingsInteractor()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_settings)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_settings)) { v, insets ->
+        _binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.activitySettings) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_settings_toolbar)
-        buttonBack.setOnClickListener {
+        binding.activitySettingsToolbar.setOnClickListener {
             this.finish()
         }
 
 
-        val buttonShare = findViewById<MaterialTextView>(R.id.SettingsShareApp)
-        buttonShare.setOnClickListener {
+        binding.SettingsShareApp.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND)
             intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_app_text))
             intent.setType("text/plain")
@@ -44,8 +50,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        val buttonWrite = findViewById<MaterialTextView>(R.id.SettingsWriteSupport)
-        buttonWrite.setOnClickListener {
+        binding.SettingsWriteSupport.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 // type = "*/*"
                 setData (Uri.parse("mailto:")) //нам нужны только почтовые приложения
@@ -60,8 +65,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        val buttonUA = findViewById<MaterialTextView>(R.id.SettingsUserAgreement)
-        buttonUA.setOnClickListener {
+        binding.SettingsUserAgreement.setOnClickListener {
             val webpage: Uri = Uri.parse(getString(R.string.settings_ua_link))
             val intent = Intent(Intent.ACTION_VIEW, webpage)
             // intent.resolveActivity(packageManager) != null // не работает?
@@ -73,13 +77,10 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         //обрабатываем переключатель темы
-        val switcher = findViewById<SwitchMaterial>(R.id.SettingsThemeSwitcher)
-        switcher.isChecked = (applicationContext as App).darkTheme
-        switcher.setOnCheckedChangeListener {_, isChecked ->
-            with((applicationContext as App)) {
-                switchTheme(isChecked)
-                sharedPrefs.edit().putBoolean(DARK_THEME_ENABLED, isChecked).apply()
-            }
+        binding.SettingsThemeSwitcher.isChecked = settingsInteractor.getThemeSettings().isDark
+        binding.SettingsThemeSwitcher.setOnCheckedChangeListener {_, isChecked ->
+            settingsInteractor.switchTheme(ThemeSettings(isChecked))
+            settingsInteractor.saveThemeSettings(ThemeSettings(isChecked))
         }
     }
 

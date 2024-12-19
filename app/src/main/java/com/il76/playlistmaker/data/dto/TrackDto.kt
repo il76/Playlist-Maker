@@ -1,11 +1,11 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.data.dto
 
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data class Track (
+data class TrackDto (
     /**
      * Название композиции
      */
@@ -47,12 +47,8 @@ data class Track (
      */
     val previewUrl: String = ""
 ) {
-    fun getPoster(thumb: Boolean = true): String {
-        if (thumb) {
-            return artworkUrl100
-        } else {
-            return artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
-        }
+    fun getPoster(): String {
+        return artworkUrl100.replaceAfterLast('/',"512x512bb.jpg")
     }
 
     /**

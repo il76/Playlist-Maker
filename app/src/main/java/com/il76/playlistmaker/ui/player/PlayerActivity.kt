@@ -1,6 +1,5 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.ui.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,16 +10,18 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.android.material.appbar.MaterialToolbar
+import com.il76.playlistmaker.Creator
+import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.il76.playlistmaker.domain.models.Track
 
 class PlayerActivity : AppCompatActivity() {
 
     private var _binding: ActivityPlayerBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
+    private val playerInteractor = Creator.provideMediaPlayerInteractor()
 
     /**
      * Данные о треке, прилетают с экрана поиска
@@ -39,11 +40,6 @@ class PlayerActivity : AppCompatActivity() {
     private var isPlaylisted = false
 
     /**
-     * Плеер
-     */
-    private var mediaPlayer = MediaPlayer()
-
-    /**
      * Текущее состояние плеера
      */
     private var playerState = STATE_DEFAULT
@@ -55,14 +51,13 @@ class PlayerActivity : AppCompatActivity() {
         enableEdgeToEdge()
         _binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.activityPlayer) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_player_toolbar)
-        buttonBack.setNavigationOnClickListener {
+        binding.activityPlayerToolbar.setNavigationOnClickListener {
             this.finish()
         }
 
@@ -96,26 +91,26 @@ class PlayerActivity : AppCompatActivity() {
      */
     private fun fillTrackInfo() {
         val json = intent.getStringExtra("track")
-        track = App.instance.gson.fromJson(json, Track::class.java)
+        track = Creator.provideGson().fromJson(json, Track::class.java)
 
         with(binding) {
             Glide.with(trackPoster)
-                .load(track.getPoster(false))
+                .load(track.poster)
                 .placeholder(R.drawable.search_cover_placeholder)
                 .centerInside()
                 .transform(RoundedCorners(trackPoster.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
                 .into(trackPoster)
             trackName.text = track.trackName
             artistName.text = track.artistName
-            trackTime.text = track.getTime()
-            trackCurrentTime.text = track.getTime()
+            trackTime.text = track.trackTime
+            trackCurrentTime.text = track.trackTime
             if (track.collectionName.isNotEmpty()) {
                 trackCollection.text = track.collectionName
                 groupCollection.isVisible = true
             } else {
                 groupCollection.isVisible = false
             }
-            trackYear.text = track.getReleaseYear()
+            trackYear.text = track.releaseYear
             trackGenre.text = track.primaryGenreName
             trackCountry.text = track.country
             buttonPlay.isEnabled = false
@@ -126,28 +121,27 @@ class PlayerActivity : AppCompatActivity() {
      * Инициализация плеера
      */
     private fun preparePlayer() {
-        mediaPlayer.setDataSource(track.previewUrl)
-        mediaPlayer.prepareAsync()
-        // готовы воспроизводить
-        mediaPlayer.setOnPreparedListener {
-            binding.buttonPlay.isEnabled = true
-            binding.buttonPlay.setImageResource(R.drawable.icon_play)
-            playerState = STATE_PREPARED
-        }
-        // завершили воспроизведение
-        mediaPlayer.setOnCompletionListener {
-            binding.buttonPlay.setImageResource(R.drawable.icon_play)
-            playerState = STATE_PREPARED
-            handler.removeCallbacksAndMessages(null)
-            binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
-        }
+        playerInteractor.init(
+            dataSource = track.previewUrl,
+            onPreparedListener = {
+               binding.buttonPlay.isEnabled = true
+               binding.buttonPlay.setImageResource(R.drawable.icon_play)
+               playerState = STATE_PREPARED
+            },
+            onCompletionListener = {
+                binding.buttonPlay.setImageResource(R.drawable.icon_play)
+                playerState = STATE_PREPARED
+                handler.removeCallbacksAndMessages(null)
+                binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
+            }
+        )
     }
 
     /**
      * Запуск
      */
     private fun startPlayer() {
-        mediaPlayer.start()
+        playerInteractor.start()
         binding.buttonPlay.setImageResource(R.drawable.icon_pause)
         playerState = STATE_PLAYING
 
@@ -173,6 +167,9 @@ class PlayerActivity : AppCompatActivity() {
      * Пауза
      */
     private fun pausePlayer() {
+        if (playerState == STATE_PLAYING) {
+            playerInteractor.pause()
+        }
         binding.buttonPlay.setImageResource(R.drawable.icon_play)
         playerState = STATE_PAUSED
         handler.removeCallbacksAndMessages(null)
@@ -196,7 +193,7 @@ class PlayerActivity : AppCompatActivity() {
      * Обновляем текущее время
      */
     private fun displayCurrentPosition() {
-        binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+        binding.trackCurrentTime.text = playerInteractor.getCurrentTime()
     }
 
     /**
@@ -213,7 +210,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
-        mediaPlayer.release()
+        playerInteractor.release()
     }
 
 
