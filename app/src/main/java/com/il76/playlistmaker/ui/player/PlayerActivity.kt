@@ -168,7 +168,9 @@ class PlayerActivity : AppCompatActivity() {
      * Пауза
      */
     private fun pausePlayer() {
-        playerInteractor.pause()
+        if (playerState == STATE_PLAYING) {
+            playerInteractor.pause()
+        }
         binding.buttonPlay.setImageResource(R.drawable.icon_play)
         playerState = STATE_PAUSED
         handler.removeCallbacksAndMessages(null)

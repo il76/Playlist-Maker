@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -215,7 +214,8 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.adapter = trackAdapter
 
         binding.searchErrorRefresh.setOnClickListener {
-            doSearch()
+            displayError(ErrorStatus.NONE)
+            searchRequest()
         }
         binding.searchHistoryClear.setOnClickListener {
             trackHistoryInteractorImpl.clearHistory()
