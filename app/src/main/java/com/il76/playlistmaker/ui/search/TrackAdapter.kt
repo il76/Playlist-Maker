@@ -1,13 +1,15 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.ui.search
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.il76.playlistmaker.R
+import com.il76.playlistmaker.domain.models.Track
 
 class TrackAdapter(private val tracks: ArrayList<Track>) : RecyclerView.Adapter<TrackViewHolder> () {
 
-    private lateinit var clickListener:OnItemClickListener
+    private lateinit var clickListener: OnItemClickListener
 
     interface OnItemClickListener{
         fun onItemClick(position: Int, view: View)
@@ -28,7 +30,7 @@ class TrackAdapter(private val tracks: ArrayList<Track>) : RecyclerView.Adapter<
 
     }
 
-    fun onClickListener(listener:OnItemClickListener){
+    fun onClickListener(listener: OnItemClickListener){
         clickListener = listener
     }
 }

@@ -1,25 +1,30 @@
-package com.il76.playlistmaker
+package com.il76.playlistmaker.ui.media
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.appbar.MaterialToolbar
+import com.il76.playlistmaker.databinding.ActivityMediaBinding
 
 class MediaActivity : AppCompatActivity() {
+
+    private var _binding: ActivityMediaBinding? = null
+    private val binding
+        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_media)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_media)) { v, insets ->
+        _binding = ActivityMediaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.activityMedia) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val buttonBack = findViewById<MaterialToolbar>(R.id.activity_media_toolbar)
-        buttonBack.setNavigationOnClickListener {
+        binding.activityMediaToolbar.setNavigationOnClickListener {
             this.finish()
         }
 
