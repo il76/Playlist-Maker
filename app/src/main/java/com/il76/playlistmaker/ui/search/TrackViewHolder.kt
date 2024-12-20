@@ -1,36 +1,30 @@
 package com.il76.playlistmaker.ui.search
 
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.il76.playlistmaker.R
+import com.il76.playlistmaker.databinding.SearchTrackListBinding
 import com.il76.playlistmaker.domain.models.Track
 
-class TrackViewHolder(itemView: View, listener: TrackAdapter.OnItemClickListener): RecyclerView.ViewHolder(itemView) {
-    private val cover: ImageView = itemView.findViewById(R.id.track_list_cover)
-    private val track: TextView = itemView.findViewById(R.id.track_list_track)
-    private val artist: TextView = itemView.findViewById(R.id.track_list_artist)
-    private val time: TextView = itemView.findViewById(R.id.track_list_time)
+class TrackViewHolder(private val binding: SearchTrackListBinding, listener: TrackAdapter.OnItemClickListener): RecyclerView.ViewHolder(binding.root) {
     init {
-        itemView.setOnClickListener {
+        binding.root.setOnClickListener {
             listener.onItemClick(adapterPosition, itemView)
         }
     }
 
     fun bind(model: Track) {
-        Glide.with(itemView)
+        Glide.with(binding.root)
             .load(model.artworkUrl100)
             .placeholder(R.drawable.search_cover_placeholder)
             .centerInside()
-            .transform(RoundedCorners(itemView.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
-            .into(cover)
+            .transform(RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
+            .into(binding.trackListCover)
 
-        track.text = model.trackName
-        artist.text = model.artistName
-        artist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем
-        time.text = model.trackTime
+        binding.trackListTrack.text = model.trackName
+        binding.trackListArtist.text = model.artistName
+        binding.trackListArtist.requestLayout() // без этой строчки едет вёрстка в строке с исполнителем
+        binding.trackListTime.text = model.trackTime
     }
 }

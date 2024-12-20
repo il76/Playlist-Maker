@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.il76.playlistmaker.R
+import com.il76.playlistmaker.databinding.SearchTrackListBinding
 import com.il76.playlistmaker.domain.models.Track
 
 class TrackAdapter(private val tracks: ArrayList<Track>) : RecyclerView.Adapter<TrackViewHolder> () {
@@ -16,8 +16,8 @@ class TrackAdapter(private val tracks: ArrayList<Track>) : RecyclerView.Adapter<
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.search_track_list, parent, false)
-        return TrackViewHolder(view, clickListener)
+        val layoutInspector = LayoutInflater.from(parent.context)
+        return TrackViewHolder(SearchTrackListBinding.inflate(layoutInspector, parent, false), clickListener)
     }
 
     override fun getItemCount(): Int {
