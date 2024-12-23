@@ -20,6 +20,10 @@ import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.api.TracksRepository
 import com.il76.playlistmaker.search.domain.impl.TracksHistoryInteractorImpl
 import com.il76.playlistmaker.search.domain.impl.TracksInteractorImpl
+import com.il76.playlistmaker.sharing.api.ExternalNavigator
+import com.il76.playlistmaker.sharing.api.SharingInteractor
+import com.il76.playlistmaker.sharing.data.ExternalNavigatorImpl
+import com.il76.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 
 object Creator {
     private lateinit var application: Application
@@ -58,6 +62,14 @@ object Creator {
      */
     fun provideSettingsInteractor(): SettingsInteractor {
         return SettingsInteractorImpl(provideSharedPreferences(), application.applicationContext)
+    }
+
+    fun provideSharingInteractor(): SharingInteractor {
+        return SharingInteractorImpl(provideExternalNavigator(), application.applicationContext)
+    }
+
+    private fun provideExternalNavigator(): ExternalNavigator {
+        return ExternalNavigatorImpl(application.applicationContext)
     }
 
     fun provideGson(): Gson {
