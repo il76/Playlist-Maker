@@ -8,22 +8,22 @@ import com.il76.playlistmaker.sharing.api.SharingInteractor
 import com.il76.playlistmaker.sharing.data.EmailData
 
 class SharingInteractorImpl(private val externalNavigator: ExternalNavigator, private val context: Context): SharingInteractor {
-    override fun share() {
-        externalNavigator.share(getShareLink())
+    override fun share(): String {
+        return externalNavigator.share(getShareLink())
     }
 
-    override fun openTOS() {
-        externalNavigator.openTOS(getTOSLink())
+    override fun openTOS(): String {
+        return externalNavigator.openTOS(getTOSLink())
     }
 
-    override fun writeSupport() {
+    override fun writeSupport(): String {
         val emailData = EmailData(
             title = context.getString(R.string.settings_email_subject),
             subject = context.getString(R.string.settings_email_subject),
             sender = context.getString(R.string.settings_email_from),
             recipient = context.getString(R.string.settings_email_recipient),
         )
-        externalNavigator.writeSupport(emailData)
+        return externalNavigator.writeSupport(emailData)
     }
 
     private fun getShareLink(): Uri {

@@ -1,6 +1,7 @@
 package com.il76.playlistmaker.settings.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -33,6 +34,10 @@ class SettingsActivity : AppCompatActivity() {
             render(it)
         }
 
+        viewModel.observeShowToast().observe(this) { toast ->
+            showToast(toast)
+        }
+
 
         binding.activitySettingsToolbar.setOnClickListener {
             this.finish()
@@ -58,6 +63,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun render(state: SettingsState) {
         binding.SettingsThemeSwitcher.isChecked = state.isChecked
+    }
+
+    private fun showToast(additionalMessage: String) {
+        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
     }
 
 }
