@@ -3,16 +3,19 @@ package com.il76.playlistmaker.player.ui
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
+import com.il76.playlistmaker.player.ui.PlayerViewModel.Companion.getViewModelFactory
 import com.il76.playlistmaker.search.domain.models.Track
 
 class PlayerActivity : AppCompatActivity() {
@@ -22,6 +25,8 @@ class PlayerActivity : AppCompatActivity() {
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
     private val playerInteractor = Creator.provideMediaPlayerInteractor()
+
+    private lateinit var viewModel: PlayerViewModel
 
     /**
      * Данные о треке, прилетают с экрана поиска
@@ -57,11 +62,20 @@ class PlayerActivity : AppCompatActivity() {
             insets
         }
 
+        val json = intent.getStringExtra("track")
+        track = Creator.provideGson().fromJson(json, Track::class.java)
+        viewModel = ViewModelProvider(this, getViewModelFactory(track))[PlayerViewModel::class.java]
+        viewModel.observeState().observe(this) {
+            render(it)
+        }
+
+        viewModel.observeShowToast().observe(this) { toast ->
+            showToast(toast)
+        }
+
         binding.activityPlayerToolbar.setNavigationOnClickListener {
             this.finish()
         }
-
-        fillTrackInfo()
 
         binding.buttonPlay.setOnClickListener {
             playbackControl()
@@ -90,9 +104,6 @@ class PlayerActivity : AppCompatActivity() {
      * Заполняем вью информацией о выбранном треке
      */
     private fun fillTrackInfo() {
-        val json = intent.getStringExtra("track")
-        track = Creator.provideGson().fromJson(json, Track::class.java)
-
         with(binding) {
             Glide.with(trackPoster)
                 .load(track.poster)
@@ -213,6 +224,13 @@ class PlayerActivity : AppCompatActivity() {
         playerInteractor.release()
     }
 
+    private fun render(track: Track) {
+        fillTrackInfo()
+    }
+
+    private fun showToast(additionalMessage: String) {
+        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
+    }
 
     companion object {
         private const val STATE_DEFAULT = 0
