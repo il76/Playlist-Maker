@@ -8,11 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.il76.playlistmaker.creator.Creator
+import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
 
 class PlayerViewModel(
     private val track: Track,
+    private val playerInteractor: MediaPlayerInteractor
 ): ViewModel() {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -38,7 +41,8 @@ class PlayerViewModel(
         fun getViewModelFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 PlayerViewModel(
-                    track
+                    track,
+                    Creator.provideMediaPlayerInteractor()
                 )
             }
         }

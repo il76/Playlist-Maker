@@ -21,20 +21,20 @@ class SettingsViewModel(
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private val isDarkLiveData = MutableLiveData<SettingsState>()
+    private val stateLiveData = MutableLiveData<SettingsState>()
 
     init {
-        isDarkLiveData.postValue(SettingsState(isLoading = false, isChecked =settingsInteractor.getThemeSettings().isDark))
+        stateLiveData.postValue(SettingsState(isLoading = false, isChecked =settingsInteractor.getThemeSettings().isDark))
     }
 
     private val showToast = SingleLiveEvent<String>()
     fun observeShowToast(): LiveData<String> = showToast
 
 
-    fun observeState(): LiveData<SettingsState> = isDarkLiveData
+    fun observeState(): LiveData<SettingsState> = stateLiveData
 
     private fun renderIsDark(isDark: Boolean) {
-        isDarkLiveData.postValue(SettingsState(false, isDark))
+        stateLiveData.postValue(SettingsState(false, isDark))
     }
 
     fun shareApp() {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -15,16 +16,21 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
+import com.il76.playlistmaker.player.ui.PlayerActivity
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
-import com.il76.playlistmaker.player.ui.PlayerActivity
+import com.il76.playlistmaker.search.ui.SearchViewModel.Companion.getViewModelFactory
+import com.il76.playlistmaker.settings.ui.SettingsState
 
 class SearchActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: SearchViewModel
 
     private var searchValue: String = ""
 
@@ -66,7 +72,7 @@ class SearchActivity : AppCompatActivity() {
         toggleSearchHistory(searchValue.isEmpty())
         binding.searchIconClear.isVisible = searchValue.isNotEmpty()
         if (searchValue.isEmpty()) {
-            displayError(ErrorStatus.NONE)
+            displayError(SearchState.ErrorStatus.NONE)
         } else {
             doSearch()
         }
@@ -75,20 +81,20 @@ class SearchActivity : AppCompatActivity() {
     /**
      * Отображение или скрытие информации об отсутствии поисковой выдачи
      */
-    private fun displayError(status: ErrorStatus) {
+    private fun displayError(status: SearchState.ErrorStatus) {
         when (status) {
-            ErrorStatus.NONE -> {
+            SearchState.ErrorStatus.NONE -> {
                 binding.searchError.isVisible = false
                 recyclerView.isVisible = true
             }
-            ErrorStatus.ERROR_NET -> {
+            SearchState.ErrorStatus.ERROR_NET -> {
                 binding.searchError.isVisible = true
                 binding.searchErrorRefresh.isVisible = true
                 binding.searchErrorImage.setImageResource(R.drawable.search_network_error)
                 binding.searchErrorText.text = getText(R.string.search_network_error)
                 recyclerView.isVisible = false
             }
-            ErrorStatus.EMPTY_RESULT -> {
+            SearchState.ErrorStatus.EMPTY_RESULT -> {
                 binding.searchError.isVisible = true
                 binding.searchErrorRefresh.isVisible = false
                 binding.searchErrorImage.setImageResource(R.drawable.search_nothing_found)
@@ -109,14 +115,14 @@ class SearchActivity : AppCompatActivity() {
                     handler.post {
                         binding.progressBar.isVisible = false
                         if (foundTracks == null) {
-                            displayError(ErrorStatus.ERROR_NET)
+                            displayError(SearchState.ErrorStatus.ERROR_NET)
                         } else if (foundTracks.isNotEmpty()) {
                             trackList.clear()
                             trackList.addAll(foundTracks)
-                            displayError(ErrorStatus.NONE)
+                            displayError(SearchState.ErrorStatus.NONE)
                             trackAdapter.notifyDataSetChanged()
                         } else {
-                            displayError(ErrorStatus.EMPTY_RESULT)
+                            displayError(SearchState.ErrorStatus.EMPTY_RESULT)
                         }
                     }
                 }
@@ -133,6 +139,15 @@ class SearchActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        viewModel = ViewModelProvider(this, getViewModelFactory())[SearchViewModel::class.java]
+        viewModel.observeState().observe(this) {
+            render(it)
+        }
+
+        viewModel.observeShowToast().observe(this) { toast ->
+            showToast(toast)
         }
 
         // назад
@@ -155,7 +170,7 @@ class SearchActivity : AppCompatActivity() {
                 val inputMethodManager = getSystemService<InputMethodManager>()
             val view = this.currentFocus
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
-            displayError(ErrorStatus.NONE)
+            displayError(SearchState.ErrorStatus.NONE)
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             toggleSearchHistory(true)
@@ -214,7 +229,7 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.adapter = trackAdapter
 
         binding.searchErrorRefresh.setOnClickListener {
-            displayError(ErrorStatus.NONE)
+            displayError(SearchState.ErrorStatus.NONE)
             searchRequest()
         }
         binding.searchHistoryClear.setOnClickListener {
@@ -249,6 +264,14 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
+    private fun render(state: SearchState) {
+        displayError(state.status)
+    }
+
+    private fun showToast(additionalMessage: String) {
+        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
+    }
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
@@ -266,10 +289,5 @@ class SearchActivity : AppCompatActivity() {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
-    /**
-     * Статусы результатов поиска
-     */
-    private enum class ErrorStatus {
-        NONE, ERROR_NET, EMPTY_RESULT
-    }
+
 }
