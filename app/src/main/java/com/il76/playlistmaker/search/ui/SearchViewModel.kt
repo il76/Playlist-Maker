@@ -18,15 +18,15 @@ class SearchViewModel(
     tracksHistoryInteractor: TracksHistoryInteractor
 ): ViewModel() {
 
-    private var loadingObserver: ((Boolean) -> Unit)? = null
-
-    fun addLoadingObserver(loadingObserver: ((Boolean) -> Unit)) {
-        this.loadingObserver = loadingObserver
-    }
-
-    fun removeLoadingObserver() {
-        this.loadingObserver = null
-    }
+//    private var loadingObserver: ((Boolean) -> Unit)? = null
+//
+//    fun addLoadingObserver(loadingObserver: ((Boolean) -> Unit)) {
+//        this.loadingObserver = loadingObserver
+//    }
+//
+//    fun removeLoadingObserver() {
+//        this.loadingObserver = null
+//    }
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -35,7 +35,7 @@ class SearchViewModel(
     private var searchValueLiveData = MutableLiveData<String>()
 
     init {
-        //playerLiveData.postValue(track)
+        //stateLiveData.postValue(SearchState(isLoading = true))
     }
 
     private val showToast = SingleLiveEvent<String>()
@@ -47,6 +47,24 @@ class SearchViewModel(
 
     override fun onCleared() {
         handler.removeCallbacksAndMessages(SEARCH_TOKEN)
+    }
+
+    fun searchDebounce(changedText: String) {
+//        if (latestSearchText == changedText) {
+//            return
+//        }
+//
+//        this.latestSearchText = changedText
+//        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
+//
+//        val searchRunnable = Runnable { searchRequest(changedText) }
+//
+//        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
+//        handler.postAtTime(
+//            searchRunnable,
+//            SEARCH_REQUEST_TOKEN,
+//            postTime,
+//        )
     }
 
 

@@ -4,7 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -26,7 +27,6 @@ import com.il76.playlistmaker.player.ui.PlayerActivity
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchViewModel.Companion.getViewModelFactory
-import com.il76.playlistmaker.settings.ui.SettingsState
 
 class SearchActivity : AppCompatActivity() {
 
@@ -46,6 +46,8 @@ class SearchActivity : AppCompatActivity() {
     private var isClickAllowed = true
 
     private val handler = Handler(Looper.getMainLooper())
+
+    private lateinit var textWatcher: TextWatcher
 
     private val searchRunnable = Runnable { searchRequest() }
 
@@ -101,6 +103,9 @@ class SearchActivity : AppCompatActivity() {
                 binding.searchErrorText.text = getText(R.string.search_nothing_found)
                 recyclerView.isVisible = false
             }
+
+            SearchState.ErrorStatus.LOADING -> TODO()
+            SearchState.ErrorStatus.SUCCESS -> TODO()
         }
     }
 
@@ -143,7 +148,7 @@ class SearchActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, getViewModelFactory())[SearchViewModel::class.java]
         viewModel.observeState().observe(this) {
-            render(it)
+            renderState(it)
         }
 
         viewModel.observeShowToast().observe(this) { toast ->
@@ -170,27 +175,49 @@ class SearchActivity : AppCompatActivity() {
                 val inputMethodManager = getSystemService<InputMethodManager>()
             val view = this.currentFocus
             inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
+
             displayError(SearchState.ErrorStatus.NONE)
             trackList.clear()
             trackAdapter.notifyDataSetChanged()
             toggleSearchHistory(true)
         }
+
+
+
         // обработчик фокуса на текстовое поле. Включаем кнопки только если есть фокус и пустой текст
         binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->
             toggleSearchHistory(hasFocus && binding.searchEditText.text.isNullOrEmpty())
         }
-        binding.searchEditText.addTextChangedListener(
-            onTextChanged = { s, _, _, _ ->
-                searchValue = s.toString()
-                toggleSearchHistory(searchValue.isEmpty())
-                binding.searchIconClear.isVisible = searchValue.isNotEmpty()
-                if (searchValue.isEmpty()) {
-                    searchRequest()
-                } else {
-                    searchDebounce()
-                }
-            },
-        )
+//        binding.searchEditText.addTextChangedListener(
+//            onTextChanged = { s, _, _, _ ->
+//                searchValue = s.toString()
+//                toggleSearchHistory(searchValue.isEmpty())
+//                binding.searchIconClear.isVisible = searchValue.isNotEmpty()
+//                if (searchValue.isEmpty()) {
+//                    searchRequest()
+//                } else {
+//                    searchDebounce()
+//                }
+//            },
+//        )
+
+        textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.searchDebounce(
+                    changedText = s?.toString() ?: ""
+                )
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+        }
+        textWatcher?.let { binding.searchEditText.addTextChangedListener(it) }
+
+
+
 
         recyclerView = binding.trackList
         trackAdapter = TrackAdapter(trackList)
@@ -242,6 +269,39 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
+    private fun renderState(state: SearchState) {
+        binding.progressBar.isVisible = state.isLoading
+        if (state.status == SearchState.ErrorStatus.LOADING) {
+            binding.progressBar.isVisible = true
+        } else {
+            binding.progressBar.isVisible = false
+        }
+
+        when (state.status) {
+            SearchState.ErrorStatus.NONE -> {}//временная заглушка
+            SearchState.ErrorStatus.ERROR_NET -> {
+                binding.searchError.isVisible = true
+                binding.searchErrorRefresh.isVisible = true
+                binding.searchErrorImage.setImageResource(R.drawable.search_network_error)
+                binding.searchErrorText.text = getText(R.string.search_network_error)
+                recyclerView.isVisible = false
+            }
+            SearchState.ErrorStatus.EMPTY_RESULT -> {
+                binding.searchError.isVisible = true
+                binding.searchErrorRefresh.isVisible = false
+                binding.searchErrorImage.setImageResource(R.drawable.search_nothing_found)
+                binding.searchErrorText.text = getText(R.string.search_nothing_found)
+                recyclerView.isVisible = false
+            }
+            SearchState.ErrorStatus.LOADING -> {}//описано в начале метода
+            SearchState.ErrorStatus.SUCCESS -> {
+                binding.searchError.isVisible = false
+                recyclerView.isVisible = true
+            }
+        }
+        //displayError(state.status)
+    }
+
     /**
      * Переключатель видимости заголовка истории поиска и кнопки очистки
      */
@@ -264,10 +324,6 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    private fun render(state: SearchState) {
-        displayError(state.status)
-    }
-
     private fun showToast(additionalMessage: String) {
         Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
     }
@@ -288,6 +344,11 @@ class SearchActivity : AppCompatActivity() {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        textWatcher?.let { binding.searchEditText.removeTextChangedListener(it) }
     }
 
 }
