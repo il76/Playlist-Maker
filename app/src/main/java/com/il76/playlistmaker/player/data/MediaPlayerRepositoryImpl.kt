@@ -24,7 +24,9 @@ class MediaPlayerRepositoryImpl(private val player: MediaPlayer): MediaPlayerRep
     }
 
     override fun pause() {
-        player.pause()
+        if (player.isPlaying) {
+            player.pause()
+        }
     }
 
     override fun release() {

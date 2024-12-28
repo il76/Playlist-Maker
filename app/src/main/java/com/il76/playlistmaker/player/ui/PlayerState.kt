@@ -1,7 +1,7 @@
 package com.il76.playlistmaker.player.ui
 
-data class PlayerState(val state: State) {
-    enum class State {
-        STATE_DEFAULT, STATE_PREPARED, STATE_PLAYING, STATE_PAUSED
-    }
+import com.il76.playlistmaker.search.domain.models.Track
+
+sealed class PlayerState {
+    data class Loading(val track: Track): PlayerState()
 }

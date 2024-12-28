@@ -1,8 +1,6 @@
 package com.il76.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,15 +22,12 @@ class PlayerActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
-    private val playerInteractor = Creator.provideMediaPlayerInteractor()
-
     private lateinit var viewModel: PlayerViewModel
 
     /**
      * Данные о треке, прилетают с экрана поиска
      */
     private var track = Track()
-
 
     /**
      * Поставлен ли лайк
@@ -47,9 +42,7 @@ class PlayerActivity : AppCompatActivity() {
     /**
      * Текущее состояние плеера
      */
-    private var playerState = STATE_DEFAULT
-
-    val handler = Handler(Looper.getMainLooper())
+    private var playerSatus = PlayerStatus.DEFAULT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +60,13 @@ class PlayerActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, getViewModelFactory(track))[PlayerViewModel::class.java]
         viewModel.observeState().observe(this) {
             render(it)
+        }
+        viewModel.observePlayerStatus().observe(this) {
+            playerSatus = it
+            renderPlayer(it)
+        }
+        viewModel.observeCurrentTime().observe(this) {
+            renderCurrentTime(it)
         }
 
         viewModel.observeShowToast().observe(this) { toast ->
@@ -96,8 +96,6 @@ class PlayerActivity : AppCompatActivity() {
             }
             isLiked = !isLiked
         }
-
-        preparePlayer()
     }
 
     /**
@@ -129,82 +127,37 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * Инициализация плеера
-     */
-    private fun preparePlayer() {
-        playerInteractor.init(
-            dataSource = track.previewUrl,
-            onPreparedListener = {
-               binding.buttonPlay.isEnabled = true
-               binding.buttonPlay.setImageResource(R.drawable.icon_play)
-               playerState = STATE_PREPARED
-            },
-            onCompletionListener = {
-                binding.buttonPlay.setImageResource(R.drawable.icon_play)
-                playerState = STATE_PREPARED
-                handler.removeCallbacksAndMessages(null)
-                binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
-            }
-        )
-    }
-
-    /**
      * Запуск
      */
     private fun startPlayer() {
-        playerInteractor.start()
-        binding.buttonPlay.setImageResource(R.drawable.icon_pause)
-        playerState = STATE_PLAYING
-
-        handler.post(prepareCurrentTimeTask())
-    }
-
-    private fun prepareCurrentTimeTask(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                // Обновляем список в главном потоке
-                displayCurrentPosition()
-
-                // И снова планируем то же действие через TIME_REFRESH_INTERVAL секунд
-                handler.postDelayed(
-                    this,
-                    TIME_REFRESH_INTERVAL,
-                )
-            }
-        }
+        viewModel.changePlayerStatus(PlayerStatus.PLAYIND)
+        playerSatus = PlayerStatus.PLAYIND
     }
 
     /**
      * Пауза
      */
     private fun pausePlayer() {
-        if (playerState == STATE_PLAYING) {
-            playerInteractor.pause()
-        }
-        binding.buttonPlay.setImageResource(R.drawable.icon_play)
-        playerState = STATE_PAUSED
-        handler.removeCallbacksAndMessages(null)
+        viewModel.changePlayerStatus(PlayerStatus.PAUSED)
+        playerSatus = PlayerStatus.PAUSED
     }
 
     /**
      * Старт-стоп
      */
     private fun playbackControl() {
-        when(playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
-            }
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
-            }
+        when(playerSatus) {
+            PlayerStatus.DEFAULT -> {}
+            PlayerStatus.PREPARED, PlayerStatus.PAUSED -> startPlayer()
+            PlayerStatus.PLAYIND -> pausePlayer()
         }
     }
 
     /**
      * Обновляем текущее время
      */
-    private fun displayCurrentPosition() {
-        binding.trackCurrentTime.text = playerInteractor.getCurrentTime()
+    private fun renderCurrentTime(time: String) {
+        binding.trackCurrentTime.text = time
     }
 
     /**
@@ -215,29 +168,29 @@ class PlayerActivity : AppCompatActivity() {
         pausePlayer()
     }
 
-    /**
-     * Закрыли активити или всё приложение
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
-        playerInteractor.release()
+    private fun render(state: PlayerState) {
+        fillTrackInfo()
     }
 
-    private fun render(track: Track) {
-        fillTrackInfo()
+    private fun renderPlayer(status: PlayerStatus) {
+        when (status) {
+            PlayerStatus.DEFAULT -> fillTrackInfo()
+            PlayerStatus.PREPARED -> {
+                binding.buttonPlay.isEnabled = true
+                binding.buttonPlay.setImageResource(R.drawable.icon_play)
+                binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
+            }
+            PlayerStatus.PLAYIND -> {
+                binding.buttonPlay.setImageResource(R.drawable.icon_pause)
+            }
+            PlayerStatus.PAUSED -> {
+                binding.buttonPlay.setImageResource(R.drawable.icon_play)
+            }
+        }
     }
 
     private fun showToast(additionalMessage: String) {
         Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
     }
 
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-
-        private const val TIME_REFRESH_INTERVAL = 500L
-    }
 }
