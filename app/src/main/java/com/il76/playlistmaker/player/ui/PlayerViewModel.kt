@@ -60,6 +60,7 @@ class PlayerViewModel(
             }
             PlayerStatus.PLAYIND -> {
                 playerInteractor.start()
+                playerStatusLiveData.postValue(PlayerStatus.PLAYIND)
                 handler.post(prepareCurrentTimeTask())
             }
             PlayerStatus.PAUSED -> {
