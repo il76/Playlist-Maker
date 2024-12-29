@@ -13,7 +13,7 @@ class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
 
     override fun getTracks(): List<Track> {
         val json = sharedPreferences.getString(TRACKS_SEARCH_HISTORY,null)
-        val itemType = object : TypeToken<ArrayList<Track>>() {}.type
+        val itemType = object : TypeToken<List<Track>>() {}.type
 
         val arrayList: ArrayList<Track> = if (json != null) {
             Creator.provideGson().fromJson(json, itemType)

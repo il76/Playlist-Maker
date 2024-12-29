@@ -16,7 +16,6 @@ import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +23,6 @@ import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import com.il76.playlistmaker.player.ui.PlayerActivity
-import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchViewModel.Companion.getViewModelFactory
 
@@ -36,10 +34,6 @@ class SearchActivity : AppCompatActivity() {
 
     private val trackList = arrayListOf<Track>()
 
-    private val trackInteractorImpl = Creator.provideTracksInteractor()
-
-    private val trackHistoryInteractorImpl = Creator.provideTracksHistoryInteractor()
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
 
@@ -48,8 +42,6 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
 
     private lateinit var textWatcher: TextWatcher
-
-    private val searchRunnable = Runnable { searchRequest() }
 
     private fun clickDebounce() : Boolean {
         val current = isClickAllowed
@@ -63,77 +55,6 @@ class SearchActivity : AppCompatActivity() {
     private var _binding: ActivitySearchBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
-
-    private fun searchDebounce() {
-        handler.removeCallbacks(searchRunnable)
-        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-    }
-
-    private fun searchRequest() {
-        // Включаем историю при пустом тексте и отключаем при непустом
-        toggleSearchHistory(searchValue.isEmpty())
-        binding.searchIconClear.isVisible = searchValue.isNotEmpty()
-        if (searchValue.isEmpty()) {
-            displayError(SearchState.ErrorStatus.NONE)
-        } else {
-            doSearch()
-        }
-    }
-
-    /**
-     * Отображение или скрытие информации об отсутствии поисковой выдачи
-     */
-    private fun displayError(status: SearchState.ErrorStatus) {
-        when (status) {
-            SearchState.ErrorStatus.NONE -> {
-                binding.searchError.isVisible = false
-                recyclerView.isVisible = true
-            }
-            SearchState.ErrorStatus.ERROR_NET -> {
-                binding.searchError.isVisible = true
-                binding.searchErrorRefresh.isVisible = true
-                binding.searchErrorImage.setImageResource(R.drawable.search_network_error)
-                binding.searchErrorText.text = getText(R.string.search_network_error)
-                recyclerView.isVisible = false
-            }
-            SearchState.ErrorStatus.EMPTY_RESULT -> {
-                binding.searchError.isVisible = true
-                binding.searchErrorRefresh.isVisible = false
-                binding.searchErrorImage.setImageResource(R.drawable.search_nothing_found)
-                binding.searchErrorText.text = getText(R.string.search_nothing_found)
-                recyclerView.isVisible = false
-            }
-
-            SearchState.ErrorStatus.LOADING -> TODO()
-            SearchState.ErrorStatus.SUCCESS -> TODO()
-        }
-    }
-
-    private fun doSearch() {
-        if (searchValue.isEmpty()) {
-            return
-        }
-        binding.progressBar.isVisible = true
-        trackInteractorImpl.searchTracks(searchValue,
-            object : TracksInteractor.TracksConsumer {
-                override fun consume(foundTracks: List<Track>?) {
-                    handler.post {
-                        binding.progressBar.isVisible = false
-                        if (foundTracks == null) {
-                            displayError(SearchState.ErrorStatus.ERROR_NET)
-                        } else if (foundTracks.isNotEmpty()) {
-                            trackList.clear()
-                            trackList.addAll(foundTracks)
-                            displayError(SearchState.ErrorStatus.NONE)
-                            trackAdapter.notifyDataSetChanged()
-                        } else {
-                            displayError(SearchState.ErrorStatus.EMPTY_RESULT)
-                        }
-                    }
-                }
-            }
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -163,8 +84,7 @@ class SearchActivity : AppCompatActivity() {
         // поисковая форма
         binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                handler.removeCallbacks(searchRunnable)
-                doSearch()
+                viewModel.doSearch(searchValue)
                 true
             }
             false
@@ -172,43 +92,30 @@ class SearchActivity : AppCompatActivity() {
 
         binding.searchIconClear.setOnClickListener {
             binding.searchEditText.setText("")
-                val inputMethodManager = getSystemService<InputMethodManager>()
-            val view = this.currentFocus
-            inputMethodManager?.hideSoftInputFromWindow(view?.windowToken, 0)
-
-            displayError(SearchState.ErrorStatus.NONE)
-            trackList.clear()
-            trackAdapter.notifyDataSetChanged()
-            toggleSearchHistory(true)
+            val inputMethodManager = getSystemService<InputMethodManager>()
+            inputMethodManager?.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
+            viewModel.setSearchText("")
+            viewModel.toggleHistory(true)
         }
-
-
 
         // обработчик фокуса на текстовое поле. Включаем кнопки только если есть фокус и пустой текст
         binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->
-            toggleSearchHistory(hasFocus && binding.searchEditText.text.isNullOrEmpty())
+            viewModel.toggleHistory(hasFocus && binding.searchEditText.text.isNullOrEmpty())
         }
-//        binding.searchEditText.addTextChangedListener(
-//            onTextChanged = { s, _, _, _ ->
-//                searchValue = s.toString()
-//                toggleSearchHistory(searchValue.isEmpty())
-//                binding.searchIconClear.isVisible = searchValue.isNotEmpty()
-//                if (searchValue.isEmpty()) {
-//                    searchRequest()
-//                } else {
-//                    searchDebounce()
-//                }
-//            },
-//        )
 
         textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchValue = s?.toString() ?: ""
                 viewModel.searchDebounce(
-                    changedText = s?.toString() ?: ""
+                    changedText = searchValue
                 )
+                binding.searchIconClear.isVisible = searchValue.isNotEmpty()
+                if (searchValue.isEmpty()) {
+                    viewModel.toggleHistory(true)
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -227,26 +134,24 @@ class SearchActivity : AppCompatActivity() {
                     if (clickDebounce()) {
                         if (trackList[position].trackId > 0) {
                             val elem = trackList[position]
-                            trackHistoryInteractorImpl.addTrack(elem)
+                            viewModel.addToHistory(elem)
+
+                            //trackHistoryInteractorImpl.addTrack(elem)
 
 //                          Если перестраивать - долгое ожидание запуска следующей активити.
 //                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
-                            if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
-                                trackList.clear()
-                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
-                                trackAdapter.notifyDataSetChanged()
-                            }
+//                            if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
+//                                trackList.clear()
+//                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
+//                                trackAdapter.notifyDataSetChanged()
+//                            }
+
                             val json = Creator.provideGson().toJson(elem)
                             val intent = Intent(applicationContext, PlayerActivity::class.java)
                             intent.putExtra("track", json)
                             startActivity(intent)
-
                         } else {
-                            Toast.makeText(
-                                applicationContext,
-                                applicationContext.getString(R.string.no_track_id),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            viewModel.showToast(applicationContext.getString(R.string.no_track_id),)
                         }
                     }
                 }
@@ -256,29 +161,26 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.adapter = trackAdapter
 
         binding.searchErrorRefresh.setOnClickListener {
-            displayError(SearchState.ErrorStatus.NONE)
-            searchRequest()
+            viewModel.doSearch(searchValue)
         }
         binding.searchHistoryClear.setOnClickListener {
-            trackHistoryInteractorImpl.clearHistory()
-            trackList.clear()
-            toggleSearchHistory(false)
-            trackAdapter.notifyDataSetChanged()
+            viewModel.clearHistory()
         }
-        toggleSearchHistory(false)
-
     }
 
     private fun renderState(state: SearchState) {
-        binding.progressBar.isVisible = state.isLoading
         if (state.status == SearchState.ErrorStatus.LOADING) {
             binding.progressBar.isVisible = true
         } else {
             binding.progressBar.isVisible = false
         }
-
+        binding.searchHistoryTitle.isVisible = false
+        binding.searchHistoryClear.isVisible = false
+        binding.searchError.isVisible = false
+        binding.searchErrorRefresh.isVisible = false
         when (state.status) {
-            SearchState.ErrorStatus.NONE -> {}//временная заглушка
+            SearchState.ErrorStatus.NONE -> {
+            }
             SearchState.ErrorStatus.ERROR_NET -> {
                 binding.searchError.isVisible = true
                 binding.searchErrorRefresh.isVisible = true
@@ -293,35 +195,35 @@ class SearchActivity : AppCompatActivity() {
                 binding.searchErrorText.text = getText(R.string.search_nothing_found)
                 recyclerView.isVisible = false
             }
-            SearchState.ErrorStatus.LOADING -> {}//описано в начале метода
+            SearchState.ErrorStatus.LOADING -> {
+                binding.searchHistoryTitle.isVisible = false
+                binding.searchHistoryClear.isVisible = false
+                binding.searchError.isVisible = false
+                binding.searchErrorRefresh.isVisible = false
+                recyclerView.isVisible = false
+            }
             SearchState.ErrorStatus.SUCCESS -> {
                 binding.searchError.isVisible = false
                 recyclerView.isVisible = true
+                trackList.clear()
+                trackList.addAll(state.trackList)
+                trackAdapter.notifyDataSetChanged()
+            }
+            SearchState.ErrorStatus.HISTORY -> {
+                binding.searchHistoryTitle.isVisible = true
+                binding.searchHistoryClear.isVisible = true
+                trackList.clear()
+                trackList.addAll(state.trackList.reversed())
+                trackAdapter.notifyDataSetChanged()
+                recyclerView.isVisible = true
+            }
+            SearchState.ErrorStatus.EMPTY_HISTORY -> {
+                binding.searchHistoryTitle.isVisible = false
+                binding.searchHistoryClear.isVisible = false
+                trackList.clear()
+                trackAdapter.notifyDataSetChanged()
             }
         }
-        //displayError(state.status)
-    }
-
-    /**
-     * Переключатель видимости заголовка истории поиска и кнопки очистки
-     */
-    private fun toggleSearchHistory(visibility: Boolean) {
-        var isVisible = visibility
-        if (trackHistoryInteractorImpl.getTracks().isEmpty()) {
-            isVisible = false // нет истории - нет истории
-        }
-        binding.searchHistoryTitle.isVisible = isVisible
-        binding.searchHistoryClear.isVisible = isVisible
-
-        if (isVisible && trackHistoryInteractorImpl.getTracks().isNotEmpty()) {
-            trackList.clear()
-            trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
-            trackAdapter.notifyDataSetChanged()
-        } else if (!isVisible && trackList.size > 0) {
-            trackList.clear()
-            trackAdapter.notifyDataSetChanged()
-        }
-
     }
 
     private fun showToast(additionalMessage: String) {
@@ -332,7 +234,7 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
         binding.searchEditText.setText(searchValue)
-        doSearch()
+        viewModel.doSearch(searchValue)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -342,7 +244,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
