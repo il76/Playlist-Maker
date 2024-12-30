@@ -16,19 +16,19 @@ import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.il76.playlistmaker.creator.Creator
+import com.google.gson.Gson
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import com.il76.playlistmaker.player.ui.PlayerActivity
 import com.il76.playlistmaker.search.domain.models.Track
-import com.il76.playlistmaker.search.ui.SearchViewModel.Companion.getViewModelFactory
+import org.koin.android.ext.android.getKoin
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel by viewModel<SearchViewModel>()
 
     private var searchValue: String = ""
 
@@ -67,7 +67,6 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel = ViewModelProvider(this, getViewModelFactory())[SearchViewModel::class.java]
         viewModel.observeState().observe(this) {
             renderState(it)
         }
@@ -146,7 +145,8 @@ class SearchActivity : AppCompatActivity() {
 //                                trackAdapter.notifyDataSetChanged()
 //                            }
 
-                            val json = Creator.provideGson().toJson(elem)
+                            val gson: Gson = getKoin().get()
+                            val json = gson.toJson(elem)
                             val intent = Intent(applicationContext, PlayerActivity::class.java)
                             intent.putExtra("track", json)
                             startActivity(intent)

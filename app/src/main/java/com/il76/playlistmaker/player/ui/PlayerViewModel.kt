@@ -5,10 +5,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
@@ -101,14 +97,14 @@ class PlayerViewModel(
     }
 
     companion object {
-        fun getViewModelFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayerViewModel(
-                    track,
-                    Creator.provideMediaPlayerInteractor()
-                )
-            }
-        }
+//        fun getViewModelFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                PlayerViewModel(
+//                    track,
+//                    Creator.provideMediaPlayerInteractor()
+//                )
+//            }
+//        }
         private val PLAYER_TOKEN = Any()
         private const val TIME_REFRESH_INTERVAL = 500L
     }

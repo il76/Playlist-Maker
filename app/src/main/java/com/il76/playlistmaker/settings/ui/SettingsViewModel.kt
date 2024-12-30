@@ -5,10 +5,6 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.settings.domain.api.SettingsInteractor
 import com.il76.playlistmaker.settings.domain.models.ThemeSettings
 import com.il76.playlistmaker.sharing.api.SharingInteractor
@@ -69,14 +65,14 @@ class SettingsViewModel(
     }
 
     companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SettingsViewModel(
-                    Creator.provideSharingInteractor(),
-                    Creator.provideSettingsInteractor()
-                )
-            }
-        }
+//        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                SettingsViewModel(
+//                    Creator.provideSharingInteractor(),
+//                    Creator.provideSettingsInteractor()
+//                )
+//            }
+//        }
         private val SETTINGS_TOKEN = Any()
     }
 

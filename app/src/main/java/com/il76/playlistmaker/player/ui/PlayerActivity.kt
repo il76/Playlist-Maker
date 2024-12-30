@@ -7,14 +7,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.il76.playlistmaker.creator.Creator
+import com.google.gson.Gson
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
-import com.il76.playlistmaker.player.ui.PlayerViewModel.Companion.getViewModelFactory
 import com.il76.playlistmaker.search.domain.models.Track
+import org.koin.android.ext.android.getKoin
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -22,7 +23,9 @@ class PlayerActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel: PlayerViewModel by viewModel {
+        parametersOf(track)
+    }
 
     /**
      * Данные о треке, прилетают с экрана поиска
@@ -56,8 +59,9 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         val json = intent.getStringExtra("track")
-        track = Creator.provideGson().fromJson(json, Track::class.java)
-        viewModel = ViewModelProvider(this, getViewModelFactory(track))[PlayerViewModel::class.java]
+        val gson: Gson = getKoin().get()
+        track = gson.fromJson(json, Track::class.java)
+
         viewModel.observeState().observe(this) {
             render(it)
         }
