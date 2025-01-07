@@ -3,7 +3,6 @@ package com.il76.playlistmaker.search.ui
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -57,19 +56,16 @@ class SearchViewModel(
 
 
     fun doSearch(text: String) {
-        Log.i("dosearch",text)
         if (text.isEmpty()) {
             return
         }
         handler.removeCallbacksAndMessages(SEARCH_TOKEN)
         stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.LOADING))
-        Log.i("pls","searching"+ text)
 
         trackInteractor.searchTracks(text,
             object : TracksInteractor.TracksConsumer {
                 override fun consume(foundTracks: List<Track>?) {
                     handler.post {
-                        Log.i("pls", foundTracks.toString())
                         if (foundTracks == null) {
                             stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.ERROR_NET))
                         } else if (foundTracks.isNotEmpty()) {
