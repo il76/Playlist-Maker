@@ -2,6 +2,7 @@ package com.il76.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import android.util.Log
 import com.google.gson.Gson
 import com.il76.playlistmaker.search.data.network.NetworkClient
 import com.il76.playlistmaker.search.data.network.RetrofitNetworkClient
@@ -18,7 +19,9 @@ val dataModule = module {
         androidContext()
             .getSharedPreferences("playlist_maker_preferences", Context.MODE_PRIVATE)
     }
-    factory { Gson() }
+    factory {
+        Gson()
+    }
 
     single<TrackAPIService> {
         Retrofit.Builder()
@@ -32,7 +35,7 @@ val dataModule = module {
         RetrofitNetworkClient(get())
     }
 
-    factory<MediaPlayer> {
+    factory {
         MediaPlayer()
     }
 

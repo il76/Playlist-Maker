@@ -25,7 +25,7 @@ val interactorModule = module {
         )
     }
 
-    single<MediaPlayerInteractor> {
+    factory<MediaPlayerInteractor> {
         MediaPlayerInteractorImpl(
             playerRepository = get()
         )

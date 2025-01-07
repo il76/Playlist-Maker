@@ -10,7 +10,7 @@ import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
 
 class PlayerViewModel(
-    private val track: Track,
+    track: Track,
     private val playerInteractor: MediaPlayerInteractor,
 ): ViewModel() {
 
@@ -97,14 +97,6 @@ class PlayerViewModel(
     }
 
     companion object {
-//        fun getViewModelFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-//            initializer {
-//                PlayerViewModel(
-//                    track,
-//                    Creator.provideMediaPlayerInteractor()
-//                )
-//            }
-//        }
         private val PLAYER_TOKEN = Any()
         private const val TIME_REFRESH_INTERVAL = 500L
     }

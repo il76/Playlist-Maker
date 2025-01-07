@@ -21,7 +21,7 @@ val repositoryModule = module {
         )
     }
 
-    single<MediaPlayerRepository> {
+    factory <MediaPlayerRepository> {
         MediaPlayerRepositoryImpl(
             player = get()
         )
