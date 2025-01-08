@@ -1,7 +1,6 @@
 package com.il76.playlistmaker.di
 
 import com.il76.playlistmaker.player.ui.PlayerViewModel
-import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchViewModel
 import com.il76.playlistmaker.settings.ui.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -15,17 +14,19 @@ val viewModelModule = module {
         )
     }
     
-    viewModel { (track: Track) ->
+    viewModel { (trackData: String) ->
         PlayerViewModel(
-            track = track,
-            playerInteractor = get()
+            trackData = trackData,
+            playerInteractor = get(),
+            gson = get()
         )
     }
     
     viewModel {
         SearchViewModel(
             trackInteractor = get(),
-            tracksHistoryInteractor = get()
+            tracksHistoryInteractor = get(),
+            gson = get()
         )
     }
 }

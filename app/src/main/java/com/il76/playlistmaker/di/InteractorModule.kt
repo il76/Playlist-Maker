@@ -40,8 +40,7 @@ val interactorModule = module {
 
     factory<SharingInteractor> {
         SharingInteractorImpl(
-            externalNavigator = get(),
-            context = get()
+            externalNavigator = get()
         )
     }
 

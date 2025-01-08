@@ -1,36 +1,21 @@
 package com.il76.playlistmaker.sharing.domain.impl
 
 import android.content.Context
-import android.net.Uri
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.sharing.api.ExternalNavigator
 import com.il76.playlistmaker.sharing.api.SharingInteractor
 import com.il76.playlistmaker.sharing.data.EmailData
 
-class SharingInteractorImpl(private val externalNavigator: ExternalNavigator, private val context: Context): SharingInteractor {
-    override fun share(): String {
-        return externalNavigator.share(getShareLink())
+class SharingInteractorImpl(private val externalNavigator: ExternalNavigator): SharingInteractor {
+    override fun share(url: String): String {
+        return externalNavigator.share(url)
     }
 
-    override fun openTOS(): String {
-        return externalNavigator.openTOS(getTOSLink())
+    override fun openTOS(url: String): String {
+        return externalNavigator.openTOS(url)
     }
 
-    override fun writeSupport(): String {
-        val emailData = EmailData(
-            title = context.getString(R.string.settings_email_subject),
-            subject = context.getString(R.string.settings_email_subject),
-            sender = context.getString(R.string.settings_email_from),
-            recipient = context.getString(R.string.settings_email_recipient),
-        )
+    override fun writeSupport(emailData: EmailData): String {
         return externalNavigator.writeSupport(emailData)
-    }
-
-    private fun getShareLink(): Uri {
-        return Uri.parse(context.getString(R.string.share_app_text))
-    }
-
-    private fun getTOSLink(): Uri {
-        return Uri.parse(context.getString(R.string.settings_ua_link))
     }
 }

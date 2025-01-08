@@ -11,7 +11,8 @@ import org.koin.dsl.module
 val repositoryModule = module {
     factory<TracksHistoryRepository> {
         TracksHistoryRepositoryImpl(
-            sharedPreferences = get()
+            sharedPreferences = get(),
+            gson = get()
         )
     }
 

@@ -5,9 +5,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.il76.playlistmaker.search.domain.api.TracksHistoryRepository
 import com.il76.playlistmaker.search.domain.models.Track
-import org.koin.java.KoinJavaComponent.getKoin
 
-class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) :
+class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences, private val gson: Gson) :
     TracksHistoryRepository {
 
     private val trackListHistory = arrayListOf<Track>()
@@ -17,7 +16,6 @@ class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
         val itemType = object : TypeToken<List<Track>>() {}.type
 
         val arrayList: ArrayList<Track> = if (json != null) {
-            val gson: Gson = getKoin().get()
             gson.fromJson(json, itemType)
         } else {
             ArrayList()
@@ -49,7 +47,6 @@ class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
     }
 
     override fun saveHistory() {
-        val gson: Gson = getKoin().get()
         sharedPreferences.edit().putString(TRACKS_SEARCH_HISTORY, gson.toJson(trackListHistory)).apply()
     }
 

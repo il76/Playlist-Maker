@@ -18,12 +18,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import com.il76.playlistmaker.player.ui.PlayerActivity
 import com.il76.playlistmaker.search.domain.models.Track
-import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
@@ -134,9 +132,6 @@ class SearchActivity : AppCompatActivity() {
                         if (trackList[position].trackId > 0) {
                             val elem = trackList[position]
                             viewModel.addToHistory(elem)
-
-                            //trackHistoryInteractorImpl.addTrack(elem)
-
 //                          Если перестраивать - долгое ожидание запуска следующей активити.
 //                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
 //                            if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
@@ -144,11 +139,8 @@ class SearchActivity : AppCompatActivity() {
 //                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
 //                                trackAdapter.notifyDataSetChanged()
 //                            }
-
-                            val gson: Gson = getKoin().get()
-                            val json = gson.toJson(elem)
                             val intent = Intent(applicationContext, PlayerActivity::class.java)
-                            intent.putExtra("track", json)
+                            intent.putExtra("track", viewModel.provideTrackData(elem))
                             startActivity(intent)
                         } else {
                             viewModel.showToast(applicationContext.getString(R.string.no_track_id),)

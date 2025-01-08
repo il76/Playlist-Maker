@@ -6,6 +6,7 @@ import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import com.il76.playlistmaker.search.domain.api.TracksHistoryInteractor
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
@@ -13,7 +14,8 @@ import com.il76.playlistmaker.utils.SingleLiveEvent
 
 class SearchViewModel(
     val trackInteractor: TracksInteractor,
-    val tracksHistoryInteractor: TracksHistoryInteractor
+    val tracksHistoryInteractor: TracksHistoryInteractor,
+    private val gson: Gson
 ): ViewModel() {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -104,16 +106,12 @@ class SearchViewModel(
         showToast.postValue(text)
     }
 
+    fun provideTrackData(track: Track): String {
+        return gson.toJson(track)
+    }
+
 
     companion object {
-//        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-//            initializer {
-//                SearchViewModel(
-//                    Creator.provideTracksInteractor(),
-//                    Creator.provideTracksHistoryInteractor()
-//                )
-//            }
-//        }
         private val SEARCH_TOKEN = Any()
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }

@@ -9,11 +9,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.gson.Gson
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
 import com.il76.playlistmaker.search.domain.models.Track
-import org.koin.android.ext.android.getKoin
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -24,13 +22,18 @@ class PlayerActivity : AppCompatActivity() {
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
     private val viewModel: PlayerViewModel by viewModel {
-        parametersOf(track)
+        parametersOf(trackData)
     }
 
     /**
      * Данные о треке, прилетают с экрана поиска
      */
     private var track = Track()
+    /**
+     * Данные о треке, прилетают с экрана поиска
+     */
+    private var trackData = ""
+
 
     /**
      * Поставлен ли лайк
@@ -57,10 +60,7 @@ class PlayerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        val json = intent.getStringExtra("track")
-        val gson: Gson = getKoin().get()
-        track = gson.fromJson(json, Track::class.java)
+        trackData = intent.getStringExtra("track").orEmpty()
 
         viewModel.observeState().observe(this) {
             render(it)
@@ -173,6 +173,11 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun render(state: PlayerState) {
+        when(state) {
+            is PlayerState.Loading -> {
+                track = state.track
+            }
+        }
         fillTrackInfo()
     }
 

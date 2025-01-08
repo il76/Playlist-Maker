@@ -5,14 +5,18 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
 
 class PlayerViewModel(
-    track: Track,
+    trackData: String,
     private val playerInteractor: MediaPlayerInteractor,
+    gson: Gson
 ): ViewModel() {
+
+    var track: Track = Track()
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -23,6 +27,7 @@ class PlayerViewModel(
     private val currentTimeLiveData = MutableLiveData<String>()
 
     init {
+        track = gson.fromJson(trackData, Track::class.java)
         //первичная загрузка трека
         playerLiveData.postValue(
             PlayerState.Loading(track)

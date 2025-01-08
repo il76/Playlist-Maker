@@ -6,7 +6,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySettingsBinding
+import com.il76.playlistmaker.sharing.data.EmailData
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
@@ -42,15 +44,22 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.SettingsShareApp.setOnClickListener {
-            viewModel.shareApp()
+            viewModel.shareApp(applicationContext.getString(R.string.share_app_text))
         }
 
         binding.SettingsWriteSupport.setOnClickListener {
-            viewModel.writeSupport()
+            viewModel.writeSupport(
+                EmailData(
+                    title = applicationContext.getString(R.string.settings_email_subject),
+                    subject = applicationContext.getString(R.string.settings_email_subject),
+                    sender = applicationContext.getString(R.string.settings_email_from),
+                    recipient = applicationContext.getString(R.string.settings_email_recipient),
+                )
+            )
         }
 
         binding.SettingsUserAgreement.setOnClickListener {
-            viewModel.openTOS()
+            viewModel.openTOS(applicationContext.getString(R.string.settings_ua_link))
         }
 
         //обрабатываем переключатель темы
