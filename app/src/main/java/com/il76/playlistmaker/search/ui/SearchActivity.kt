@@ -16,19 +16,17 @@ import androidx.core.content.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivitySearchBinding
 import com.il76.playlistmaker.player.ui.PlayerActivity
 import com.il76.playlistmaker.search.domain.models.Track
-import com.il76.playlistmaker.search.ui.SearchViewModel.Companion.getViewModelFactory
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel by viewModel<SearchViewModel>()
 
     private var searchValue: String = ""
 
@@ -67,7 +65,6 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel = ViewModelProvider(this, getViewModelFactory())[SearchViewModel::class.java]
         viewModel.observeState().observe(this) {
             renderState(it)
         }
@@ -135,9 +132,6 @@ class SearchActivity : AppCompatActivity() {
                         if (trackList[position].trackId > 0) {
                             val elem = trackList[position]
                             viewModel.addToHistory(elem)
-
-                            //trackHistoryInteractorImpl.addTrack(elem)
-
 //                          Если перестраивать - долгое ожидание запуска следующей активити.
 //                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
 //                            if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
@@ -145,10 +139,8 @@ class SearchActivity : AppCompatActivity() {
 //                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
 //                                trackAdapter.notifyDataSetChanged()
 //                            }
-
-                            val json = Creator.provideGson().toJson(elem)
                             val intent = Intent(applicationContext, PlayerActivity::class.java)
-                            intent.putExtra("track", json)
+                            intent.putExtra("track", viewModel.provideTrackData(elem))
                             startActivity(intent)
                         } else {
                             viewModel.showToast(applicationContext.getString(R.string.no_track_id),)

@@ -66,9 +66,13 @@ data class TrackDto (
      * Год выпуска из исходной даты в ISO формате
      */
     fun getReleaseYear(): String {
-        val isoDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-        val date: Date = isoDateFormat.parse(releaseDate)
-        val yearDateFormat = SimpleDateFormat("yyyy")
-        return yearDateFormat.format(date)
+        if (releaseDate.isNotEmpty()) {
+            val isoDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            val date: Date = isoDateFormat.parse(releaseDate)
+            val yearDateFormat = SimpleDateFormat("yyyy")
+            return yearDateFormat.format(date)
+        } else {
+            return ""
+        }
     }
 }

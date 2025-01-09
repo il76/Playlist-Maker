@@ -5,13 +5,10 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.settings.domain.api.SettingsInteractor
 import com.il76.playlistmaker.settings.domain.models.ThemeSettings
 import com.il76.playlistmaker.sharing.api.SharingInteractor
+import com.il76.playlistmaker.sharing.data.EmailData
 import com.il76.playlistmaker.utils.SingleLiveEvent
 
 class SettingsViewModel(
@@ -24,7 +21,7 @@ class SettingsViewModel(
     private val stateLiveData = MutableLiveData<SettingsState>()
 
     init {
-        stateLiveData.postValue(SettingsState(isLoading = false, isChecked =settingsInteractor.getThemeSettings().isDark))
+        stateLiveData.postValue(SettingsState(isLoading = false, isChecked = settingsInteractor.getThemeSettings().isDark))
     }
 
     private val showToast = SingleLiveEvent<String>()
@@ -37,22 +34,24 @@ class SettingsViewModel(
         stateLiveData.postValue(SettingsState(false, isDark))
     }
 
-    fun shareApp() {
-        val result = sharingInteractor.share()
+    fun shareApp(url: String) {
+        val result = sharingInteractor.share(url)
         if (result.isNotEmpty()) {
             showToast.postValue(result)
         }
     }
 
-    fun openTOS() {
-        val result = sharingInteractor.openTOS()
+    fun openTOS(url: String) {
+        val result = sharingInteractor.openTOS(url)
         if (result.isNotEmpty()) {
             showToast.postValue(result)
         }
     }
 
-    fun writeSupport() {
-        val result = sharingInteractor.writeSupport()
+    fun writeSupport(emailData: EmailData) {
+        val result = sharingInteractor.writeSupport(
+            emailData
+        )
         if (result.isNotEmpty()) {
             showToast.postValue(result)
         }
@@ -69,14 +68,6 @@ class SettingsViewModel(
     }
 
     companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SettingsViewModel(
-                    Creator.provideSharingInteractor(),
-                    Creator.provideSettingsInteractor()
-                )
-            }
-        }
         private val SETTINGS_TOKEN = Any()
     }
 

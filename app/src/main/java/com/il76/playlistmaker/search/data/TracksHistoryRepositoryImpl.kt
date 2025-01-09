@@ -1,12 +1,12 @@
 package com.il76.playlistmaker.search.data
 
 import android.content.SharedPreferences
+import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.search.domain.api.TracksHistoryRepository
 import com.il76.playlistmaker.search.domain.models.Track
 
-class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) :
+class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences, private val gson: Gson) :
     TracksHistoryRepository {
 
     private val trackListHistory = arrayListOf<Track>()
@@ -16,7 +16,7 @@ class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
         val itemType = object : TypeToken<List<Track>>() {}.type
 
         val arrayList: ArrayList<Track> = if (json != null) {
-            Creator.provideGson().fromJson(json, itemType)
+            gson.fromJson(json, itemType)
         } else {
             ArrayList()
         }
@@ -47,7 +47,7 @@ class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
     }
 
     override fun saveHistory() {
-        sharedPreferences.edit().putString(TRACKS_SEARCH_HISTORY, Creator.provideGson().toJson(trackListHistory)).apply()
+        sharedPreferences.edit().putString(TRACKS_SEARCH_HISTORY, gson.toJson(trackListHistory)).apply()
     }
 
     companion object {

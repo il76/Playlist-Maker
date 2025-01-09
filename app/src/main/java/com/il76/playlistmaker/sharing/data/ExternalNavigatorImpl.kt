@@ -9,9 +9,9 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.sharing.api.ExternalNavigator
 
 class ExternalNavigatorImpl(private val context: Context): ExternalNavigator {
-    override fun share(uri: Uri): String {
+    override fun share(url: String): String {
         val intent = Intent(Intent.ACTION_SEND)
-        intent.putExtra(Intent.EXTRA_SUBJECT, uri)
+        intent.putExtra(Intent.EXTRA_SUBJECT, Uri.parse(url))
         intent.setType("text/plain")
         if (intent.resolveActivity(context.packageManager) != null) {
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
@@ -22,8 +22,8 @@ class ExternalNavigatorImpl(private val context: Context): ExternalNavigator {
         }
     }
 
-    override fun openTOS(uri: Uri): String {
-        val intent = Intent(Intent.ACTION_VIEW, uri)
+    override fun openTOS(url: String): String {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
         // intent.resolveActivity(packageManager) != null // не работает?
         try {

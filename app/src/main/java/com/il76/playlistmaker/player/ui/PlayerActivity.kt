@@ -7,14 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.il76.playlistmaker.creator.Creator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityPlayerBinding
-import com.il76.playlistmaker.player.ui.PlayerViewModel.Companion.getViewModelFactory
 import com.il76.playlistmaker.search.domain.models.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -22,12 +21,19 @@ class PlayerActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel: PlayerViewModel by viewModel {
+        parametersOf(trackData)
+    }
 
     /**
      * Данные о треке, прилетают с экрана поиска
      */
     private var track = Track()
+    /**
+     * Данные о треке, прилетают с экрана поиска
+     */
+    private var trackData = ""
+
 
     /**
      * Поставлен ли лайк
@@ -54,10 +60,8 @@ class PlayerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        trackData = intent.getStringExtra("track").orEmpty()
 
-        val json = intent.getStringExtra("track")
-        track = Creator.provideGson().fromJson(json, Track::class.java)
-        viewModel = ViewModelProvider(this, getViewModelFactory(track))[PlayerViewModel::class.java]
         viewModel.observeState().observe(this) {
             render(it)
         }
@@ -169,6 +173,11 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun render(state: PlayerState) {
+        when(state) {
+            is PlayerState.Loading -> {
+                track = state.track
+            }
+        }
         fillTrackInfo()
     }
 

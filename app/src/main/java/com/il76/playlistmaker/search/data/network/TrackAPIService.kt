@@ -6,6 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface TrackAPIService {
-    @GET("search")
+    @GET("search?entity=musicTrack")
     fun getTracks(@Query("term", encoded = false) text: String): Call<TracksSearchResponse>
 }

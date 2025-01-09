@@ -3,14 +3,10 @@ package com.il76.playlistmaker.search.ui
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.il76.playlistmaker.creator.Creator
+import com.google.gson.Gson
 import com.il76.playlistmaker.search.domain.api.TracksHistoryInteractor
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
@@ -18,7 +14,8 @@ import com.il76.playlistmaker.utils.SingleLiveEvent
 
 class SearchViewModel(
     val trackInteractor: TracksInteractor,
-    val tracksHistoryInteractor: TracksHistoryInteractor
+    val tracksHistoryInteractor: TracksHistoryInteractor,
+    private val gson: Gson
 ): ViewModel() {
 
     private val handler = Handler(Looper.getMainLooper())
@@ -61,19 +58,16 @@ class SearchViewModel(
 
 
     fun doSearch(text: String) {
-        Log.i("dosearch",text)
         if (text.isEmpty()) {
             return
         }
         handler.removeCallbacksAndMessages(SEARCH_TOKEN)
         stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.LOADING))
-        Log.i("pls","searching"+ text)
 
         trackInteractor.searchTracks(text,
             object : TracksInteractor.TracksConsumer {
                 override fun consume(foundTracks: List<Track>?) {
                     handler.post {
-                        Log.i("pls", foundTracks.toString())
                         if (foundTracks == null) {
                             stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.ERROR_NET))
                         } else if (foundTracks.isNotEmpty()) {
@@ -112,16 +106,12 @@ class SearchViewModel(
         showToast.postValue(text)
     }
 
+    fun provideTrackData(track: Track): String {
+        return gson.toJson(track)
+    }
+
 
     companion object {
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(
-                    Creator.provideTracksInteractor(),
-                    Creator.provideTracksHistoryInteractor()
-                )
-            }
-        }
         private val SEARCH_TOKEN = Any()
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
