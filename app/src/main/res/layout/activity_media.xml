@@ -15,4 +15,13 @@
         app:navigationIcon="@drawable/icon_back"
         app:title="@string/button_media"
         app:titleTextAppearance="@style/Toolbar.TitleText" />
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/mediaTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/mediaViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </LinearLayout>

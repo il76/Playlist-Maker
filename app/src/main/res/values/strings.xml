@@ -34,5 +34,10 @@
     <string name="track_year">Год</string>
     <string name="track_genre">Жанр</string>
     <string name="track_country">Страна</string>
+    <string name="media_tab_faforite_tracks">Избранные треки</string>
+    <string name="media_tab_playlists">Плейлисты</string>
+    <string name="media_empty_tracks">Ваша медиатека пуста</string>
+    <string name="media_empty_playlists">Вы не создали\nни одного плейлиста</string>
+
 
 </resources>
