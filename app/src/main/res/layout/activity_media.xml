@@ -17,6 +17,14 @@
         app:titleTextAppearance="@style/Toolbar.TitleText" />
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/mediaTabLayout"
+        style="@style/MediaTab"
+        app:tabTextAppearance="@style/MediaTab"
+        app:tabSelectedTextAppearance="@style/MediaTab"
+        app:tabIndicatorColor="@color/back_icon_fill"
+        app:tabIndicatorHeight="2dp"
+        android:layout_marginHorizontal="16dp"
+        app:tabMode="fixed"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <androidx.viewpager2.widget.ViewPager2
