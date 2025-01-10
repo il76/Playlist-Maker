@@ -1,5 +1,6 @@
 package com.il76.playlistmaker.di
 
+import com.il76.playlistmaker.media.ui.MediaViewModel
 import com.il76.playlistmaker.player.ui.PlayerViewModel
 import com.il76.playlistmaker.search.ui.SearchViewModel
 import com.il76.playlistmaker.settings.ui.SettingsViewModel
@@ -29,4 +30,9 @@ val viewModelModule = module {
             gson = get()
         )
     }
+
+    viewModel {
+        MediaViewModel()
+    }
+
 }

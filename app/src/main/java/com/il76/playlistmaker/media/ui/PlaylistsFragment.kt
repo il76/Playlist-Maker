@@ -6,10 +6,13 @@ import android.view.ViewGroup
 import androidx.core.bundle.Bundle
 import androidx.fragment.app.Fragment
 import com.il76.playlistmaker.databinding.MediaPlaylistsBinding
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class PlaylistsFragment: Fragment() {
 
     private lateinit var binding: MediaPlaylistsBinding
+
+    val mediaViewModel by activityViewModel<MediaViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
