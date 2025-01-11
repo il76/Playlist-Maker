@@ -7,12 +7,15 @@ import androidx.core.bundle.Bundle
 import androidx.fragment.app.Fragment
 import com.il76.playlistmaker.databinding.MediaTracksBinding
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TracksFragment: Fragment() {
 
     private lateinit var binding: MediaTracksBinding
 
-    val mediaViewModel by activityViewModel<MediaViewModel>()
+    private val mediaViewModel by activityViewModel<MediaViewModel>()
+
+    private val tracksViewModel: TracksViewModel by viewModel<TracksViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
