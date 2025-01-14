@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_media"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_secondary"
     android:backgroundTint="@color/background_secondary"
-    android:id="@+id/activity_media"
-    >
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/activity_media_toolbar"
@@ -15,4 +15,23 @@
         app:navigationIcon="@drawable/icon_back"
         app:title="@string/button_media"
         app:titleTextAppearance="@style/Toolbar.TitleText" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/media_tab_layout"
+        style="@style/MediaTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        app:tabIndicatorColor="@color/back_icon_fill"
+        app:tabIndicatorHeight="2dp"
+        app:tabMode="fixed"
+
+        app:tabSelectedTextAppearance="@style/MediaTab"
+        app:tabTextAppearance="@style/MediaTab" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/media_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

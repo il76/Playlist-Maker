@@ -1,15 +1,17 @@
 package com.il76.playlistmaker.main.ui
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.il76.playlistmaker.databinding.ActivityMainBinding
 import com.il76.playlistmaker.settings.ui.SettingsActivity
-import com.il76.playlistmaker.player.ui.MediaActivity
+import com.il76.playlistmaker.media.ui.MediaActivity
 import com.il76.playlistmaker.search.ui.SearchActivity
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.BLACK))
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
