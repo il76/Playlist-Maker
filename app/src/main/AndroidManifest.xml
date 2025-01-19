@@ -16,19 +16,10 @@
         android:theme="@style/Theme.PlaylistMaker"
         tools:targetApi="35">
         <activity
-            android:name=".main.ui.NavActivity"
-            android:exported="false" />
-        <activity
             android:name=".player.ui.PlayerActivity"
             android:exported="false" />
         <activity
-            android:name=".media.ui.MediaActivity"
-            android:exported="false" />
-        <activity
             android:name=".search.ui.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".settings.ui.SettingsActivity"
             android:exported="false" />
         <activity
             android:name=".main.ui.MainActivity"

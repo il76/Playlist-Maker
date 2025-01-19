@@ -29,12 +29,17 @@ class MediaFragment: Fragment() {
 
         tabMediator = TabLayoutMediator(binding.mediaTabLayout, binding.mediaViewPager) { tab, position ->
             when(position) {
-                0 -> tab.text = getActivity()?.getApplicationContext()?.getString(R.string.media_tab_faforite_tracks)
-                1 -> tab.text = getActivity()?.getApplicationContext()?.getString(R.string.media_tab_playlists)
+                0 -> tab.text = requireContext().getString(R.string.media_tab_faforite_tracks)
+                1 -> tab.text = requireContext().getString(R.string.media_tab_playlists)
             }
         }
         tabMediator.attach()
 
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        tabMediator.detach()
     }
 }
