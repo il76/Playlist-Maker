@@ -7,13 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.ActivitySettingsBinding
+import com.il76.playlistmaker.databinding.FragmentSettingsBinding
 import com.il76.playlistmaker.sharing.data.EmailData
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsActivity : AppCompatActivity() {
 
-    private var _binding: ActivitySettingsBinding? = null
+    private var _binding: FragmentSettingsBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
@@ -22,9 +22,9 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        _binding = ActivitySettingsBinding.inflate(layoutInflater)
+        _binding = FragmentSettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.activitySettings) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentSettings) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -39,9 +39,9 @@ class SettingsActivity : AppCompatActivity() {
         }
 
 
-        binding.activitySettingsToolbar.setOnClickListener {
-            this.finish()
-        }
+//        binding.activitySettingsToolbar.setOnClickListener {
+//            this.finish()
+//        }
 
         binding.SettingsShareApp.setOnClickListener {
             viewModel.shareApp(applicationContext.getString(R.string.share_app_text))

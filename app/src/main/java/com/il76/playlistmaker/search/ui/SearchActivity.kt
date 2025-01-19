@@ -19,7 +19,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.ActivitySearchBinding
+import com.il76.playlistmaker.databinding.FragmentSearchBinding
 import com.il76.playlistmaker.player.ui.PlayerActivity
 import com.il76.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -50,16 +50,16 @@ class SearchActivity : AppCompatActivity() {
         return current
     }
 
-    private var _binding: ActivitySearchBinding? = null
+    private var _binding: FragmentSearchBinding? = null
     private val binding
         get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        _binding = ActivitySearchBinding.inflate(layoutInflater)
+        _binding = FragmentSearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.activitySearch) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentSearch) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -74,9 +74,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         // назад
-        binding.activitySearchToolbar.setNavigationOnClickListener {
-            this.finish()
-        }
+//        binding.activitySearchToolbar.setNavigationOnClickListener {
+//            this.finish()
+//        }
 
         // поисковая форма
         binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->

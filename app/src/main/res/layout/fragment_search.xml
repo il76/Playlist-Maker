@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_search"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_secondary"
     android:backgroundTint="@color/background_secondary"
+    tools:context=".search.ui.SearchFragment"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/activity_search_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/icon_back"
+
         app:title="@string/button_search"
         app:titleTextAppearance="@style/Toolbar.TitleText" />
 
@@ -89,6 +91,7 @@
         android:layout_marginVertical="@dimen/pdg_root"
         android:layout_weight="1"
         android:padding="0dp"
+        tools:listitem="@layout/search_track_list"
     />
     <LinearLayout
         android:id="@+id/search_error"
