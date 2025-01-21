@@ -16,9 +16,6 @@
         android:theme="@style/Theme.PlaylistMaker"
         tools:targetApi="35">
         <activity
-            android:name=".player.ui.PlayerActivity"
-            android:exported="false" />
-        <activity
             android:name=".main.ui.MainActivity"
             android:windowSoftInputMode="adjustResize"
             android:enableOnBackInvokedCallback="true"

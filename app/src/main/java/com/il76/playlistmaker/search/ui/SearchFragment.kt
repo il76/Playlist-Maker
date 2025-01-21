@@ -1,6 +1,5 @@
 package com.il76.playlistmaker.search.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,11 +14,12 @@ import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentSearchBinding
-import com.il76.playlistmaker.player.ui.PlayerActivity
+import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -140,9 +140,10 @@ class SearchFragment: Fragment() {
 //                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
 //                                trackAdapter.notifyDataSetChanged()
 //                            }
-                            val intent = Intent(requireContext(), PlayerActivity::class.java)
-                            intent.putExtra("track", viewModel.provideTrackData(elem))
-                            startActivity(intent)
+                                findNavController().navigate(
+                                    R.id.action_search_fragment_to_playerFragment,
+                                    PlayerFragment.createArgs(viewModel.provideTrackData(elem))
+                                )
                         } else {
                             viewModel.showToast(requireContext().getString(R.string.no_track_id),)
                         }

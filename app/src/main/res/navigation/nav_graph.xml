@@ -15,16 +15,18 @@
         android:label="@string/button_search"
         tools:layout="@layout/fragment_search">
         <action
-            android:id="@+id/action_searchFragment_to_playerActivity"
-            app:destination="@id/playerActivity" />
+            android:id="@+id/action_search_fragment_to_playerFragment"
+            app:destination="@id/playerFragment"
+            app:popUpTo="@id/search_fragment" />
     </fragment>
     <fragment
         android:id="@+id/settings_fragment"
         android:name="com.il76.playlistmaker.settings.ui.SettingsFragment"
         android:label="@string/button_settings"
         tools:layout="@layout/fragment_settings" />
-    <activity
-        android:id="@+id/playerActivity"
-        android:name="com.il76.playlistmaker.player.ui.PlayerActivity"
-        tools:layout="@layout/activity_player" />
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.il76.playlistmaker.player.ui.PlayerFragment"
+        android:label="fragment_player"
+        tools:layout="@layout/fragment_player" />
 </navigation>

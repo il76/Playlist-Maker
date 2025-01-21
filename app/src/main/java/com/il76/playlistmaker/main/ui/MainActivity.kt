@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.il76.playlistmaker.R
@@ -23,15 +25,22 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.BLACK))
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainActivity)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainActivity) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)//systemBars.bottom - bottom padding fix
-            insets
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            // Android 15 fix
+            WindowInsetsCompat.CONSUMED
         }
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainFragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
-
+        navController.addOnDestinationChangedListener { _, nd: NavDestination, _ ->
+            if (nd.label == "fragment_player") { //прячем нижнее меню на экране плеера
+                binding.bottomNavigationView.isVisible = false
+            } else {
+                binding.bottomNavigationView.isVisible = true
+            }
+        }
         binding.bottomNavigationView.setupWithNavController(navController)
     }
 }
