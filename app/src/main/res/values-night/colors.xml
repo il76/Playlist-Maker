@@ -18,4 +18,7 @@
     <color name="player_icon_bg">#FF535459</color>
     <color name="player_icon_play">#FFFFFFFF</color>
     <color name="player_icon_play_inner">#FF000000</color>
+    <color name="progressbar_tint">#FF3772E7</color>
+    <color name="bottom_navigation_item_active">#FF3772E7</color>
+    <color name="bottom_navigation_item_default">#FFFFFFFF</color>
 </resources>
