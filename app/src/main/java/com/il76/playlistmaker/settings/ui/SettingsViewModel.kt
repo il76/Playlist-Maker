@@ -1,7 +1,5 @@
 package com.il76.playlistmaker.settings.ui
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,8 +13,6 @@ class SettingsViewModel(
     private val sharingInteractor: SharingInteractor,
     private val settingsInteractor: SettingsInteractor,
 ): ViewModel() {
-
-    private val handler = Handler(Looper.getMainLooper())
 
     private val stateLiveData = MutableLiveData<SettingsState>()
 
@@ -58,17 +54,9 @@ class SettingsViewModel(
     }
 
     fun switchTheme(isChecked: Boolean) {
-        settingsInteractor.switchTheme(ThemeSettings(isChecked))
-        settingsInteractor.saveThemeSettings(ThemeSettings(isChecked))
         renderIsDark(isChecked)
-    }
+        settingsInteractor.saveThemeSettings(ThemeSettings(isChecked))
+        settingsInteractor.switchTheme(ThemeSettings(isChecked))
 
-    override fun onCleared() {
-        handler.removeCallbacksAndMessages(SETTINGS_TOKEN)
     }
-
-    companion object {
-        private val SETTINGS_TOKEN = Any()
-    }
-
 }
