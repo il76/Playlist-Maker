@@ -56,11 +56,6 @@ class SearchFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        if (savedInstanceState !== null) {
-            searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
-        }
-        binding.searchEditText.setText(searchValue)
-        viewModel.doSearch(searchValue)
         return binding.root
     }
 
@@ -71,6 +66,11 @@ class SearchFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (savedInstanceState !== null) {
+            searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
+        }
+        binding.searchEditText.setText(searchValue)
+        viewModel.doSearch(searchValue)
         viewModel.observeState().observe(viewLifecycleOwner) {
             renderState(it)
         }
