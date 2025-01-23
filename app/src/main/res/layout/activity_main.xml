@@ -21,7 +21,7 @@
     <View
         android:id="@+id/bottomNavigationViewBorder"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height=".5dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
