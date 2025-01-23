@@ -37,8 +37,10 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, nd: NavDestination, _ ->
             if (nd.label == "fragment_player") { //прячем нижнее меню на экране плеера
                 binding.bottomNavigationView.isVisible = false
+                binding.bottomNavigationViewBorder.isVisible = false
             } else {
                 binding.bottomNavigationView.isVisible = true
+                binding.bottomNavigationViewBorder.isVisible = true
             }
         }
         binding.bottomNavigationView.setupWithNavController(navController)
