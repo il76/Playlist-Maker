@@ -3,6 +3,8 @@
     <style name="Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/white</item>
         <item name="colorOnPrimary">@color/black</item>
+        <item name="colorControlNormal">#FF1A1B22</item>
+        <item name="colorControlActivated">#FF3772E7</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>

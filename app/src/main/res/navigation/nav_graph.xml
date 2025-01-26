@@ -3,26 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
-
+    app:startDestination="@id/media_fragment">
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.il76.playlistmaker.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-
+        android:id="@+id/media_fragment"
+        android:name="com.il76.playlistmaker.media.ui.MediaFragment"
+        android:label="@string/button_media"
+        tools:layout="@layout/fragment_media" />
+    <fragment
+        android:id="@+id/search_fragment"
+        android:name="com.il76.playlistmaker.search.ui.SearchFragment"
+        android:label="@string/button_search"
+        tools:layout="@layout/fragment_search">
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_search_fragment_to_playerFragment"
+            app:destination="@id/playerFragment"
+            app:popUpTo="@id/search_fragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.il76.playlistmaker.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
-        <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
-    </fragment>
+        android:id="@+id/settings_fragment"
+        android:name="com.il76.playlistmaker.settings.ui.SettingsFragment"
+        android:label="@string/button_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/playerFragment"
+        android:name="com.il76.playlistmaker.player.ui.PlayerFragment"
+        android:label="fragment_player"
+        tools:layout="@layout/fragment_player" />
 </navigation>

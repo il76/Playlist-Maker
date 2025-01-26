@@ -1,18 +1,18 @@
 package com.il76.playlistmaker.main.ui
 
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.navigation.NavDestination
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.ActivityMainBinding
-import com.il76.playlistmaker.settings.ui.SettingsActivity
-import com.il76.playlistmaker.media.ui.MediaActivity
-import com.il76.playlistmaker.search.ui.SearchActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,30 +25,24 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.BLACK))
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainActivity) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+            // Android 15 fix
+            WindowInsetsCompat.CONSUMED
         }
 
-        // анонимный класс
-        val btnClickListener: View.OnClickListener = object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                val intent = Intent(this@MainActivity, SearchActivity::class.java)
-                startActivity(intent)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainFragmentContainerView) as NavHostFragment
+        val navController = navHostFragment.navController
+        navController.addOnDestinationChangedListener { _, nd: NavDestination, _ ->
+            if (nd.label == "fragment_player") { //прячем нижнее меню на экране плеера
+                binding.bottomNavigationView.isVisible = false
+                binding.bottomNavigationViewBorder.isVisible = false
+            } else {
+                binding.bottomNavigationView.isVisible = true
+                binding.bottomNavigationViewBorder.isVisible = true
             }
         }
-        binding.buttonSearch.setOnClickListener(btnClickListener)
-
-        // лямбда
-        binding.buttonMedia.setOnClickListener {
-            val intent = Intent(this, MediaActivity::class.java)
-            startActivity(intent)
-        }
-        // открываем настройки
-        binding.buttonSettings.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        }
+        binding.bottomNavigationView.setupWithNavController(navController)
     }
 }

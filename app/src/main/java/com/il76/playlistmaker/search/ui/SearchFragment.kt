@@ -1,31 +1,31 @@
 package com.il76.playlistmaker.search.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.ActivitySearchBinding
-import com.il76.playlistmaker.player.ui.PlayerActivity
+import com.il76.playlistmaker.databinding.FragmentSearchBinding
+import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment: Fragment() {
 
+    private lateinit var binding: FragmentSearchBinding
     private val viewModel by viewModel<SearchViewModel>()
 
     private var searchValue: String = ""
@@ -50,32 +50,33 @@ class SearchActivity : AppCompatActivity() {
         return current
     }
 
-    private var _binding: ActivitySearchBinding? = null
-    private val binding
-        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        _binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.activitySearch) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    override fun onDestroyView() {
+        super.onDestroyView()
+        textWatcher?.let { binding.searchEditText.removeTextChangedListener(it) }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (savedInstanceState !== null) {
+            searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
         }
-
-        viewModel.observeState().observe(this) {
+        binding.searchEditText.setText(searchValue)
+        viewModel.doSearch(searchValue)
+        viewModel.observeState().observe(viewLifecycleOwner) {
             renderState(it)
         }
 
-        viewModel.observeShowToast().observe(this) { toast ->
+        viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
-        }
-
-        // назад
-        binding.activitySearchToolbar.setNavigationOnClickListener {
-            this.finish()
         }
 
         // поисковая форма
@@ -89,8 +90,8 @@ class SearchActivity : AppCompatActivity() {
 
         binding.searchIconClear.setOnClickListener {
             binding.searchEditText.setText("")
-            val inputMethodManager = getSystemService<InputMethodManager>()
-            inputMethodManager?.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
+            val inputMethodManager = requireActivity().getSystemService<InputMethodManager>()
+            inputMethodManager?.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, 0)
             viewModel.setSearchText("")
             viewModel.toggleHistory(true)
         }
@@ -139,17 +140,18 @@ class SearchActivity : AppCompatActivity() {
 //                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
 //                                trackAdapter.notifyDataSetChanged()
 //                            }
-                            val intent = Intent(applicationContext, PlayerActivity::class.java)
-                            intent.putExtra("track", viewModel.provideTrackData(elem))
-                            startActivity(intent)
+                                findNavController().navigate(
+                                    R.id.action_search_fragment_to_playerFragment,
+                                    PlayerFragment.createArgs(viewModel.provideTrackData(elem))
+                                )
                         } else {
-                            viewModel.showToast(applicationContext.getString(R.string.no_track_id),)
+                            viewModel.showToast(requireContext().getString(R.string.no_track_id),)
                         }
                     }
                 }
             }
         )
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         recyclerView.adapter = trackAdapter
 
         binding.searchErrorRefresh.setOnClickListener {
@@ -219,14 +221,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showToast(additionalMessage: String) {
-        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
-        binding.searchEditText.setText(searchValue)
-        viewModel.doSearch(searchValue)
+        Toast.makeText(requireActivity(), additionalMessage, Toast.LENGTH_LONG).show()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -239,10 +234,4 @@ class SearchActivity : AppCompatActivity() {
 
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        textWatcher?.let { binding.searchEditText.removeTextChangedListener(it) }
-    }
-
 }

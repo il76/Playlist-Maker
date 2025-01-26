@@ -138,6 +138,7 @@
         <item name="android:layout_marginEnd">16dp</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
+
     </style>
     <style name="MediaTab" parent="Font500">
         <item name="android:textSize">14sp</item>

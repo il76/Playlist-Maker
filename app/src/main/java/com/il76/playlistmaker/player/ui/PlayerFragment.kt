@@ -1,25 +1,25 @@
 package com.il76.playlistmaker.player.ui
 
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.bundle.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.ActivityPlayerBinding
+import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.search.domain.models.Track
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class PlayerActivity : AppCompatActivity() {
-
-    private var _binding: ActivityPlayerBinding? = null
-    private val binding
-        get() = _binding ?: throw IllegalStateException("Binding wasn't initiliazed!")
+class PlayerFragment: Fragment() {
+    private lateinit var binding: FragmentPlayerBinding
 
     private val viewModel: PlayerViewModel by viewModel {
         parametersOf(trackData)
@@ -50,35 +50,38 @@ class PlayerActivity : AppCompatActivity() {
      */
     private var playerSatus = PlayerStatus.DEFAULT
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        _binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.activityPlayer) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        trackData = intent.getStringExtra("track").orEmpty()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        Log.i("pls", "oncreate")
+        return binding.root
+    }
 
-        viewModel.observeState().observe(this) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        trackData = requireArguments().getString(ARGS_TRACKDATA).orEmpty()
+        Log.i("pls", trackData)
+
+        viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
         }
-        viewModel.observePlayerStatus().observe(this) {
+        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
             playerSatus = it
             renderPlayer(it)
         }
-        viewModel.observeCurrentTime().observe(this) {
+        viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
             renderCurrentTime(it)
         }
 
-        viewModel.observeShowToast().observe(this) { toast ->
+        viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
         }
 
         binding.activityPlayerToolbar.setNavigationOnClickListener {
-            this.finish()
+            findNavController().navigateUp()
         }
 
         binding.buttonPlay.setOnClickListener {
@@ -101,6 +104,7 @@ class PlayerActivity : AppCompatActivity() {
             isLiked = !isLiked
         }
     }
+
 
     /**
      * Заполняем вью информацией о выбранном треке
@@ -199,7 +203,16 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun showToast(additionalMessage: String) {
-        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
+    }
+
+
+    companion object {
+
+        private const val ARGS_TRACKDATA = "track"
+
+        fun createArgs(trackData: String): Bundle =
+            bundleOf(ARGS_TRACKDATA to trackData)
     }
 
 }

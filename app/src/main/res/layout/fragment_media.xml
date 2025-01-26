@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_media"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_media"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_secondary"
     android:backgroundTint="@color/background_secondary"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".media.ui.MediaFragment"
+    >
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/activity_media_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/icon_back"
         app:title="@string/button_media"
         app:titleTextAppearance="@style/Toolbar.TitleText" />
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/media_tab_layout"
         style="@style/MediaTab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
+        android:background="@color/background_secondary"
         app:tabIndicatorColor="@color/back_icon_fill"
         app:tabIndicatorHeight="2dp"
         app:tabMode="fixed"
@@ -33,5 +35,4 @@
         android:id="@+id/media_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 </LinearLayout>

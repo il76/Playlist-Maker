@@ -26,12 +26,6 @@ class PlaylistsFragment: Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: android.os.Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //тут будет заполнение содержимого
-        //binding.number.text = requireArguments().getInt(NUMBER).toString()
-    }
-
     companion object {
         private const val NUMBER = "tracks"
         fun newInstance(number: Int) = PlaylistsFragment().apply {
