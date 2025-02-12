@@ -7,13 +7,7 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.SearchTrackListBinding
 import com.il76.playlistmaker.search.domain.models.Track
 
-class TrackViewHolder(private val binding: SearchTrackListBinding, listener: TrackAdapter.OnItemClickListener): RecyclerView.ViewHolder(binding.root) {
-    init {
-        binding.root.setOnClickListener {
-            listener.onItemClick(adapterPosition, itemView)
-        }
-    }
-
+class TrackViewHolder(private val binding: SearchTrackListBinding): RecyclerView.ViewHolder(binding.root) {
     fun bind(model: Track) {
         Glide.with(binding.root)
             .load(model.artworkUrl100)

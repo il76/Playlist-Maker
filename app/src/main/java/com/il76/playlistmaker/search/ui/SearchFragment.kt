@@ -1,8 +1,6 @@
 package com.il76.playlistmaker.search.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -14,6 +12,7 @@ import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +20,7 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentSearchBinding
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment: Fragment() {
@@ -35,20 +35,9 @@ class SearchFragment: Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
 
-    private var isClickAllowed = true
-
-    private val handler = Handler(Looper.getMainLooper())
-
     private lateinit var textWatcher: TextWatcher
 
-    private fun clickDebounce() : Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
-    }
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,6 +58,19 @@ class SearchFragment: Fragment() {
         if (savedInstanceState !== null) {
             searchValue = savedInstanceState.getString(SEARCH_QUERY, "")
         }
+
+        onTrackClickDebounce = debounce<Track>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { track ->
+            findNavController().navigate(
+                R.id.action_search_fragment_to_playerFragment,
+                PlayerFragment.createArgs(viewModel.provideTrackData(track))
+            )
+        }
+
+
         binding.searchEditText.setText(searchValue)
         viewModel.doSearch(searchValue)
         viewModel.observeState().observe(viewLifecycleOwner) {
@@ -120,37 +122,9 @@ class SearchFragment: Fragment() {
             }
         }
         textWatcher?.let { binding.searchEditText.addTextChangedListener(it) }
-
-
-
-
         recyclerView = binding.trackList
-        trackAdapter = TrackAdapter(trackList)
-        trackAdapter.onClickListener(
-            object : TrackAdapter.OnItemClickListener {
-                override fun onItemClick(position: Int, view: View) {
-                    if (clickDebounce()) {
-                        if (trackList[position].trackId > 0) {
-                            val elem = trackList[position]
-                            viewModel.addToHistory(elem)
-//                          Если перестраивать - долгое ожидание запуска следующей активити.
-//                          Если не перестраивать - при возврате текущий элемент не прыгает наверх
-//                            if (binding.searchHistoryClear.isVisible) { //если кнопка очистки отображается - значит сейчас режим истории и нужно её перестраивать
-//                                trackList.clear()
-//                                trackList.addAll(trackHistoryInteractorImpl.getTracks().reversed())
-//                                trackAdapter.notifyDataSetChanged()
-//                            }
-                                findNavController().navigate(
-                                    R.id.action_search_fragment_to_playerFragment,
-                                    PlayerFragment.createArgs(viewModel.provideTrackData(elem))
-                                )
-                        } else {
-                            viewModel.showToast(requireContext().getString(R.string.no_track_id),)
-                        }
-                    }
-                }
-            }
-        )
+
+        trackAdapter = TrackAdapter(trackList, onTrackClickDebounce)
         recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         recyclerView.adapter = trackAdapter
 

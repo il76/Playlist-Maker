@@ -1,7 +1,6 @@
 package com.il76.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -56,14 +55,12 @@ class PlayerFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentPlayerBinding.inflate(inflater, container, false)
-        Log.i("pls", "oncreate")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         trackData = requireArguments().getString(ARGS_TRACKDATA).orEmpty()
-        Log.i("pls", trackData)
 
         viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
