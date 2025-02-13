@@ -64,6 +64,7 @@ class SearchFragment: Fragment() {
             viewLifecycleOwner.lifecycleScope,
             false
         ) { track ->
+            viewModel.addToHistory(track)
             findNavController().navigate(
                 R.id.action_search_fragment_to_playerFragment,
                 PlayerFragment.createArgs(viewModel.provideTrackData(track))

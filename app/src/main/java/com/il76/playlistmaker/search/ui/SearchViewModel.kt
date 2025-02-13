@@ -1,7 +1,5 @@
 package com.il76.playlistmaker.search.ui
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +19,6 @@ class SearchViewModel(
     private val gson: Gson
 ): ViewModel() {
 
-    private val handler = Handler(Looper.getMainLooper())
 
     private val stateLiveData = MutableLiveData<SearchState>()
 
@@ -56,25 +53,21 @@ class SearchViewModel(
         if (text.isEmpty()) {
             return
         }
-        handler.removeCallbacksAndMessages(SEARCH_TOKEN)
         stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.LOADING))
 
-        trackInteractor.searchTracks(text,
-            object : TracksInteractor.TracksConsumer {
-                override fun consume(foundTracks: List<Track>?) {
-                    handler.post {
-                        if (foundTracks == null) {
-                            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.ERROR_NET))
-                        } else if (foundTracks.isNotEmpty()) {
-                            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.SUCCESS, trackList = foundTracks))
-                        } else {
-                            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.EMPTY_RESULT))
-                        }
-                    }
+        viewModelScope.launch {
+            trackInteractor.searchTracks(text).collect { foundTracks ->
+                if (foundTracks == null) {
+                    stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.ERROR_NET))
+                } else if (foundTracks.isNotEmpty()) {
+                    stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.SUCCESS, trackList = foundTracks))
+                } else {
+                    stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.EMPTY_RESULT))
                 }
             }
-        )
+        }
     }
+
 
     fun clearHistory() {
         tracksHistoryInteractor.clearHistory()
@@ -107,7 +100,6 @@ class SearchViewModel(
 
 
     companion object {
-        private val SEARCH_TOKEN = Any()
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }
