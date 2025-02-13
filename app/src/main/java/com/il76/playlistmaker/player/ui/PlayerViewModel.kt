@@ -1,14 +1,16 @@
 package com.il76.playlistmaker.player.ui
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     trackData: String,
@@ -18,13 +20,13 @@ class PlayerViewModel(
 
     var track: Track = Track()
 
-    private val handler = Handler(Looper.getMainLooper())
-
     private var playerStatus = PlayerStatus.DEFAULT
 
     private val playerLiveData = MutableLiveData<PlayerState>()
     private val playerStatusLiveData = MutableLiveData<PlayerStatus>()
     private val currentTimeLiveData = MutableLiveData<String>()
+
+    private var timerJob: Job? = null
 
     init {
         track = gson.fromJson(trackData, Track::class.java)
@@ -39,7 +41,7 @@ class PlayerViewModel(
             },
             onCompletionListener = {
                 playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-                handler.removeCallbacksAndMessages(null)
+                stopTimer()
             }
         )
     }
@@ -54,6 +56,7 @@ class PlayerViewModel(
     fun observeCurrentTime(): LiveData<String> = currentTimeLiveData
 
     fun changePlayerStatus(status: PlayerStatus) {
+        playerStatus = status
         when (status) {
             PlayerStatus.DEFAULT -> {}
             PlayerStatus.PREPARED -> {
@@ -61,49 +64,37 @@ class PlayerViewModel(
             }
             PlayerStatus.PLAYIND -> {
                 playerInteractor.start()
+                startTimer()
                 playerStatusLiveData.postValue(PlayerStatus.PLAYIND)
-                handler.post(prepareCurrentTimeTask())
             }
             PlayerStatus.PAUSED -> {
                 playerInteractor.pause()
                 playerStatusLiveData.postValue(PlayerStatus.PAUSED)
-                handler.removeCallbacksAndMessages(null)
+                stopTimer()
             }
         }
-        playerStatus = status
+
     }
 
-
-    private fun prepareCurrentTimeTask(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                // Обновляем список в главном потоке
-                displayCurrentPosition()
-
-                // И снова планируем то же действие через TIME_REFRESH_INTERVAL миллисекунд
-                handler.postDelayed(
-                    this,
-                    TIME_REFRESH_INTERVAL,
-                )
+    private fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (playerStatus == PlayerStatus.PLAYIND) {
+                delay(TIME_REFRESH_INTERVAL)
+                currentTimeLiveData.postValue(playerInteractor.getCurrentTime())
             }
         }
     }
 
-    /**
-     * Обновляем текущее время
-     */
-    private fun displayCurrentPosition() {
-        currentTimeLiveData.postValue(playerInteractor.getCurrentTime())
+    private fun stopTimer() {
+        timerJob?.cancel()
     }
 
     override fun onCleared() {
-        handler.removeCallbacksAndMessages(PLAYER_TOKEN)
         playerInteractor.release()
     }
 
     companion object {
-        private val PLAYER_TOKEN = Any()
-        private const val TIME_REFRESH_INTERVAL = 500L
+        private const val TIME_REFRESH_INTERVAL = 300L
     }
 
 }
