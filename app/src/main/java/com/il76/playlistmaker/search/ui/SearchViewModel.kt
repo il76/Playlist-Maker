@@ -1,16 +1,17 @@
 package com.il76.playlistmaker.search.ui
 
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.il76.playlistmaker.search.domain.api.TracksHistoryInteractor
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     val trackInteractor: TracksInteractor,
@@ -18,7 +19,6 @@ class SearchViewModel(
     private val gson: Gson
 ): ViewModel() {
 
-    private val handler = Handler(Looper.getMainLooper())
 
     private val stateLiveData = MutableLiveData<SearchState>()
 
@@ -28,32 +28,24 @@ class SearchViewModel(
 
     private var latestSearchText: String? = null
 
+    private var searchJob: Job? = null
+
     private val showToast = SingleLiveEvent<String>()
     fun observeShowToast(): LiveData<String> = showToast
 
 
     fun observeState(): LiveData<SearchState> = stateLiveData
 
-
-    override fun onCleared() {
-        handler.removeCallbacksAndMessages(SEARCH_TOKEN)
-    }
-
     fun searchDebounce(changedText: String) {
         if (latestSearchText == changedText) {
             return
         }
         this.latestSearchText = changedText
-        handler.removeCallbacksAndMessages(SEARCH_TOKEN)
-
-        val searchRunnable = Runnable { doSearch(changedText) }
-
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(
-            searchRunnable,
-            SEARCH_TOKEN,
-            postTime,
-        )
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            doSearch(changedText)
+        }
     }
 
 
@@ -61,25 +53,21 @@ class SearchViewModel(
         if (text.isEmpty()) {
             return
         }
-        handler.removeCallbacksAndMessages(SEARCH_TOKEN)
         stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.LOADING))
 
-        trackInteractor.searchTracks(text,
-            object : TracksInteractor.TracksConsumer {
-                override fun consume(foundTracks: List<Track>?) {
-                    handler.post {
-                        if (foundTracks == null) {
-                            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.ERROR_NET))
-                        } else if (foundTracks.isNotEmpty()) {
-                            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.SUCCESS, trackList = foundTracks))
-                        } else {
-                            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.EMPTY_RESULT))
-                        }
-                    }
+        viewModelScope.launch {
+            trackInteractor.searchTracks(text).collect { foundTracks ->
+                if (foundTracks == null) {
+                    stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.ERROR_NET))
+                } else if (foundTracks.isNotEmpty()) {
+                    stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.SUCCESS, trackList = foundTracks))
+                } else {
+                    stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.EMPTY_RESULT))
                 }
             }
-        )
+        }
     }
+
 
     fun clearHistory() {
         tracksHistoryInteractor.clearHistory()
@@ -112,7 +100,6 @@ class SearchViewModel(
 
 
     companion object {
-        private val SEARCH_TOKEN = Any()
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }
