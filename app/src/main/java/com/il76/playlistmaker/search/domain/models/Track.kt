@@ -3,6 +3,7 @@ package com.il76.playlistmaker.search.domain.models
 import com.google.gson.annotations.SerializedName
 
 data class Track (
+    val id: String = "",
     /**
      * Название композиции
      */

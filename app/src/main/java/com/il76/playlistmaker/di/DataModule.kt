@@ -2,8 +2,9 @@ package com.il76.playlistmaker.di
 
 import android.content.Context
 import android.media.MediaPlayer
-import android.util.Log
+import androidx.room.Room.databaseBuilder
 import com.google.gson.Gson
+import com.il76.playlistmaker.data.db.AppDatabase
 import com.il76.playlistmaker.search.data.network.NetworkClient
 import com.il76.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.il76.playlistmaker.search.data.network.TrackAPIService
@@ -43,6 +44,11 @@ val dataModule = module {
         ExternalNavigatorImpl(
             context = get()
         )
+    }
+
+    single {
+        databaseBuilder(androidContext(), AppDatabase::class.java, "playlistmaker.db")
+            .build()
     }
 
 }

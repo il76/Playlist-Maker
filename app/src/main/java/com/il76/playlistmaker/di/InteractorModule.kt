@@ -4,6 +4,8 @@ import com.il76.playlistmaker.player.data.MediaPlayerInteractorImpl
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.api.TracksHistoryInteractor
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
+import com.il76.playlistmaker.history.domain.db.HistoryInteractor
+import com.il76.playlistmaker.history.domain.impl.HistoryInteractorImpl
 import com.il76.playlistmaker.search.domain.impl.TracksHistoryInteractorImpl
 import com.il76.playlistmaker.search.domain.impl.TracksInteractorImpl
 import com.il76.playlistmaker.settings.data.SettingsInteractorImpl
@@ -42,6 +44,10 @@ val interactorModule = module {
         SharingInteractorImpl(
             externalNavigator = get()
         )
+    }
+
+    single<HistoryInteractor> {
+        HistoryInteractorImpl(get())
     }
 
 }
