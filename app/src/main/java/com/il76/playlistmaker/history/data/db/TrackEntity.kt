@@ -1,9 +1,10 @@
 package com.il76.playlistmaker.history.data.db
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "tracks_list")
+@Entity(tableName = "tracks_list", indices = [Index(value = ["trackId"], unique = true)])
 data class TrackEntity (
     @PrimaryKey(autoGenerate = true)
     val id: Int,
