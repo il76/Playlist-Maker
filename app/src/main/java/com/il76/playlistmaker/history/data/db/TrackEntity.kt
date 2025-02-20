@@ -2,12 +2,11 @@ package com.il76.playlistmaker.history.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "tracks_list")
 data class TrackEntity (
-    @PrimaryKey
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val trackName: String,
     val artistName: String,
     val trackTime: String,

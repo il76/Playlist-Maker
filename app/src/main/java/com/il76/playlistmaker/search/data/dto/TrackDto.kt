@@ -6,7 +6,7 @@ import java.util.Date
 import java.util.Locale
 
 data class TrackDto (
-    val id: String = "",
+    val id: Int = 0,
     /**
      * Название композиции
      */
