@@ -52,4 +52,9 @@ data class Track (
      * Годл выпуска
      */
     val releaseYear: String = ""
-)
+) {
+    /**
+     * Добавлен ли трек в избранное
+     */
+    var isFavourite = false
+}

@@ -1,6 +1,7 @@
 package com.il76.playlistmaker.history.data.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -10,8 +11,14 @@ import com.il76.playlistmaker.history.data.db.TrackEntity
 interface TrackDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTracks(movies: List<TrackEntity>)
+    suspend fun insertTracks(tracks: List<TrackEntity>)
 
-    @Query("SELECT * FROM tracks_list")
+    @Delete
+    suspend fun deleteTrack(track: TrackEntity)
+
+    @Query("SELECT * FROM tracks_list ORDER BY id DESC")
     suspend fun getTracks(): List<TrackEntity>
+
+    @Query("SELECT trackId FROM tracks_list")
+    suspend fun getTracksIds(): List<Int>
 }

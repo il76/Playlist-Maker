@@ -19,6 +19,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient,
     override fun searchTracks(term: String): Flow<List<Track>?> = flow {
         val response = networkClient.doRequest(TracksSearchRequest(term))
         if (response.resultCode == 200) {
+            val favouriteTracks = appDatabase.trackDao().getTracksIds()
             with(response as TracksSearchResponse) {
                 val data = results.map {
                     Track(
@@ -35,9 +36,10 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient,
                         it.previewUrl,
                         it.getPoster(),
                         it.getReleaseYear()
-                    )
+                    ).apply {
+                        isFavourite = it.trackId in favouriteTracks
+                    }
                 }
-                saveTrack(results)
                 emit(data)
             }
         } else {
