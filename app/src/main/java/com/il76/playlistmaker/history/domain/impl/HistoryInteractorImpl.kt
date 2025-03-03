@@ -11,4 +11,12 @@ class HistoryInteractorImpl(
     override fun historyTracks(): Flow<List<Track>> {
         return historyRepository.historyTracks()
     }
+
+    override suspend fun addTrack(track: Track) {
+        historyRepository.addTrack(track)
+    }
+
+    override suspend fun delTrack(track: Track) {
+        historyRepository.delTrack(track)
+    }
 }

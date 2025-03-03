@@ -21,7 +21,7 @@ val repositoryModule = module {
 
     factory<TracksRepository> {
         TracksRepositoryImpl(
-            networkClient = get(), get(), get()
+            networkClient = get(), get()
         )
     }
 

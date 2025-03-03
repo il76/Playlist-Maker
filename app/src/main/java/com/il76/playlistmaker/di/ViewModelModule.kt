@@ -20,9 +20,10 @@ val viewModelModule = module {
     
     viewModel { (trackData: String) ->
         PlayerViewModel(
-            trackData = trackData,
-            playerInteractor = get(),
-            gson = get()
+            trackData,
+            get(),
+            get(),
+            get()
         )
     }
     

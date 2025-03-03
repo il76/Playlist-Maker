@@ -8,12 +8,14 @@ import android.widget.Toast
 import androidx.core.bundle.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -32,12 +34,6 @@ class PlayerFragment: Fragment() {
      * Данные о треке, прилетают с экрана поиска
      */
     private var trackData = ""
-
-
-    /**
-     * Поставлен ли лайк
-     */
-    private var isLiked = false
 
     /**
      * Добавлено ли в плейлист
@@ -72,6 +68,9 @@ class PlayerFragment: Fragment() {
         viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
             renderCurrentTime(it)
         }
+        viewModel.observeFavourite().observe(viewLifecycleOwner) {
+            renderFavourite(it)
+        }
 
         viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
@@ -93,12 +92,17 @@ class PlayerFragment: Fragment() {
             isPlaylisted = !isPlaylisted
         }
         binding.buttonLike.setOnClickListener {
-            if (isLiked) {
-                binding.buttonLike.setImageResource(R.drawable.icon_like)
-            } else {
-                binding.buttonLike.setImageResource(R.drawable.icon_like_active)
+            lifecycleScope.launch {
+                viewModel.toggleFavouriteStatus()
             }
-            isLiked = !isLiked
+        }
+    }
+
+    private fun renderFavourite(isFauvorite: Boolean) {
+        if (isFauvorite) {
+            binding.buttonLike.setImageResource(R.drawable.icon_like)
+        } else {
+            binding.buttonLike.setImageResource(R.drawable.icon_like_active)
         }
     }
 

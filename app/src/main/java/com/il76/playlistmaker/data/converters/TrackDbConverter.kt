@@ -1,11 +1,10 @@
 package com.il76.playlistmaker.data.converters
 
 import com.il76.playlistmaker.history.data.db.TrackEntity
-import com.il76.playlistmaker.search.data.dto.TrackDto
 import com.il76.playlistmaker.search.domain.models.Track
 
 class TrackDbConverter {
-    fun map(track: TrackDto): TrackEntity {
+    fun map(track: Track): TrackEntity {
         return TrackEntity(
             track.id,
             track.trackName,
@@ -18,8 +17,8 @@ class TrackDbConverter {
             track.primaryGenreName,
             track.country,
             track.previewUrl,
-            track.getPoster(),
-            track.getReleaseYear()
+            track.poster,
+            track.releaseYear
         )
     }
 
