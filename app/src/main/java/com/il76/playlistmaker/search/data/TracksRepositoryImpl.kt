@@ -32,10 +32,9 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient,
                         it.country,
                         it.previewUrl,
                         it.getPoster(),
-                        it.getReleaseYear()
-                    ).apply {
-                        isFavourite = it.trackId in favouriteTracks
-                    }
+                        it.getReleaseYear(),
+                        it.trackId in favouriteTracks
+                    )
                 }
                 emit(data)
             }

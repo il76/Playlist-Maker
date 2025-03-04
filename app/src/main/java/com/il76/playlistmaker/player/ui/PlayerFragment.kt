@@ -1,6 +1,7 @@
 package com.il76.playlistmaker.player.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,9 +101,9 @@ class PlayerFragment: Fragment() {
 
     private fun renderFavourite(isFauvorite: Boolean) {
         if (isFauvorite) {
-            binding.buttonLike.setImageResource(R.drawable.icon_like)
-        } else {
             binding.buttonLike.setImageResource(R.drawable.icon_like_active)
+        } else {
+            binding.buttonLike.setImageResource(R.drawable.icon_like)
         }
     }
 
@@ -132,6 +133,8 @@ class PlayerFragment: Fragment() {
             trackGenre.text = track.primaryGenreName
             trackCountry.text = track.country
             buttonPlay.isEnabled = false
+            Log.i("pls", track.isFavourite.toString())
+            renderFavourite(track.isFavourite)
         }
     }
 

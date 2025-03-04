@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.bundle.bundleOf
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.il76.playlistmaker.R
@@ -41,5 +42,13 @@ class MediaFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         tabMediator.detach()
+    }
+
+    companion object {
+
+        private const val ARGS_TRACKDATA = "track"
+
+        fun createArgs(trackData: String): Bundle =
+            bundleOf(ARGS_TRACKDATA to trackData)
     }
 }
