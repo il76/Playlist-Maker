@@ -8,7 +8,11 @@
         android:id="@+id/media_fragment"
         android:name="com.il76.playlistmaker.media.ui.MediaFragment"
         android:label="@string/button_media"
-        tools:layout="@layout/fragment_media" />
+        tools:layout="@layout/fragment_media" >
+        <action
+            android:id="@+id/action_media_fragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/search_fragment"
         android:name="com.il76.playlistmaker.search.ui.SearchFragment"

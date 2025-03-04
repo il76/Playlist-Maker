@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.il76.playlistmaker.history.domain.db.HistoryInteractor
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
@@ -15,7 +16,8 @@ import kotlinx.coroutines.launch
 class PlayerViewModel(
     trackData: String,
     private val playerInteractor: MediaPlayerInteractor,
-    gson: Gson
+    gson: Gson,
+    private val historyInteractor: HistoryInteractor
 ): ViewModel() {
 
     var track: Track = Track()
@@ -25,6 +27,7 @@ class PlayerViewModel(
     private val playerLiveData = MutableLiveData<PlayerState>()
     private val playerStatusLiveData = MutableLiveData<PlayerStatus>()
     private val currentTimeLiveData = MutableLiveData<String>()
+    private val favouriteLiveData = MutableLiveData<Boolean>()
 
     private var timerJob: Job? = null
 
@@ -54,6 +57,7 @@ class PlayerViewModel(
 
     fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
     fun observeCurrentTime(): LiveData<String> = currentTimeLiveData
+    fun observeFavourite(): LiveData<Boolean> = favouriteLiveData
 
     fun changePlayerStatus(status: PlayerStatus) {
         playerStatus = status
@@ -87,6 +91,16 @@ class PlayerViewModel(
 
     private fun stopTimer() {
         timerJob?.cancel()
+    }
+
+    suspend fun toggleFavouriteStatus() {
+        track.isFavourite = !track.isFavourite
+        if (track.isFavourite) {
+            historyInteractor.addTrack(track)
+        } else {
+            historyInteractor.delTrack(track)
+        }
+        favouriteLiveData.postValue(track.isFavourite)
     }
 
     override fun onCleared() {

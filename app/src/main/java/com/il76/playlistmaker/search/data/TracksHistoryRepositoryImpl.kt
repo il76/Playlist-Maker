@@ -6,7 +6,10 @@ import com.google.gson.reflect.TypeToken
 import com.il76.playlistmaker.search.domain.api.TracksHistoryRepository
 import com.il76.playlistmaker.search.domain.models.Track
 
-class TracksHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences, private val gson: Gson) :
+class TracksHistoryRepositoryImpl(
+    private val sharedPreferences: SharedPreferences,
+    private val gson: Gson
+) :
     TracksHistoryRepository {
 
     private val trackListHistory = arrayListOf<Track>()

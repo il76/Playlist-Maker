@@ -1,10 +1,13 @@
 package com.il76.playlistmaker.di
 
+import com.il76.playlistmaker.history.presentation.HistoryViewModel
+import com.il76.playlistmaker.media.ui.MediaViewModel
 import com.il76.playlistmaker.media.ui.PlaylistsViewModel
 import com.il76.playlistmaker.media.ui.TracksViewModel
 import com.il76.playlistmaker.player.ui.PlayerViewModel
 import com.il76.playlistmaker.search.ui.SearchViewModel
 import com.il76.playlistmaker.settings.ui.SettingsViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -18,9 +21,10 @@ val viewModelModule = module {
     
     viewModel { (trackData: String) ->
         PlayerViewModel(
-            trackData = trackData,
-            playerInteractor = get(),
-            gson = get()
+            trackData,
+            get(),
+            get(),
+            get()
         )
     }
     
@@ -32,10 +36,21 @@ val viewModelModule = module {
         )
     }
     viewModel {
-        TracksViewModel()
+        TracksViewModel(
+            get(),
+            get()
+        )
     }
 
     viewModel {
         PlaylistsViewModel()
+    }
+
+    viewModel {
+        HistoryViewModel(androidContext(), get())
+    }
+
+    viewModel {
+        MediaViewModel()
     }
 }

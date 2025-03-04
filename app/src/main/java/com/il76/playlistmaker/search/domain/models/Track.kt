@@ -3,6 +3,7 @@ package com.il76.playlistmaker.search.domain.models
 import com.google.gson.annotations.SerializedName
 
 data class Track (
+    val id: Int = 0,
     /**
      * Название композиции
      */
@@ -50,5 +51,9 @@ data class Track (
     /**
      * Годл выпуска
      */
-    val releaseYear: String = ""
+    val releaseYear: String = "",
+    /**
+     * Добавлен ли трек в избранное
+     */
+    var isFavourite: Boolean = false
 )
