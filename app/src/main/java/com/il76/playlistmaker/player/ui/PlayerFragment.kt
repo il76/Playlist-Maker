@@ -1,6 +1,7 @@
 package com.il76.playlistmaker.player.ui
 
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,12 +14,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+
 
 class PlayerFragment: Fragment() {
     private lateinit var binding: FragmentPlayerBinding
@@ -84,10 +87,30 @@ class PlayerFragment: Fragment() {
         binding.buttonPlay.setOnClickListener {
             playbackControl()
         }
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        val displayMetrics = DisplayMetrics()
+
+        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val screenHeight = displayMetrics.heightPixels
+        val maxHeight = (screenHeight * 0.5).toInt() // 80% от высоты экрана
+        Log.i("pls", maxHeight.toString())
+        bottomSheetBehavior.maxHeight = maxHeight
+        bottomSheetBehavior.peekHeight = maxHeight
+
+
+// Дополнительные настройки
+        //bottomSheetBehavior.peekHeight = 240 // Высота в свернутом состоянии
+        bottomSheetBehavior.isHideable = true // Разрешить скрытие
+        //bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // Начальное состояние
+
         binding.buttonPlaylistAdd.setOnClickListener {
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
             if (isPlaylisted) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
             } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                 binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
             }
             isPlaylisted = !isPlaylisted
@@ -97,6 +120,7 @@ class PlayerFragment: Fragment() {
                 viewModel.toggleFavouriteStatus()
             }
         }
+
     }
 
     private fun renderFavourite(isFauvorite: Boolean) {
