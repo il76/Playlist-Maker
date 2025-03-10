@@ -20,3 +20,5 @@ local.properties
 /.idea/misc.xml
 /.idea/other.xml
 /app/schemas/
+/.kotlin/errors/
+/.idea/AndroidProjectSystem.xml
