@@ -251,12 +251,45 @@
         android:id="@+id/player_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="240dp"
-        android:background="@color/black"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
+        android:background="@drawable/rounded_bottom_sheet_background"
         android:orientation="vertical"
+
         app:behavior_hideable="true"
-        app:behavior_peekHeight="0dp"
+        app:behavior_peekHeight="240dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         >
+        <View
+            android:layout_width="50dp"
+            android:layout_gravity="center"
+            android:layout_height="4dp"
+            android:background="@color/bottom_sheet_handle"/>
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    style="@style/BottomSheetHeader"
+    android:text="Добавить в плейлист"
+    />
+        <Button
+            android:id="@+id/newPlaylist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/new_playlist"
+            style="@style/SearchRefreshButton"
+            android:layout_marginBottom="24dp"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/track_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="@dimen/pdg_root"
+            android:layout_marginVertical="@dimen/pdg_root"
+            android:layout_weight="1"
+            android:padding="0dp"
+            tools:listitem="@layout/player_playlists_list"
+            />
 
     </LinearLayout>
 

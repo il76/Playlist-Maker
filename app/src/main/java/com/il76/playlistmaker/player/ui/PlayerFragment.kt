@@ -89,14 +89,14 @@ class PlayerFragment: Fragment() {
         }
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        val displayMetrics = DisplayMetrics()
-
-        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val screenHeight = displayMetrics.heightPixels
-        val maxHeight = (screenHeight * 0.5).toInt() // 80% от высоты экрана
-        Log.i("pls", maxHeight.toString())
-        bottomSheetBehavior.maxHeight = maxHeight
-        bottomSheetBehavior.peekHeight = maxHeight
+//        val displayMetrics = DisplayMetrics()
+//
+//        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
+//        val screenHeight = displayMetrics.heightPixels
+//        val maxHeight = (screenHeight * 0.5).toInt() // 80% от высоты экрана
+//        Log.i("pls", maxHeight.toString())
+//        bottomSheetBehavior.maxHeight = maxHeight
+//        bottomSheetBehavior.peekHeight = maxHeight
 
 
 // Дополнительные настройки
@@ -119,6 +119,10 @@ class PlayerFragment: Fragment() {
             lifecycleScope.launch {
                 viewModel.toggleFavouriteStatus()
             }
+        }
+
+        binding.newPlaylist.setOnClickListener {
+            findNavController().navigate(R.id.action_media_fragment_to_playerFragment)
         }
 
     }
@@ -157,7 +161,6 @@ class PlayerFragment: Fragment() {
             trackGenre.text = track.primaryGenreName
             trackCountry.text = track.country
             buttonPlay.isEnabled = false
-            Log.i("pls", track.isFavourite.toString())
             renderFavourite(track.isFavourite)
         }
     }

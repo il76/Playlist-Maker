@@ -22,4 +22,5 @@
     <color name="bottom_navigation_border">#FFE6E8EB</color>
     <color name="bottom_navigation_item_active">#FF3772E7</color>
     <color name="bottom_navigation_item_default">#FFFFFFFF</color>
+    <color name="bottom_sheet_handle">#FFFFFFFF</color>
 </resources>
