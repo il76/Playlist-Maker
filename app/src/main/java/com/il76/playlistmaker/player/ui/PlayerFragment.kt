@@ -122,7 +122,7 @@ class PlayerFragment: Fragment() {
         }
 
         binding.newPlaylist.setOnClickListener {
-            findNavController().navigate(R.id.action_media_fragment_to_playerFragment)
+            findNavController().navigate(R.id.action_playerFragment_to_fragment_playlist_add)
         }
 
     }
