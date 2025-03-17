@@ -1,8 +1,6 @@
 package com.il76.playlistmaker.player.ui
 
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +10,16 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlayerBinding
+import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.media.ui.PlaylistAdapter
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -48,6 +50,10 @@ class PlayerFragment: Fragment() {
      * Текущее состояние плеера
      */
     private var playerSatus = PlayerStatus.DEFAULT
+
+    private lateinit var playlistsAdapter: PlaylistAdapter
+
+    private lateinit var onPlaylistClickDebounce: (Pair<Playlist, Track>) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,22 +93,43 @@ class PlayerFragment: Fragment() {
         binding.buttonPlay.setOnClickListener {
             playbackControl()
         }
+
+//        onPlaylistClickDebounce = debounce<Playlist, Track>(
+//            CLICK_DEBOUNCE_DELAY,
+//            viewLifecycleOwner.lifecycleScope,
+//            false
+//        ) {}
+
+        onPlaylistClickDebounce = debounce<Pair<Playlist, Track>>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { (playlist, track) ->
+            viewModel.addToPlaylist(playlist, track)
+        }
+
+
+
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-//        val displayMetrics = DisplayMetrics()
-//
-//        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
-//        val screenHeight = displayMetrics.heightPixels
-//        val maxHeight = (screenHeight * 0.5).toInt() // 80% от высоты экрана
-//        Log.i("pls", maxHeight.toString())
-//        bottomSheetBehavior.maxHeight = maxHeight
-//        bottomSheetBehavior.peekHeight = maxHeight
+        //bottomSheetBehavior.isHideable = true // Разрешить скрытие
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                // newState — новое состояние BottomSheet
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        // загружаем список плейлистов
+                        viewModel.loadPlaylists()
+                    }
+                    else -> {
+                        // Остальные состояния не обрабатываем
+                    }
+                }
+            }
 
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+        })
 
-// Дополнительные настройки
-        //bottomSheetBehavior.peekHeight = 240 // Высота в свернутом состоянии
-        bottomSheetBehavior.isHideable = true // Разрешить скрытие
-        //bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED // Начальное состояние
 
         binding.buttonPlaylistAdd.setOnClickListener {
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
@@ -125,6 +152,16 @@ class PlayerFragment: Fragment() {
             findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
         }
 
+        binding.playlistsList.layoutManager = GridLayoutManager(requireActivity(), 2)
+        binding.playlistsList.adapter = playlistsAdapter
+
+    }
+
+    private fun renderPlaylists(playlists: List<Playlist>) {
+        playlistsAdapter = PlaylistAdapter(playlists, track, onPlaylistClickDebounce)
+        binding.playlistsList.adapter = playlistsAdapter
+        playlistsAdapter.notifyDataSetChanged()
+        //binding.playlistsList.isVisible = tracks.isNotEmpty()
     }
 
     private fun renderFavourite(isFauvorite: Boolean) {
@@ -241,6 +278,8 @@ class PlayerFragment: Fragment() {
     companion object {
 
         private const val ARGS_TRACKDATA = "track"
+
+        private const val CLICK_DEBOUNCE_DELAY = 300L
 
         fun createArgs(trackData: String): Bundle =
             bundleOf(ARGS_TRACKDATA to trackData)

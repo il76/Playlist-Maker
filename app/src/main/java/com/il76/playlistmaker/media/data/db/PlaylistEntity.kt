@@ -1,4 +1,4 @@
-package com.il76.playlistmaker.history.data.db
+package com.il76.playlistmaker.media.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,4 +9,5 @@ data class PlaylistEntity (
     val id: Int,
     val name: String,
     val cover: String,
+    val cnt: Int,
 )

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.il76.playlistmaker.history.domain.db.HistoryInteractor
+import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
@@ -101,6 +102,14 @@ class PlayerViewModel(
             historyInteractor.delTrack(track)
         }
         favouriteLiveData.postValue(track.isFavourite)
+    }
+
+    public fun loadPlaylists() {
+
+    }
+
+    public fun addToPlaylist(playlist: Playlist, track: Track) {
+
     }
 
     override fun onCleared() {

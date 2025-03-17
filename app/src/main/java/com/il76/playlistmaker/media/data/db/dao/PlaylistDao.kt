@@ -1,11 +1,11 @@
-package com.il76.playlistmaker.history.data.db.dao
+package com.il76.playlistmaker.media.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.il76.playlistmaker.history.data.db.PlaylistEntity
+import com.il76.playlistmaker.media.data.db.PlaylistEntity
 
 @Dao
 interface PlaylistDao {

@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/fragment_player"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_player"
     android:layout_width="match_parent"
+
     android:layout_height="match_parent"
     android:background="@color/background_secondary"
     android:backgroundTint="@color/background_secondary"
+    tools:context=".player.ui.PlayerFragment">
 
-    tools:context=".player.ui.PlayerFragment"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/activity_player_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/icon_back"
-        app:title="@string/button_media"
-        app:titleTextAppearance="@style/Toolbar.TitleText" />
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/activity_player_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/icon_back"
+            app:title="@string/button_media"
+            app:titleTextAppearance="@style/Toolbar.TitleText" />
     </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    >
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -136,8 +138,8 @@
                 style="@style/PlayerDetailsRow.Name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/track_time"
                 android:layout_marginTop="30dp"
+                android:text="@string/track_time"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/trackCurrentTime" />
 
@@ -146,8 +148,8 @@
                 style="@style/PlayerDetailsRow.Value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/track_time"
                 android:layout_marginTop="30dp"
+                android:text="@string/track_time"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@id/barrier"
@@ -169,8 +171,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/track_collection_name"
-                app:layout_constraintStart_toEndOf="@id/barrier"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/barrier"
                 app:layout_constraintTop_toBottomOf="@id/trackTime" />
 
 
@@ -227,8 +229,8 @@
             <TextView
                 android:id="@+id/trackCountry"
                 style="@style/PlayerDetailsRow.Value"
-                app:layout_constrainedWidth="true"
                 android:text="@string/track_country"
+                app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/barrier"
                 app:layout_constraintTop_toBottomOf="@id/trackGenre" />
@@ -247,49 +249,50 @@
                 app:constraint_referenced_ids="trackTimeLabel, trackCollectionLabel, trackYearLabel, trackGenreLabel, trackCountryLabel" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
     <LinearLayout
         android:id="@+id/player_bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_marginTop="8dp"
-        android:padding="8dp"
         android:background="@drawable/rounded_bottom_sheet_background"
         android:orientation="vertical"
+        android:padding="8dp"
 
         app:behavior_hideable="true"
         app:behavior_peekHeight="240dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        >
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
         <View
             android:layout_width="50dp"
-            android:layout_gravity="center"
             android:layout_height="4dp"
-            android:background="@color/bottom_sheet_handle"/>
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    style="@style/BottomSheetHeader"
-    android:text="Добавить в плейлист"
-    />
+            android:layout_gravity="center"
+            android:background="@color/bottom_sheet_handle" />
+
+        <TextView
+            style="@style/BottomSheetHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добавить в плейлист" />
+
         <Button
             android:id="@+id/newPlaylist"
+            style="@style/SearchRefreshButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/new_playlist"
-            style="@style/SearchRefreshButton"
             android:layout_marginBottom="24dp"
-            />
+            android:text="@string/new_playlist" />
+
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/track_list"
+            android:id="@+id/playlists_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginHorizontal="@dimen/pdg_root"
             android:layout_marginVertical="@dimen/pdg_root"
             android:layout_weight="1"
             android:padding="0dp"
-            tools:listitem="@layout/player_playlists_list"
-            />
+            tools:listitem="@layout/player_playlists_list" />
 
     </LinearLayout>
 
