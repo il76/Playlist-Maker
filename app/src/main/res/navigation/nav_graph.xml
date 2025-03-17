@@ -34,12 +34,12 @@
         android:label="fragment_player"
         tools:layout="@layout/fragment_player" >
         <action
-            android:id="@+id/action_playerFragment_to_fragment_playlist_add"
-            app:destination="@id/fragment_playlist_add" />
+            android:id="@+id/action_playerFragment_to_fragment_playlistadd"
+            app:destination="@id/fragment_playlistadd" />
     </fragment>
     <fragment
-        android:id="@+id/fragment_playlist_add"
+        android:id="@+id/fragment_playlistadd"
         android:name="com.il76.playlistmaker.media.ui.PlaylistAddFragment"
-        android:label="fragment_playlist_add"
+        android:label="fragment_playlistadd"
         tools:layout="@layout/fragment_playlistadd" />
 </navigation>
