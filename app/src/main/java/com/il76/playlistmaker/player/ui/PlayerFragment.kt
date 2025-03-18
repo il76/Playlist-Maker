@@ -153,6 +153,7 @@ class PlayerFragment: Fragment() {
         }
 
         binding.newPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
         }
 
