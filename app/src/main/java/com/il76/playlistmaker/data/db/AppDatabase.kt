@@ -7,10 +7,12 @@ import com.il76.playlistmaker.media.data.db.PlaylistEntity
 import com.il76.playlistmaker.history.data.db.TrackEntity
 import com.il76.playlistmaker.media.data.db.dao.PlaylistDao
 import com.il76.playlistmaker.history.data.db.dao.TrackDao
+import com.il76.playlistmaker.media.data.db.PlaylistTrackEntity
+import com.il76.playlistmaker.media.data.db.dao.PlaylistTrackDao
 
 @Database(
     version = 2,
-    entities = [TrackEntity::class, PlaylistEntity::class],
+    entities = [TrackEntity::class, PlaylistEntity::class, PlaylistTrackEntity::class],
     autoMigrations = [
         AutoMigration (
             from = 1,
@@ -22,5 +24,6 @@ abstract class AppDatabase : RoomDatabase(){
 
     abstract fun trackDao(): TrackDao
     abstract fun playlistDao(): PlaylistDao
+    abstract fun playlistTrackDao(): PlaylistTrackDao
 
 }

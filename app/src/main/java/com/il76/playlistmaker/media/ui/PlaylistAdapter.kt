@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.databinding.PlayerPlaylistsListBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
 
-class PlaylistAdapter(private val playlists: List<Playlist>, private val track: Track, private val clickListener: (Pair<Playlist, Track>) -> Unit) : RecyclerView.Adapter<PlaylistViewHolder> () {
+class PlaylistAdapter(private val playlists: List<Playlist>, private val track: Track, private val clickListener: (PlaylistTrack) -> Unit) : RecyclerView.Adapter<PlaylistViewHolder> () {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistViewHolder {
         val layoutInspector = LayoutInflater.from(parent.context)
@@ -22,7 +23,7 @@ class PlaylistAdapter(private val playlists: List<Playlist>, private val track: 
         val playlist = playlists[holder.adapterPosition]
         holder.bind(playlist)
         holder.itemView.setOnClickListener {
-            clickListener(playlist to track)
+            clickListener(PlaylistTrack(playlist, track))
         }
     }
 

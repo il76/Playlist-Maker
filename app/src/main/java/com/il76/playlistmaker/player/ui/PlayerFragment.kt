@@ -17,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.media.ui.PlaylistAdapter
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.debounce
@@ -53,7 +54,7 @@ class PlayerFragment: Fragment() {
 
     private lateinit var playlistsAdapter: PlaylistAdapter
 
-    private lateinit var onPlaylistClickDebounce: (Pair<Playlist, Track>) -> Unit
+    private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -100,13 +101,14 @@ class PlayerFragment: Fragment() {
 //            false
 //        ) {}
 
-        onPlaylistClickDebounce = debounce<Pair<Playlist, Track>>(
+        onPlaylistClickDebounce = debounce<PlaylistTrack>(
             CLICK_DEBOUNCE_DELAY,
             viewLifecycleOwner.lifecycleScope,
             false
-        ) { (playlist, track) ->
-            viewModel.addToPlaylist(playlist, track)
+        ) { playlistTrack ->
+            viewModel.addToPlaylist(playlistTrack)
         }
+        viewModel.loadPlaylists()
 
 
 
@@ -117,17 +119,19 @@ class PlayerFragment: Fragment() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // newState — новое состояние BottomSheet
                 when (newState) {
-                    BottomSheetBehavior.STATE_EXPANDED -> {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.isVisible = false
                         // загружаем список плейлистов
-                        viewModel.loadPlaylists()
                     }
                     else -> {
-                        // Остальные состояния не обрабатываем
+                        binding.overlay.isVisible = true
                     }
                 }
             }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = (slideOffset + 1f) / 2
+            }
         })
 
 
@@ -153,8 +157,6 @@ class PlayerFragment: Fragment() {
         }
 
         binding.playlistsList.layoutManager = GridLayoutManager(requireActivity(), 2)
-        binding.playlistsList.adapter = playlistsAdapter
-
     }
 
     private fun renderPlaylists(playlists: List<Playlist>) {
