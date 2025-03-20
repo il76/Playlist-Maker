@@ -23,6 +23,6 @@ import com.il76.playlistmaker.history.data.db.TrackEntity
     ]
 )
 data class PlaylistTrackEntity(
-    val playlistId: Long,
-    val trackId: Long,
+    val playlistId: Int,
+    val trackId: Int,
 )

@@ -21,6 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.util.UUID
 
 class PlaylistAddFragment: Fragment() {
 
@@ -74,21 +75,22 @@ class PlaylistAddFragment: Fragment() {
 
     private fun showConfirmationDialog() {
         MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
-            .setTitle("Завершить создание плейлиста?") // Заголовок диалога
-            .setMessage("Все несохраненные данные будут потеряны") // Описание диалога
-            .setNegativeButton("Отмена") { dialog, which -> // Добавляет кнопку «Нет»
-                // Действия, выполняемые при нажатии на кнопку «Нет»
+            .setTitle("Завершить создание плейлиста?")
+            .setMessage("Все несохраненные данные будут потеряны")
+            .setNegativeButton("Отмена") { dialog, which ->
+                // ничего не делаем пока
             }
-            .setPositiveButton("Завершить") { dialog, which -> // Добавляет кнопку «Да»
+            .setPositiveButton("Завершить") { dialog, which -> //
                 findNavController().navigateUp()
             }
             .show()
     }
 
-    private fun saveFileToPrivateStorage(uri: Uri) {
+    private fun saveFileToPrivateStorage(uri: Uri): String {
         val context = requireContext()
         val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-        val file = File(context.filesDir, "my_image.jpg")
+
+        val file = File(context.filesDir, UUID.randomUUID().toString().take(16)) //генерим случайное имя файла
 
         try {
             val outputStream = FileOutputStream(file)
@@ -97,12 +99,14 @@ class PlaylistAddFragment: Fragment() {
                     input.copyTo(output)
                 }
             }
-            Log.d("MyFragment", "File saved to: ${file.absolutePath}")
+            return file.absolutePath
+            //Log.d("MyFragment", "File saved to: ${file.absolutePath}")
         } catch (e: Exception) {
-            Log.e("MyFragment", "Error saving file", e)
+            //Log.e("MyFragment", "Error saving file", e)
         } finally {
             inputStream?.close()
         }
+        return ""
     }
 
     private fun savePlaylist() {
