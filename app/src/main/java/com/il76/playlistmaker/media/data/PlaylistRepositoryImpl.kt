@@ -3,6 +3,7 @@ package com.il76.playlistmaker.media.data
 import com.il76.playlistmaker.data.converters.PlaylistDbConverter
 import com.il76.playlistmaker.data.converters.PlaylistTrackDbConverter
 import com.il76.playlistmaker.data.db.AppDatabase
+import com.il76.playlistmaker.media.data.db.PlaylistEntity
 import com.il76.playlistmaker.media.domain.api.PlaylistRepository
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
@@ -23,10 +24,13 @@ class PlaylistRepositoryImpl(
         appDatabase.playlistTrackDao().insert(playlistTrackDbConverter.map(playlistTrack))
     }
 
-    override suspend fun getPlaylists(): Flow<List<Playlist>?> {
-        suspend fun getPlaylists(): Flow<List<Playlist>?> = flow {
+    override fun getPlaylists(): Flow<List<Playlist>> = flow {
+        val playlists = appDatabase.playlistDao().getPlaylists()
+        emit(convertFromPlaylistEntity(playlists))
+    }
 
-        }
+    private fun convertFromPlaylistEntity(playlists: List<PlaylistEntity>): List<Playlist> {
+        return playlists.map { playlist -> playlistDbConverter.map(playlist) }
     }
 
 

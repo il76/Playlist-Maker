@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 class PlaylistInteractorImpl(private val repository: PlaylistRepositoryImpl): PlaylistInteractor {
     override fun getPlaylists(): Flow<List<Playlist>?> {
-        //return repository.getPlaylists()
-        TODO()
+        return repository.getPlaylists()
     }
 }
