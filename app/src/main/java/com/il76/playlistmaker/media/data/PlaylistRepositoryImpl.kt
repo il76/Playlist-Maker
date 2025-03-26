@@ -7,6 +7,7 @@ import com.il76.playlistmaker.media.data.db.PlaylistEntity
 import com.il76.playlistmaker.media.domain.api.PlaylistRepository
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
+import com.il76.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -32,6 +33,5 @@ class PlaylistRepositoryImpl(
     private fun convertFromPlaylistEntity(playlists: List<PlaylistEntity>): List<Playlist> {
         return playlists.map { playlist -> playlistDbConverter.map(playlist) }
     }
-
 
 }

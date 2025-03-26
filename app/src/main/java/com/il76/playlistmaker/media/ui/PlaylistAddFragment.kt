@@ -12,11 +12,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.bundle.Bundle
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistaddBinding
+import com.il76.playlistmaker.media.domain.models.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -51,7 +53,8 @@ class PlaylistAddFragment: Fragment() {
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 //обрабатываем событие выбора пользователем фотографии
                 if (uri != null) {
-                    binding.playlistCreateImage.setImageURI(uri)
+                    binding.playlistCreateImage.isVisible = false
+                    binding.playlistCover.setImageURI(uri)
                     imageUri = uri
                 } else {
                     Log.d("PhotoPicker", "No media selected")
@@ -69,6 +72,18 @@ class PlaylistAddFragment: Fragment() {
         }
         // Регистрируем обработчик
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
+        playlistAddViewModel.observeSuccess().observe(viewLifecycleOwner) { result ->
+            if (result) {
+                findNavController().navigateUp()
+            } else {
+                //ошибка
+            }
+        }
+
+        binding.createPlaylist.setOnClickListener {
+            savePlaylist()
+        }
 
     }
 
@@ -110,7 +125,14 @@ class PlaylistAddFragment: Fragment() {
     }
 
     private fun savePlaylist() {
-        imageUri?.let { saveFileToPrivateStorage(it) }
+        var cover = ""
+        imageUri?.let { cover = saveFileToPrivateStorage(it) }
+        playlistAddViewModel.savePlaylist(Playlist(
+            name = binding.textInputEditTextName.text.toString(),
+            description = binding.textInputEditTextDescr.text.toString(),
+            cover = cover,
+            cnt = 0
+        ))
         findNavController().navigateUp()
     }
 

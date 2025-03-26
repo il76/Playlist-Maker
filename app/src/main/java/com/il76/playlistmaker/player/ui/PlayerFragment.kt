@@ -87,6 +87,14 @@ class PlayerFragment: Fragment() {
             showToast(toast)
         }
 
+        viewModel.observePlaylistsList().observe(viewLifecycleOwner) { playlists ->
+            if (playlists != null) {
+                renderPlaylists(playlists)
+            } else {
+                renderPlaylists(arrayListOf())
+            }
+        }
+
         binding.activityPlayerToolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }

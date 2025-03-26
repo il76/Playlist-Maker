@@ -8,6 +8,7 @@ class PlaylistDbConverter {
         return PlaylistEntity(
             id = playlist.id,
             name = playlist.name,
+            description = playlist.description,
             cover = playlist.cover,
             cnt = playlist.cnt
         )
@@ -17,6 +18,7 @@ class PlaylistDbConverter {
         return Playlist(
             id = playlist.id,
             name = playlist.name,
+            description = playlist.description,
             cover = playlist.cover,
             cnt = playlist.cnt
         )

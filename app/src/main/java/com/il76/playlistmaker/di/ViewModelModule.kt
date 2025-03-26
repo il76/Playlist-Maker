@@ -25,6 +25,7 @@ val viewModelModule = module {
             trackData,
             get(),
             get(),
+            get(),
             get()
         )
     }
@@ -55,6 +56,8 @@ val viewModelModule = module {
         MediaViewModel()
     }
     viewModel {
-        PlaylistAddViewModel()
+        PlaylistAddViewModel(
+            get()
+        )
     }
 }
