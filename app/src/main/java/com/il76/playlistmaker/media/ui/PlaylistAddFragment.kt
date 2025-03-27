@@ -1,5 +1,6 @@
 package com.il76.playlistmaker.media.ui
 
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.text.Editable
 import android.text.TextUtils
@@ -12,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.bundle.Bundle
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -89,8 +91,29 @@ class PlaylistAddFragment: Fragment() {
 
             override fun afterTextChanged(s: Editable) {
                 binding.createPlaylist.setEnabled(s.toString().isNotEmpty())
+//                val isEmpty = s.isNullOrEmpty()
+//                val hintColorRes = if (isEmpty) R.color.playlist_create_disabled else R.color.playlist_create_enabled
+//                binding.textInputLayoutName.boxStrokeColor = requireContext().getColor(hintColorRes)
+//                binding.textInputLayoutName.hintTextColor =
+//                    ContextCompat.getColorStateList(requireContext(), hintColorRes)
             }
         })
+//        binding.textInputEditTextDescr.addTextChangedListener(object : TextWatcher {
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+//
+//            override fun afterTextChanged(s: Editable) {
+//                binding.createPlaylist.setEnabled(s.toString().isNotEmpty())
+//                val isEmpty = s.isNullOrEmpty()
+//                val hintColorRes = if (isEmpty) R.color.playlist_create_disabled else R.color.playlist_create_enabled
+//                binding.textInputLayoutDescr.boxStrokeColor = requireContext().getColor(hintColorRes)
+//                binding.textInputLayoutDescr.hintTextColor =
+//                    ContextCompat.getColorStateList(requireContext(), hintColorRes)
+//
+//            }
+//        })
+        binding.createPlaylist.setEnabled(!binding.textInputEditTextName.text.isNullOrEmpty())
 
         binding.createPlaylist.setOnClickListener {
             savePlaylist()

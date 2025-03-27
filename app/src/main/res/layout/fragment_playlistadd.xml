@@ -85,7 +85,7 @@
         app:boxStrokeErrorColor="@color/black"
         app:hintTextColor="@color/text_input_layout_hint_color_selector"
         app:boxStrokeWidth="1dp"
-        app:boxStrokeColor="@color/text_input_layout_stroke_color_selector">
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditTextDescr"
