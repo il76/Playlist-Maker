@@ -1,4 +1,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:drawable="@drawable/button_disabled"/>
-    <item android:drawable="@drawable/button_enabled"/>
+<item android:state_enabled="true">
+    <shape android:shape="rectangle">
+        <solid android:color="@color/playlist_create_enabled"/>
+        <corners android:radius="8dp"/> <!-- Здесь задается скругление -->
+    </shape>
+</item>
+<item>
+    <shape android:shape="rectangle">
+        <solid android:color="@color/playlist_create_disabled"/>
+        <corners android:radius="8dp"/> <!-- Здесь задается скругление -->
+    </shape>
+</item>
 </selector>

@@ -51,7 +51,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayoutName"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/TextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
@@ -73,7 +73,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayoutDescr"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/TextInputLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
@@ -95,14 +95,15 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/createPlaylist"
-        style="@style/PlaylistAdd.ButtonCreate"
+        style="@style/PlaylistAddButtonCreate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="17dp"
         android:layout_marginBottom="32dp"
-        android:text="@string/new_playlist_create"
         android:background="@drawable/button_background_selector"
+        android:text="@string/new_playlist_create"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
