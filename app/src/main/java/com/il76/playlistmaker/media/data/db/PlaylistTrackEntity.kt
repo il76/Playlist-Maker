@@ -2,7 +2,6 @@ package com.il76.playlistmaker.media.data.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.il76.playlistmaker.history.data.db.TrackEntity
 
 @Entity(
     tableName = "playlists_tracks",
@@ -14,12 +13,6 @@ import com.il76.playlistmaker.history.data.db.TrackEntity
             childColumns = ["playlistId"],
             onDelete = ForeignKey.CASCADE
         ),
-        ForeignKey(
-            entity = TrackEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["trackId"],
-            onDelete = ForeignKey.CASCADE
-        )
     ]
 )
 data class PlaylistTrackEntity(

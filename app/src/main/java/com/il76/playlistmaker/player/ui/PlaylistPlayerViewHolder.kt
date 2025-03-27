@@ -1,4 +1,4 @@
-package com.il76.playlistmaker.media.ui
+package com.il76.playlistmaker.player.ui
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide

@@ -1,4 +1,4 @@
-package com.il76.playlistmaker.media.ui
+package com.il76.playlistmaker.player.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

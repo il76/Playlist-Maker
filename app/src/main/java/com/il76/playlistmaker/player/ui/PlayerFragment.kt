@@ -15,11 +15,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.il76.playlistmaker.R
+import com.il76.playlistmaker.data.db.InsertStatus
 import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
-import com.il76.playlistmaker.media.ui.PlaylistAdapter
-import com.il76.playlistmaker.media.ui.PlaylistPlayerAdapter
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
@@ -94,6 +93,17 @@ class PlayerFragment: Fragment() {
             } else {
                 renderPlaylists(arrayListOf())
             }
+        }
+
+        viewModel.observeaddTrackResult().observe(viewLifecycleOwner) { status ->
+            if (status == InsertStatus.SUCCESS) {
+                findNavController().navigateUp()
+            } else {
+            }
+        }
+
+        viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
+            showToast(toast)
         }
 
         binding.activityPlayerToolbar.setNavigationOnClickListener {
@@ -173,7 +183,6 @@ class PlayerFragment: Fragment() {
         playlistsAdapter = PlaylistPlayerAdapter(playlists, track, onPlaylistClickDebounce)
         binding.playlistsList.adapter = playlistsAdapter
         playlistsAdapter.notifyDataSetChanged()
-        //binding.playlistsList.isVisible = tracks.isNotEmpty()
     }
 
     private fun renderFavourite(isFauvorite: Boolean) {

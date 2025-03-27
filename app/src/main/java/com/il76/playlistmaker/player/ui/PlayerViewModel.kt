@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.il76.playlistmaker.data.db.InsertStatus
 import com.il76.playlistmaker.history.domain.db.HistoryInteractor
 import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
@@ -109,6 +110,9 @@ class PlayerViewModel(
     private val playlistsLiveData = MutableLiveData<List<Playlist>?>()
     fun observePlaylistsList(): MutableLiveData<List<Playlist>?> = playlistsLiveData
 
+    private val addTrackResultLiveData = MutableLiveData<InsertStatus>()
+    fun observeaddTrackResult(): MutableLiveData<InsertStatus> = addTrackResultLiveData
+
     fun loadPlaylists() {
         viewModelScope.launch {
             playlistsInteractor.getPlaylists().collect { playlists ->
@@ -118,7 +122,14 @@ class PlayerViewModel(
     }
 
     fun addToPlaylist(playlistTrack: PlaylistTrack) {
-
+        viewModelScope.launch {
+            val result = playlistsInteractor.addTrackToPlaylist(playlistTrack)
+            if (result == InsertStatus.SUCCESS) {
+                showToast.postValue("Добавлено в плейлист \"" + playlistTrack.playlist.name + "\"")
+            } else {
+                showToast.postValue("Трек уже добавлен в плейлист \"" + playlistTrack.playlist.name + "\"")
+            }
+        }
     }
 
     override fun onCleared() {
