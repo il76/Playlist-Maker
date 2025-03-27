@@ -1,9 +1,9 @@
 package com.il76.playlistmaker.media.ui
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Environment
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +24,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.UUID
+
 
 class PlaylistAddFragment: Fragment() {
 
@@ -80,6 +81,16 @@ class PlaylistAddFragment: Fragment() {
                 //ошибка
             }
         }
+
+        binding.textInputEditTextName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable) {
+                binding.createPlaylist.setEnabled(s.toString().isNotEmpty())
+            }
+        })
 
         binding.createPlaylist.setOnClickListener {
             savePlaylist()
