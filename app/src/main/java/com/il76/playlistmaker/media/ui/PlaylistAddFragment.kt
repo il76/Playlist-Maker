@@ -89,6 +89,10 @@ class PlaylistAddFragment: Fragment() {
 
 
     private fun showConfirmationDialog() {
+        if (binding.textInputEditTextName.text.isNullOrEmpty() && imageUri == null) {
+            findNavController().navigateUp()
+            return
+        }
         MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
             .setTitle("Завершить создание плейлиста?")
             .setMessage("Все несохраненные данные будут потеряны")
