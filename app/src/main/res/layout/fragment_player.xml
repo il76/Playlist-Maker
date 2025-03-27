@@ -257,14 +257,14 @@
     <LinearLayout
         android:id="@+id/player_bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="505dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_bottom_sheet_background"
         android:orientation="vertical"
         android:padding="8dp"
 
         app:behavior_hideable="true"
-        app:behavior_peekHeight="240dp"
+        app:behavior_peekHeight="505dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
