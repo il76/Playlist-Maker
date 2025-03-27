@@ -2,6 +2,7 @@ package com.il76.playlistmaker.media.ui
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.media.domain.models.Playlist
@@ -12,8 +13,7 @@ class PlaylistViewHolder(private val binding: PlayerPlaylistsListBinding): Recyc
         Glide.with(binding.root)
             .load(model.cover)
             .placeholder(R.drawable.search_cover_placeholder)
-            .centerInside()
-            .transform(RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
+            .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
             .into(binding.playlistCover)
 
         binding.playlistName.text = model.name

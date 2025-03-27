@@ -7,7 +7,7 @@ import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
 import kotlinx.coroutines.launch
 
-class   PlaylistsViewModel(private val playlistsInteractor: PlaylistInteractor): ViewModel() {
+class PlaylistsViewModel(private val playlistsInteractor: PlaylistInteractor) : ViewModel() {
 
     private val playlistsLiveData = MutableLiveData<List<Playlist>?>()
     fun observePlaylistsList(): MutableLiveData<List<Playlist>?> = playlistsLiveData

@@ -192,5 +192,9 @@
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/dialog_color</item>
     </style>
+    <style name="PlaylistsList.caption" parent="Font400">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/colorControlNormal</item>
+    </style>
 
 </resources>
