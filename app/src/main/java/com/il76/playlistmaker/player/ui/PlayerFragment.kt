@@ -10,7 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -19,6 +19,7 @@ import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.media.ui.PlaylistAdapter
+import com.il76.playlistmaker.media.ui.PlaylistPlayerAdapter
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ class PlayerFragment: Fragment() {
      */
     private var playerSatus = PlayerStatus.DEFAULT
 
-    private lateinit var playlistsAdapter: PlaylistAdapter
+    private lateinit var playlistsAdapter: PlaylistPlayerAdapter
 
     private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
 
@@ -165,11 +166,11 @@ class PlayerFragment: Fragment() {
             findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
         }
 
-        binding.playlistsList.layoutManager = GridLayoutManager(requireActivity(), 2)
+        binding.playlistsList.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun renderPlaylists(playlists: List<Playlist>) {
-        playlistsAdapter = PlaylistAdapter(playlists, track, onPlaylistClickDebounce)
+        playlistsAdapter = PlaylistPlayerAdapter(playlists, track, onPlaylistClickDebounce)
         binding.playlistsList.adapter = playlistsAdapter
         playlistsAdapter.notifyDataSetChanged()
         //binding.playlistsList.isVisible = tracks.isNotEmpty()

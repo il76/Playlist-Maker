@@ -5,10 +5,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.MediaPlaylistsListBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.databinding.PlayerPlaylistsListBinding
 
-class PlaylistViewHolder(private val binding: MediaPlaylistsListBinding): RecyclerView.ViewHolder(binding.root) {
+class PlaylistPlayerViewHolder(private val binding: PlayerPlaylistsListBinding): RecyclerView.ViewHolder(binding.root) {
     fun bind(model: Playlist) {
         Glide.with(binding.root)
             .load(model.cover)
