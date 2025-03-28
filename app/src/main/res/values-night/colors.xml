@@ -26,5 +26,7 @@
     <color name="playlist_create_icon_fill">#FFAEAFB4</color>
     <color name="playlist_create_disabled">#FFAEAFB4</color>
     <color name="playlist_create_enabled">#FF3772E7</color>
+    <color name="playlist_create_empty_field">#FFFFFFFF</color>
+    <color name="playlist_create_filled_field">#FF3772E7</color>
     <color name="dialog_color">#FFFFFFFF</color>
 </resources>

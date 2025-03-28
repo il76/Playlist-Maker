@@ -99,11 +99,13 @@ class PlaylistAddFragment: Fragment() {
 
             override fun afterTextChanged(s: Editable) {
                 binding.createPlaylist.setEnabled(s.toString().isNotEmpty())
-//                val isEmpty = s.isNullOrEmpty()
-//                val hintColorRes = if (isEmpty) R.color.playlist_create_disabled else R.color.playlist_create_enabled
-//                binding.textInputLayoutName.boxStrokeColor = requireContext().getColor(hintColorRes)
-//                binding.textInputLayoutName.hintTextColor =
-//                    ContextCompat.getColorStateList(requireContext(), hintColorRes)
+                val isEmpty = s.isNullOrEmpty()
+                val hintColorRes = if (isEmpty) R.color.playlist_create_disabled else R.color.playlist_create_enabled
+                binding.textInputLayoutName.boxStrokeColor = requireContext().getColor(hintColorRes)
+                binding.textInputLayoutName.hintTextColor =
+                    ContextCompat.getColorStateList(requireContext(), hintColorRes)
+                binding.textInputLayoutName.backgroundTintList =
+                    ColorStateList.valueOf(requireContext().getColor(hintColorRes))
             }
         })
 //        binding.textInputEditTextDescr.addTextChangedListener(object : TextWatcher {
