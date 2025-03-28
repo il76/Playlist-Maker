@@ -62,16 +62,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dashedBorderView"
-        app:boxStrokeErrorColor="@color/black"
-        app:hintTextColor="@color/text_input_layout_hint_color_selector"
-        android:textColorHint="@color/text_input_layout_hint_color_selector"
-        app:boxStrokeWidth="1dp"
-        android:textCursorDrawable="@drawable/eitview_cursor"
-        app:boxStrokeColor="@color/text_input_layout_stroke_color_selector">
-
+        >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditTextName"
-            android:textCursorDrawable="@drawable/eitview_cursor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -87,15 +80,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textInputLayoutName"
-        app:boxStrokeErrorColor="@color/black"
-        app:hintTextColor="@color/text_input_layout_hint_color_selector"
-        android:textColorHint="@color/text_input_layout_hint_color_selector"
-        app:boxStrokeWidth="1dp"
         >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditTextDescr"
-            android:textCursorDrawable="@drawable/eitview_cursor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>

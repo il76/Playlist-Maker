@@ -1,5 +1,4 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="#3772E7" android:state_focused="true"/>
-    <item android:color="#AEAFB4" android:state_selected="false"/>
-    <item android:color="#3772E7"/>
+    <item android:color="@color/playlist_create_enabled" android:state_focused="true"/>
+    <item android:color="@color/playlist_create_disabled"/>
 </selector>
