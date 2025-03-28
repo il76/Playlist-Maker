@@ -13,7 +13,7 @@ class PlaylistViewHolder(private val binding: MediaPlaylistsListBinding): Recycl
         Glide.with(binding.root)
             .load(model.cover)
             .placeholder(R.drawable.search_cover_placeholder)
-            .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius_player)))
+            .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
             .into(binding.playlistCover)
 
         binding.playlistName.text = model.name

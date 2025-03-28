@@ -17,6 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistaddBinding
@@ -57,7 +60,12 @@ class PlaylistAddFragment: Fragment() {
                 //обрабатываем событие выбора пользователем фотографии
                 if (uri != null) {
                     binding.playlistCreateImage.isVisible = false
-                    binding.playlistCover.setImageURI(uri)
+                    //binding.playlistCover.setImageURI(uri)
+                    Glide.with(binding.playlistCover)
+                        .load(uri)
+                        .placeholder(R.drawable.search_cover_placeholder)
+                        .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
+                        .into(binding.playlistCover)
                     imageUri = uri
                 } else {
                     Log.d("PhotoPicker", "No media selected")
