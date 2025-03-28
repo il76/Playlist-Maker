@@ -13,12 +13,12 @@ import com.il76.playlistmaker.media.data.db.dao.PlaylistTrackDao
 @Database(
     version = 2,
     entities = [TrackEntity::class, PlaylistEntity::class, PlaylistTrackEntity::class],
-    autoMigrations = [
-        AutoMigration (
-            from = 1,
-            to = 2
-        ),
-    ],
+//    autoMigrations = [
+//        AutoMigration (
+//            from = 1,
+//            to = 2
+//        ),
+//    ],
 )
 abstract class AppDatabase : RoomDatabase(){
 
