@@ -48,7 +48,7 @@ val dataModule = module {
 
     single {
         databaseBuilder(androidContext(), AppDatabase::class.java, "playlistmaker.db")
-            .fallbackToDestructiveMigrationFrom(1)
+            .fallbackToDestructiveMigration()
             .build()
     }
 

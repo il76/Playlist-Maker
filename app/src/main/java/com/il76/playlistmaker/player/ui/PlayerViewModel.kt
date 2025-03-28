@@ -126,6 +126,7 @@ class PlayerViewModel(
             val result = playlistsInteractor.addTrackToPlaylist(playlistTrack)
             if (result == InsertStatus.SUCCESS) {
                 showToast.postValue("Добавлено в плейлист \"" + playlistTrack.playlist.name + "\"")
+                loadPlaylists()
             } else {
                 showToast.postValue("Трек уже добавлен в плейлист \"" + playlistTrack.playlist.name + "\"")
             }
