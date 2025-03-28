@@ -1,4 +1,4 @@
-package com.il76.playlistmaker.media.data
+package com.il76.playlistmaker.media.domain
 
 import com.il76.playlistmaker.data.db.InsertStatus
 import com.il76.playlistmaker.media.domain.api.PlaylistInteractor

@@ -1,4 +1,4 @@
-package com.il76.playlistmaker.player.data
+package com.il76.playlistmaker.player.domain
 
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.player.domain.api.MediaPlayerRepository
