@@ -17,7 +17,7 @@
         tools:targetApi="35">
         <activity
             android:name=".main.ui.MainActivity"
-            android:windowSoftInputMode="adjustNothing"
+            android:windowSoftInputMode="adjustPan"
             android:enableOnBackInvokedCallback="true"
             android:exported="true">
             <intent-filter>
