@@ -23,4 +23,7 @@ interface PlaylistDao {
         ORDER BY p.id DESC
     """)
     suspend fun getPlaylists(): List<PlaylistEntity>
+
+    @Query("SELECT * FROM playlists WHERE id = :playlistId")
+    suspend fun getSinglePlaylist(playlistId: Int): PlaylistEntity
 }

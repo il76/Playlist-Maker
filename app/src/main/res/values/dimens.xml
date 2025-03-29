@@ -17,4 +17,5 @@
     <dimen name="track_cover_size">45dp</dimen>
     <dimen name="track_cover_border_radius">8dp</dimen>
     <dimen name="track_cover_border_radius_player">2dp</dimen>
+    <dimen name="playlist_placeholder_padding">24dp</dimen>
 </resources>

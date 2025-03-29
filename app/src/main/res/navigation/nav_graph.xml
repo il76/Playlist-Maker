@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_media_fragment_to_fragment_playlistadd"
             app:destination="@id/fragment_playlistadd" />
+        <action
+            android:id="@+id/action_media_fragment_to_fragment_playlist"
+            app:destination="@id/fragment_playlist" />
     </fragment>
     <fragment
         android:id="@+id/search_fragment"
@@ -45,4 +48,14 @@
         android:name="com.il76.playlistmaker.media.ui.PlaylistAddFragment"
         android:label="fragment_playlistadd"
         tools:layout="@layout/fragment_playlistadd" />
+    <fragment
+        android:id="@+id/fragment_playlist"
+        android:name="com.il76.playlistmaker.playlist.ui.PlaylistFragment"
+        android:label="fragment_playlist"
+        tools:layout="@layout/fragment_playlist">
+        <argument
+            android:name="Номер плейлиста"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
 </navigation>
