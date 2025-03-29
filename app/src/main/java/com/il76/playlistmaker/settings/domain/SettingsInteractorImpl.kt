@@ -1,4 +1,4 @@
-package com.il76.playlistmaker.settings.data
+package com.il76.playlistmaker.settings.domain
 
 import android.content.Context
 import android.content.SharedPreferences

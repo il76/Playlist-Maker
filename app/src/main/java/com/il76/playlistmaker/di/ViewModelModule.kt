@@ -2,6 +2,7 @@ package com.il76.playlistmaker.di
 
 import com.il76.playlistmaker.history.presentation.HistoryViewModel
 import com.il76.playlistmaker.media.ui.MediaViewModel
+import com.il76.playlistmaker.media.ui.PlaylistAddViewModel
 import com.il76.playlistmaker.media.ui.PlaylistsViewModel
 import com.il76.playlistmaker.media.ui.TracksViewModel
 import com.il76.playlistmaker.player.ui.PlayerViewModel
@@ -24,6 +25,7 @@ val viewModelModule = module {
             trackData,
             get(),
             get(),
+            get(),
             get()
         )
     }
@@ -43,7 +45,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PlaylistsViewModel()
+        PlaylistsViewModel(get())
     }
 
     viewModel {
@@ -52,5 +54,10 @@ val viewModelModule = module {
 
     viewModel {
         MediaViewModel()
+    }
+    viewModel {
+        PlaylistAddViewModel(
+            get()
+        )
     }
 }
