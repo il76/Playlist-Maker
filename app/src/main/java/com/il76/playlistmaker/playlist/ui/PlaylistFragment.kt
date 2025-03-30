@@ -1,7 +1,6 @@
 package com.il76.playlistmaker.playlist.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.bundle.bundleOf
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -81,28 +79,35 @@ class PlaylistFragment: Fragment() {
 //            }
 //        }
 
-
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetTracks)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        //bottomSheetBehavior.isHideable = true // Разрешить скрытие
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                // newState — новое состояние BottomSheet
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.isVisible = false
-                        // загружаем список плейлистов
-                    }
-                    else -> {
-                        binding.overlay.isVisible = true
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        val bottomSheetInfoBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetPlaylistInfo)
+        bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        binding.playlistIconSubmenu.setOnClickListener {
+            val bottomSheetInfoBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetPlaylistInfo)
+            bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetInfoBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            binding.overlay.isVisible = false
+                            bottomSheetBehavior.isHideable = false
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        }
+                        else -> {
+                            binding.overlay.isVisible = true
+                            bottomSheetBehavior.isHideable = true
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                        }
                     }
                 }
-            }
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.overlay.alpha = (slideOffset + 1f) / 2
-            }
-        })
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    binding.overlay.alpha = (slideOffset + 1f) / 2
+                }
+            })
+        }
 
 
     }
@@ -115,9 +120,12 @@ class PlaylistFragment: Fragment() {
         if (playlist.cover.isNotEmpty()) {
             binding.playlistCover.setPadding(0,0,0,0) //для реальной картинки в макете отступы отсутствуют
             Glide.with(this).load(playlist.cover).into(binding.playlistCover)
+            Glide.with(this).load(playlist.cover).into(binding.bottomSheetPlaylistinfoBlock.playlistCover)
         }
         binding.playlistName.text = playlist.name
+        binding.bottomSheetPlaylistinfoBlock.playlistName.text = playlist.name
         binding.playlistDescription.text = playlist.description
+        binding.bottomSheetPlaylistinfoBlock.playlistCover
         // длительность и количество треков после загрузки данных по ним
 
     }
@@ -129,8 +137,12 @@ class PlaylistFragment: Fragment() {
             binding.tracksList.adapter = trackAdapter
             trackAdapter.notifyDataSetChanged()
         }
+
+        var counterText = "0 треков"
+        var durationText = "0 минут"
         if (trackList != null) {
-            binding.playlistCounter.text = trackList?.count().toString() + " треков"
+            counterText = trackList?.count().toString() + " треков"
+
             var duration = 0
             for (track in trackList) {
                 val parts = track.trackTime.split(":")
@@ -140,11 +152,11 @@ class PlaylistFragment: Fragment() {
                 duration += minutes * 60 + seconds
             }
             val minutes = duration/60
-            binding.playlistDuration.text = "$minutes минут"
-        } else {
-            binding.playlistCounter.text = "0 треков"
-            binding.playlistDuration.text = "0 минут"
+            durationText = "$minutes минут"
         }
+        binding.playlistCounter.text = counterText
+        binding.bottomSheetPlaylistinfoBlock.playlistCounter.text = counterText
+        binding.playlistDuration.text = durationText
     }
 
     private var playlistId: Int = 0

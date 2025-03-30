@@ -117,18 +117,69 @@
         android:layout_height="match_parent"
         android:background="#99000000"
         android:visibility="gone" />
-
     <LinearLayout
-        android:id="@+id/playlist_bottom_sheet_tracks"
+        android:id="@+id/playlist_bottom_sheet_playlist_info"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="400dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_bottom_sheet_background"
         android:orientation="vertical"
         android:padding="0dp"
 
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="400dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <View
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:background="@color/bottom_sheet_handle" />
+
+        <include
+            android:id="@+id/bottom_sheet_playlistinfo_block"
+            layout="@layout/player_playlists_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_share"
+            style="@style/Playlist.PlaylistSheetActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Поделиться" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_edit"
+            style="@style/Playlist.PlaylistSheetActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Редактировать информацию" />
+
+        <TextView
+            android:id="@+id/bottom_sheet_delplaylist"
+            style="@style/Playlist.PlaylistSheetActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Удалить плейлист" />
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/playlist_bottom_sheet_tracks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_bottom_sheet_background"
+        android:orientation="vertical"
+        android:padding="0dp"
         app:behavior_hideable="false"
         app:behavior_peekHeight="200dp"
+
+
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
