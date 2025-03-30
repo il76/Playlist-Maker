@@ -56,9 +56,10 @@ val viewModelModule = module {
     viewModel {
         MediaViewModel()
     }
-    viewModel {
+    viewModel { (playlistId: Int) ->
         PlaylistAddViewModel(
-            get()
+            get(),
+            playlistId
         )
     }
     viewModel { (playlistId: Int) ->

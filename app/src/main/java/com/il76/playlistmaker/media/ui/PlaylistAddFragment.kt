@@ -3,7 +3,6 @@ package com.il76.playlistmaker.media.ui
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.text.Editable
-import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.bundle.Bundle
+import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -25,6 +24,7 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistaddBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -35,9 +35,13 @@ class PlaylistAddFragment: Fragment() {
 
     private lateinit var binding: FragmentPlaylistaddBinding
 
-    private val playlistAddViewModel: PlaylistAddViewModel by viewModel<PlaylistAddViewModel>()
+    private val playlistAddViewModel: PlaylistAddViewModel by viewModel<PlaylistAddViewModel> {
+        parametersOf(playlistId)
+    }
 
     private var imageUri: Uri? = null // Переменная для хранения Uri
+
+    private var playlistId = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +50,16 @@ class PlaylistAddFragment: Fragment() {
     ): View? {
         binding = FragmentPlaylistaddBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    private fun putImage(uri: Uri) {
+        binding.playlistCreateImage.isVisible = false
+        Glide.with(binding.playlistCover)
+            .load(uri)
+            .placeholder(R.drawable.search_cover_placeholder)
+            .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
+            .into(binding.playlistCover)
+        imageUri = uri
     }
 
     override fun onViewCreated(view: View, savedInstanceState: android.os.Bundle?) {
@@ -59,14 +73,7 @@ class PlaylistAddFragment: Fragment() {
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 //обрабатываем событие выбора пользователем фотографии
                 if (uri != null) {
-                    binding.playlistCreateImage.isVisible = false
-                    //binding.playlistCover.setImageURI(uri)
-                    Glide.with(binding.playlistCover)
-                        .load(uri)
-                        .placeholder(R.drawable.search_cover_placeholder)
-                        .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
-                        .into(binding.playlistCover)
-                    imageUri = uri
+                    putImage(uri)
                 } else {
                     Log.d("PhotoPicker", "No media selected")
                 }
@@ -89,6 +96,12 @@ class PlaylistAddFragment: Fragment() {
                 findNavController().navigateUp()
             } else {
                 //ошибка
+            }
+        }
+        if (playlistId > 0) {
+            Log.i("pls", playlistId.toString())
+            playlistAddViewModel.observePlaylist().observe(viewLifecycleOwner) { playlistData ->
+                renderPlaylist(playlistData)
             }
         }
 
@@ -131,6 +144,14 @@ class PlaylistAddFragment: Fragment() {
 
     }
 
+
+    private fun renderPlaylist(playlist: Playlist) {
+        binding.textInputEditTextName.setText(playlist.name)
+        binding.textInputEditTextDescr.setText(playlist.description)
+        if (playlist.cover.isNotEmpty()) {
+            putImage(Uri.parse(playlist.cover))
+        }
+    }
 
     private fun showConfirmationDialog() {
         if (binding.textInputEditTextName.text.isNullOrEmpty() && imageUri == null) {
@@ -185,12 +206,10 @@ class PlaylistAddFragment: Fragment() {
     }
 
     companion object {
-        private const val NUMBER = "tracks"
-        fun newInstance(number: Int) = PlaylistAddFragment().apply {
-            arguments = Bundle().apply {
-                putInt(NUMBER, number)
-            }
-        }
+        private const val PLAYLIST_ID = "playlist"
+        fun createArgs(playlistId: Int): android.os.Bundle =
+            bundleOf(PLAYLIST_ID to playlistId)
+
     }
 
 }

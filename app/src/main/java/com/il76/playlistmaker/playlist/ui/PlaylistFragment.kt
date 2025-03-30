@@ -20,6 +20,9 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
+import com.il76.playlistmaker.media.ui.PlaylistAddFragment
+import com.il76.playlistmaker.media.ui.PlaylistsFragment
+import com.il76.playlistmaker.media.ui.PlaylistsFragment.Companion
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchFragment.Companion.CLICK_DEBOUNCE_DELAY
@@ -156,7 +159,13 @@ class PlaylistFragment: Fragment() {
 
                 }
                 .show()
+        }
 
+        binding.bottomSheetEdit.setOnClickListener {
+            Log.i("pls", viewModel.playlist.toString())
+            findNavController().navigate(R.id.action_fragment_playlist_to_fragment_playlistadd,
+                viewModel.playlist?.let { it1 -> PlaylistAddFragment.createArgs(it1.id) }
+            )
         }
 
 

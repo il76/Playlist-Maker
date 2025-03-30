@@ -53,12 +53,11 @@
         android:name="com.il76.playlistmaker.playlist.ui.PlaylistFragment"
         android:label="fragment_playlist"
         tools:layout="@layout/fragment_playlist">
-        <argument
-            android:name="Номер плейлиста"
-            app:argType="integer"
-            android:defaultValue="0" />
         <action
             android:id="@+id/action_fragment_playlist_to_playerFragment"
             app:destination="@id/playerFragment" />
+        <action
+            android:id="@+id/action_fragment_playlist_to_fragment_playlistadd"
+            app:destination="@id/fragment_playlistadd" />
     </fragment>
 </navigation>
