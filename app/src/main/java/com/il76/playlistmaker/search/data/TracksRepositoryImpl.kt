@@ -1,6 +1,8 @@
 package com.il76.playlistmaker.search.data
 
+import com.il76.playlistmaker.data.converters.TrackDbConverter
 import com.il76.playlistmaker.data.db.AppDatabase
+import com.il76.playlistmaker.history.data.db.TrackEntity
 import com.il76.playlistmaker.search.data.dto.TracksSearchRequest
 import com.il76.playlistmaker.search.data.dto.TracksSearchResponse
 import com.il76.playlistmaker.search.domain.api.TracksRepository
@@ -10,7 +12,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient,
-                           private val appDatabase: AppDatabase) : TracksRepository {
+                           private val appDatabase: AppDatabase,
+    private val trackDbConverter: TrackDbConverter) : TracksRepository {
 
     // null пришлось добавить для возврата статуса ошибки
     override fun searchTracks(term: String): Flow<List<Track>?> = flow {
@@ -42,4 +45,14 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient,
             emit(null)
         }
     }
+
+    override fun getPlaylistTracks(playlistId: Int): Flow<List<Track>?> = flow {
+        val tracks = appDatabase.trackDao().getPlaylistTracks(playlistId)
+        emit(convertFromTrackEntity(tracks))
+    }
+
+    private fun convertFromTrackEntity(tracks: List<TrackEntity>): List<Track> {
+        return tracks.map { track -> trackDbConverter.map(track) }
+    }
+
 }

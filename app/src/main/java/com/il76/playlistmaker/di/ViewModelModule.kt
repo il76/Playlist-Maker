@@ -64,6 +64,8 @@ val viewModelModule = module {
     viewModel { (playlistId: Int) ->
         PlaylistViewModel(
             playlistId,
+            get(),
+            get(),
             get()
         )
 

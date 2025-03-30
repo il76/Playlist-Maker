@@ -18,7 +18,8 @@ class TrackDbConverter {
             track.country,
             track.previewUrl,
             track.poster,
-            track.releaseYear
+            track.releaseYear,
+            track.isFavourite
         )
     }
 
@@ -35,6 +36,8 @@ class TrackDbConverter {
             track.country,
             track.previewUrl,
             track.poster,
-            track.releaseYear)
+            track.releaseYear,
+            track.isFavourite
+            )
     }
 }

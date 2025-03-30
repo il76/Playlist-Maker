@@ -23,4 +23,12 @@ interface TrackDao {
 
     @Query("SELECT trackId FROM tracks_list")
     suspend fun getTracksIds(): List<Int>
+
+    @Query("""
+        SELECT tl.* FROM playlists_tracks AS plt
+         INNER JOIN tracks_list AS tl ON tl.trackId = plt.trackId  
+        WHERE plt.playlistId = :playlistId
+        ORDER BY plt.trackId DESC
+    """)
+    suspend fun getPlaylistTracks(playlistId: Int): List<TrackEntity>
 }

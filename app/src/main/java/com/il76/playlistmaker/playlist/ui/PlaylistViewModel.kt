@@ -5,16 +5,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.search.domain.api.TracksInteractor
+import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.utils.SingleLiveEvent
 import kotlinx.coroutines.launch
 
-class PlaylistViewModel(private val playlistId: Int, playlistInteractor: PlaylistInteractor): ViewModel() {
+class PlaylistViewModel(private val playlistId: Int, private val playlistInteractor: PlaylistInteractor, private val tracksInteractor: TracksInteractor, private val gson: Gson): ViewModel() {
 
     var playlist: Playlist? = null
+    var tracksList: List<Track>? = null
 
     private val playlistLiveData = MutableLiveData<Playlist>()
     fun observePlaylist(): LiveData<Playlist> = playlistLiveData
+    private val tracksLiveData = MutableLiveData<List<Track>>()
+    fun observeTrackslist(): LiveData<List<Track>> = tracksLiveData
+    private val showToast = SingleLiveEvent<String>()
+    fun observeShowToast(): LiveData<String> = showToast
 
     init {
         viewModelScope.launch {
@@ -23,6 +32,22 @@ class PlaylistViewModel(private val playlistId: Int, playlistInteractor: Playlis
                 playlistLiveData.postValue(playlist)
                 Log.i("pls", playlist.toString())
             }
+            if (playlist != null) {
+                loadTracks()
+            }
         }
+    }
+
+    fun loadTracks() {
+        viewModelScope.launch {
+            tracksInteractor.getPlaylistTracks(playlist!!.id).collect { tracksData ->
+                tracksList = tracksData
+                tracksLiveData.postValue(tracksList)
+            }
+        }
+    }
+
+    fun provideTrackData(track: Track): String {
+        return gson.toJson(track)
     }
 }

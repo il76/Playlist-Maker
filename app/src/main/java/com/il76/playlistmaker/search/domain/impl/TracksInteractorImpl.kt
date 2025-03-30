@@ -9,4 +9,8 @@ class TracksInteractorImpl(private val repository: TracksRepository) : TracksInt
     override fun searchTracks(term: String): Flow<List<Track>?> {
         return repository.searchTracks(term)
     }
+
+    override fun getPlaylistTracks(playlistId: Int): Flow<List<Track>?> {
+        return repository.getPlaylistTracks(playlistId)
+    }
 }
