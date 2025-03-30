@@ -68,8 +68,9 @@ class PlaylistViewModel(
                 share_text += i.toString() + ". " + track.artistName + " - " + track.trackName + " (" + track.trackTime + ")" + "\n"
                 i++
             }
+            sharingInteractor.share(share_text)
+        } else {
+            showToast.postValue(share_text)
         }
-        Log.i("pls", share_text)
-        sharingInteractor.share(share_text)
     }
 }

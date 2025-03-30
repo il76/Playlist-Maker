@@ -92,8 +92,10 @@ class PlaylistFragment: Fragment() {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
                             binding.overlay.isVisible = false
-                            bottomSheetBehavior.isHideable = false
-                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            if (viewModel.tracksList.isNullOrEmpty()) {
+                                bottomSheetBehavior.isHideable = false
+                                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
                         }
                         else -> {
                             binding.overlay.isVisible = true
@@ -138,16 +140,14 @@ class PlaylistFragment: Fragment() {
     }
 
     private fun renderTracks(trackList: List<Track>?) {
-        if (trackList != null) {
+        var counterText = "0 треков"
+        var durationText = "0 минут"
+        if (!trackList.isNullOrEmpty()) {
             val trackAdapter = TrackAdapter(trackList, onTrackClickDebounce)
             binding.tracksList.layoutManager = LinearLayoutManager(requireActivity())
             binding.tracksList.adapter = trackAdapter
             trackAdapter.notifyDataSetChanged()
-        }
 
-        var counterText = "0 треков"
-        var durationText = "0 минут"
-        if (trackList != null) {
             counterText = trackList?.count().toString() + " треков"
 
             var duration = 0
@@ -160,6 +160,8 @@ class PlaylistFragment: Fragment() {
             }
             val minutes = duration/60
             durationText = "$minutes минут"
+        } else {
+            binding.playlistBottomSheetTracks.isVisible = false
         }
         binding.playlistCounter.text = counterText
         binding.bottomSheetPlaylistinfoBlock.playlistCounter.text = counterText
