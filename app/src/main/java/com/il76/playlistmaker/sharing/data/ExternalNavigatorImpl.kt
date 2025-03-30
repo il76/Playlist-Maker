@@ -7,11 +7,19 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.sharing.api.ExternalNavigator
+import java.net.MalformedURLException
+import java.net.URL
+
+
 
 class ExternalNavigatorImpl(private val context: Context): ExternalNavigator {
-    override fun share(url: String): String {
+    override fun share(text: String): String {
         val intent = Intent(Intent.ACTION_SEND)
-        intent.putExtra(Intent.EXTRA_SUBJECT, Uri.parse(url))
+        if (isValidUrl(text)) {
+            intent.putExtra(Intent.EXTRA_SUBJECT, Uri.parse(text))
+        } else {
+            intent.putExtra(Intent.EXTRA_TEXT, text)
+        }
         intent.setType("text/plain")
         if (intent.resolveActivity(context.packageManager) != null) {
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK)
@@ -19,6 +27,15 @@ class ExternalNavigatorImpl(private val context: Context): ExternalNavigator {
             return ""
         } else {
             return context.getString(R.string.action_not_supported)
+        }
+    }
+
+    private fun isValidUrl(url: String): Boolean {
+        try {
+            URL(url)
+            return true
+        } catch (e: MalformedURLException) {
+            return false
         }
     }
 

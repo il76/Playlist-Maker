@@ -112,6 +112,9 @@ class PlaylistFragment: Fragment() {
         binding.playlistIconShare.setOnClickListener {
             viewModel.sharePlaylist()
         }
+        binding.bottomSheetShare.setOnClickListener {
+            viewModel.sharePlaylist()
+        }
 
 
     }
