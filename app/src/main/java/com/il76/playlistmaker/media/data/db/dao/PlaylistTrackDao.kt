@@ -19,5 +19,7 @@ interface PlaylistTrackDao {
     @Query("SELECT COUNT(*) FROM playlists_tracks WHERE playlistId = :playlistId AND trackId = :trackId")
     suspend fun exists(playlistId: Int, trackId: Int): Int
 
+    @Query("SELECT COUNT(*) FROM playlists_tracks WHERE trackId = :trackId")
+    suspend fun getTrackUsageCnt(trackId: Int): Int
 
 }

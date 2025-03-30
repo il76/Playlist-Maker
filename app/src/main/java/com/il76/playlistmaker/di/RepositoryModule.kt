@@ -46,9 +46,10 @@ val repositoryModule = module {
 
     factory<PlaylistRepository> {
         PlaylistRepositoryImpl(
-            appDatabase = get(),
-            playlistDbConverter = get(),
-            playlistTrackDbConverter = get()
+            get(),
+            get(),
+            get(),
+            get()
         )
     }
 

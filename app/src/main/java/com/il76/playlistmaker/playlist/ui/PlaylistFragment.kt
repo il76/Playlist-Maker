@@ -19,6 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchFragment.Companion.CLICK_DEBOUNCE_DELAY
@@ -34,6 +35,8 @@ class PlaylistFragment: Fragment() {
     }
 
     private lateinit var onTrackClickDebounce: (Track) -> Unit
+
+    private lateinit var onTrackLongClick: (PlaylistTrack) -> Boolean
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,6 +76,23 @@ class PlaylistFragment: Fragment() {
                 R.id.action_fragment_playlist_to_playerFragment,
                 PlayerFragment.createArgs(viewModel.provideTrackData(track))
             )
+        }
+        onTrackLongClick = {playlistTrack ->
+            MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
+                .setTitle("Удалить трек")
+                .setMessage("Вы уверены, что хотите удалить трек из плейлиста \""+viewModel.playlist?.name + "\"?")
+                .setNegativeButton("Отмена") { dialog, which ->
+                    // ничего не делаем пока
+                }
+                .setPositiveButton("Удалить") { dialog, which ->
+                    viewModel.deleteTrackFromPlaylist(playlistTrack).observe(viewLifecycleOwner) { result ->
+                        if (result) {
+                            viewModel.loadTracks()
+                        }
+                    }
+                }
+                .show()
+            true
         }
         // Создаем обработчик нажатия кнопки "Назад"
 //        val callback = object : OnBackPressedCallback(true) {
@@ -164,7 +184,7 @@ class PlaylistFragment: Fragment() {
         var counterText = "0 треков"
         var durationText = "0 минут"
         if (!trackList.isNullOrEmpty()) {
-            val trackAdapter = TrackAdapter(trackList, onTrackClickDebounce)
+            val trackAdapter = TrackAdapter(trackList, onTrackClickDebounce, viewModel.playlist, onTrackLongClick)
             binding.tracksList.layoutManager = LinearLayoutManager(requireActivity())
             binding.tracksList.adapter = trackAdapter
             trackAdapter.notifyDataSetChanged()
