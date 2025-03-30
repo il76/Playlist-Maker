@@ -198,6 +198,19 @@
             android:layout_weight="1"
             android:padding="0dp"
             tools:listitem="@layout/search_track_list" />
+<!--        Где дизайн!!!-->
+        <TextView
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone"
+            android:id="@+id/empty_tracks_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|top"
+            android:drawableTop="@drawable/search_nothing_found"
+            android:drawablePadding="4dp"
+            style="@style/MediaEmptyResult"
+            android:text="В этом плейлисте нет треков"/>
 
     </LinearLayout>
 

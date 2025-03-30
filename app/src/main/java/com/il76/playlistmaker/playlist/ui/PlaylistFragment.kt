@@ -182,7 +182,8 @@ class PlaylistFragment: Fragment() {
             val minutes = duration/60
             durationText = "$minutes минут"
         } else {
-            binding.playlistBottomSheetTracks.isVisible = false
+            binding.emptyTracksList.isVisible = true
+            binding.tracksList.isVisible = false
         }
         binding.playlistCounter.text = counterText
         binding.bottomSheetPlaylistinfoBlock.playlistCounter.text = counterText
