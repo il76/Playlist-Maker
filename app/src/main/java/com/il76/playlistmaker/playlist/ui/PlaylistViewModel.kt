@@ -73,4 +73,15 @@ class PlaylistViewModel(
             showToast.postValue(share_text)
         }
     }
+
+    fun deletePlaylist(): LiveData<Boolean> {
+        val result = MutableLiveData<Boolean>()
+        viewModelScope.launch {
+            if (playlist != null) {
+                playlistInteractor.deletePlaylist(playlist!!)
+            }
+            result.postValue(true)
+        }
+        return result
+    }
 }

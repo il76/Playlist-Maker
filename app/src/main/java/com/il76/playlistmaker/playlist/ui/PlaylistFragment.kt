@@ -1,6 +1,7 @@
 package com.il76.playlistmaker.playlist.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
@@ -116,6 +118,25 @@ class PlaylistFragment: Fragment() {
         }
         binding.bottomSheetShare.setOnClickListener {
             viewModel.sharePlaylist()
+        }
+
+        binding.bottomSheetDeletePlaylist.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
+                .setTitle("")
+                .setMessage("Хотите удалить плейлист \""+viewModel.playlist?.name + "\"")
+                .setNegativeButton("Нет") { dialog, which ->
+                    // ничего не делаем пока
+                }
+                .setPositiveButton("Да") { dialog, which ->
+                    viewModel.deletePlaylist().observe(viewLifecycleOwner) { result ->
+                        if (result) {
+                            findNavController().navigateUp()
+                        }
+                    }
+
+                }
+                .show()
+
         }
 
 

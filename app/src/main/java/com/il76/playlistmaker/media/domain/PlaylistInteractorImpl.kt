@@ -23,4 +23,8 @@ class PlaylistInteractorImpl(private val repository: PlaylistRepository): Playli
     override suspend fun addTrackToPlaylist(playlistTrack: PlaylistTrack): InsertStatus {
         return repository.addTrackToPlaylist(playlistTrack)
     }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        repository.deletePlaylist(playlist)
+    }
 }
