@@ -10,10 +10,18 @@ import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.search.domain.api.TracksInteractor
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.sharing.api.SharingInteractor
 import com.il76.playlistmaker.utils.SingleLiveEvent
 import kotlinx.coroutines.launch
 
-class PlaylistViewModel(private val playlistId: Int, private val playlistInteractor: PlaylistInteractor, private val tracksInteractor: TracksInteractor, private val gson: Gson): ViewModel() {
+class PlaylistViewModel(
+    private val playlistId: Int,
+    private val playlistInteractor: PlaylistInteractor,
+    private val tracksInteractor:
+    TracksInteractor,
+    private val gson: Gson,
+    private val sharingInteractor: SharingInteractor
+    ): ViewModel() {
 
     var playlist: Playlist? = null
     var tracksList: List<Track>? = null
@@ -49,5 +57,19 @@ class PlaylistViewModel(private val playlistId: Int, private val playlistInterac
 
     fun provideTrackData(track: Track): String {
         return gson.toJson(track)
+    }
+
+    fun sharePlaylist() {
+        var share_text = "В этом плейлисте нет списка треков, которым можно поделиться"
+        if (!tracksList.isNullOrEmpty() && playlist != null) {
+            share_text = playlist?.name + "\n" + playlist?.description + "\n" + tracksList?.size + " треков" + "\n\n"
+            var i = 1
+            for (track in tracksList!!) {
+                share_text += i.toString() + ". " + track.artistName + " - " + track.trackName + " (" + track.trackTime + ")" + "\n"
+                i++
+            }
+        }
+        Log.i("pls", share_text)
+        sharingInteractor.share(share_text)
     }
 }

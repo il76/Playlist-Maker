@@ -109,6 +109,10 @@ class PlaylistFragment: Fragment() {
             })
         }
 
+        binding.playlistIconShare.setOnClickListener {
+            viewModel.sharePlaylist()
+        }
+
 
     }
 

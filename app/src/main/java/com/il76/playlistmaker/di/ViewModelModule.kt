@@ -66,6 +66,7 @@ val viewModelModule = module {
             playlistId,
             get(),
             get(),
+            get(),
             get()
         )
 
