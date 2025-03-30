@@ -12,4 +12,5 @@ interface PlaylistInteractor {
     suspend fun addTrackToPlaylist(playlistTrack: PlaylistTrack): InsertStatus
     suspend fun deletePlaylist(playlist: Playlist)
     suspend fun deleteTrackFromPlaylist(playlistTrack: PlaylistTrack)
+    suspend fun updatePlaylist(playlist: Playlist)
 }
