@@ -204,4 +204,18 @@
         <item name="cursorColor">@color/progressbar_tint</item>
     </style>
 
+    <style name="Playlist.PlaylistName" parent="Font700">
+        <item name="android:textSize">24sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#FF1A1B22</item>
+        <item name="android:layout_marginTop">24dp</item>
+    </style>
+    <style name="Playlist.PlaylistDescription" parent="Font400">
+        <item name="android:textSize">18sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">#FF1A1B22</item>
+    </style>
+
 </resources>

@@ -8,10 +8,13 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.bundle.bundleOf
 import androidx.core.view.isVisible
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.il76.playlistmaker.databinding.FragmentPlaylistBinding
+import com.il76.playlistmaker.media.domain.models.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -36,13 +39,21 @@ class PlaylistFragment: Fragment() {
         binding.activityPlaylistToolbar.setOnClickListener {
             findNavController().navigateUp()
         }
+        viewModel.observePlaylist().observe(viewLifecycleOwner) { playlist ->
+            if (playlist != null) {
+                renderPlaylist(playlist)
+            } else {
+                findNavController().navigateUp()
+            }
+
+        }
         Log.i("pls", viewModel.playlist.toString())
         // Создаем обработчик нажатия кнопки "Назад"
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                //showConfirmationDialog()
-            }
-        }
+//        val callback = object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                //showConfirmationDialog()
+//            }
+//        }
 
 
         val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetTracks)
@@ -67,6 +78,17 @@ class PlaylistFragment: Fragment() {
             }
         })
 
+
+    }
+
+    private fun renderPlaylist(playlist: Playlist) {
+        if (playlist.cover.isNotEmpty()) {
+            binding.playlistCover.setPadding(0,0,0,0) //для реальной картинки в макете отступы отсутствуют
+            Glide.with(this).load(playlist.cover).into(binding.playlistCover)
+        }
+        binding.playlistName.text = playlist.name
+        binding.playlistDescription.text = playlist.description
+        // длительность и количество треков после загрузки данных по ним
 
     }
 
