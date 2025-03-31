@@ -56,9 +56,12 @@ class PlaylistViewModel(
 
     fun loadTracks() {
         viewModelScope.launch {
-            tracksInteractor.getPlaylistTracks(playlist!!.id).collect { tracksData ->
-                tracksList = tracksData
-                tracksLiveData.postValue(tracksList)
+            val id = playlist?.id ?: 0;
+            if (id > 0) {
+                tracksInteractor.getPlaylistTracks(id).collect { tracksData ->
+                    tracksList = tracksData
+                    tracksLiveData.postValue(tracksList)
+                }
             }
         }
     }

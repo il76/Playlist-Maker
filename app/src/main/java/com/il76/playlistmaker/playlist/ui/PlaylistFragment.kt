@@ -84,12 +84,12 @@ class PlaylistFragment: Fragment() {
         }
         onTrackLongClick = {playlistTrack ->
             MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
-                .setTitle("Удалить трек")
+                .setTitle(getString(R.string.delete_track))
                 .setMessage("Вы уверены, что хотите удалить трек из плейлиста \""+viewModel.playlist?.name + "\"?")
-                .setNegativeButton("Нет") { dialog, which ->
+                .setNegativeButton(getString(R.string.text_no)) { dialog, which ->
                     // ничего не делаем пока
                 }
-                .setPositiveButton("Да") { dialog, which ->
+                .setPositiveButton(getString(R.string.text_yes)) { dialog, which ->
                     viewModel.deleteTrackFromPlaylist(playlistTrack).observe(viewLifecycleOwner) { result ->
                         if (result) {
                             viewModel.loadTracks()
@@ -146,10 +146,10 @@ class PlaylistFragment: Fragment() {
             MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
                 .setTitle("")
                 .setMessage("Хотите удалить плейлист \""+viewModel.playlist?.name + "\"")
-                .setNegativeButton("Нет") { dialog, which ->
+                .setNegativeButton(getString(R.string.text_no)) { dialog, which ->
                     // ничего не делаем пока
                 }
-                .setPositiveButton("Да") { dialog, which ->
+                .setPositiveButton(getString(R.string.text_yes)) { dialog, which ->
                     viewModel.deletePlaylist().observe(viewLifecycleOwner) { result ->
                         if (result) {
                             findNavController().navigateUp()

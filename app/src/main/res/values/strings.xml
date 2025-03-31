@@ -44,4 +44,7 @@
     <string name="new_playlist_title">Название*</string>
     <string name="new_playlist_description">Описание</string>
     <string name="new_playlist_create">Создать</string>
+    <string name="delete_track">Удалить трек</string>
+    <string name="text_no">Нет</string>
+    <string name="text_yes">Да</string>
 </resources>
