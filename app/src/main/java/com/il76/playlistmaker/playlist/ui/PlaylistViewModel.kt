@@ -1,6 +1,5 @@
 package com.il76.playlistmaker.playlist.ui
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,9 +34,11 @@ class PlaylistViewModel(
     fun observeShowToast(): LiveData<String> = showToast
 
     init {
-        loadPlaylist()
         viewModelScope.launch {
-
+            playlistInteractor.getSinglePlaylist(playlistId)?.collect { playlistData ->
+                playlist = playlistData
+                playlistLiveData.postValue(playlist)
+            }
             if (playlist != null) {
                 loadTracks()
             }
