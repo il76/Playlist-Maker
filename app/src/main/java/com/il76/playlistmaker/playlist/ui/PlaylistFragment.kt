@@ -86,10 +86,10 @@ class PlaylistFragment: Fragment() {
             MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)
                 .setTitle("Удалить трек")
                 .setMessage("Вы уверены, что хотите удалить трек из плейлиста \""+viewModel.playlist?.name + "\"?")
-                .setNegativeButton("Отмена") { dialog, which ->
+                .setNegativeButton("Нет") { dialog, which ->
                     // ничего не делаем пока
                 }
-                .setPositiveButton("Удалить") { dialog, which ->
+                .setPositiveButton("Да") { dialog, which ->
                     viewModel.deleteTrackFromPlaylist(playlistTrack).observe(viewLifecycleOwner) { result ->
                         if (result) {
                             viewModel.loadTracks()

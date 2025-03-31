@@ -13,6 +13,9 @@ interface PlaylistTrackDao {
     @Delete
     suspend fun delete(playlistTrack: PlaylistTrackEntity)
 
+    @Query("DELETE FROM playlists_tracks WHERE playlistId = :playlistId AND trackId = :trackId")
+    suspend fun deleteTrackFromPlaylist(playlistId: Int, trackId: Int)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(playlistTrack: PlaylistTrackEntity): Long
 

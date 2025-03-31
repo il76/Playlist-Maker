@@ -40,7 +40,8 @@ class PlaylistRepositoryImpl(
     }
 
     override suspend fun deleteTrackFromPlaylist(playlistTrack: PlaylistTrack) {
-        appDatabase.playlistTrackDao().delete(playlistTrackDbConverter.map(playlistTrack))
+        val entity = playlistTrackDbConverter.map(playlistTrack)
+        appDatabase.playlistTrackDao().deleteTrackFromPlaylist(entity.playlistId, entity.trackId)
         if (!playlistTrack.track.isFavourite) { //трек не в избранных, ищем, нужен ли он вообще
             if (appDatabase.playlistTrackDao().getTrackUsageCnt(playlistTrack.track.trackId) == 0) { //трек больше не нужен
                 appDatabase.trackDao().deleteTrackById(playlistTrack.track.trackId)
