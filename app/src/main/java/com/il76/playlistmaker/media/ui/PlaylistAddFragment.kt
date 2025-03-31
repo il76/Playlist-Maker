@@ -65,10 +65,6 @@ class PlaylistAddFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: android.os.Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.newPlaylistToolbar.setNavigationOnClickListener {
-            showConfirmationDialog()
-
-        }
         playlistId = arguments?.getInt(PLAYLIST_ID) ?: 0
         //регистрируем событие, которое вызывает photo picker
         val pickMedia =
@@ -83,15 +79,28 @@ class PlaylistAddFragment: Fragment() {
         binding.playlistCreateImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
+        binding.playlistCover.setOnClickListener {
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
 
         // Создаем обработчик нажатия кнопки "Назад"
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-               showConfirmationDialog()
+        if (playlistId == 0) {
+            val callback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    showConfirmationDialog()
+                }
+            }
+            // Регистрируем обработчик
+            requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+            binding.newPlaylistToolbar.setNavigationOnClickListener {
+                showConfirmationDialog()
+            }
+        } else {
+            binding.newPlaylistToolbar.setNavigationOnClickListener {
+                findNavController().navigateUp()
             }
         }
-        // Регистрируем обработчик
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+
 
         playlistAddViewModel.observeSuccess().observe(viewLifecycleOwner) { result ->
             if (result) {
@@ -105,6 +114,7 @@ class PlaylistAddFragment: Fragment() {
             playlistAddViewModel.observePlaylist().observe(viewLifecycleOwner) { playlistData ->
                 renderPlaylist(playlistData)
             }
+            binding.createPlaylist.text = "Сохранить"
         }
 
         binding.textInputEditTextName.addTextChangedListener(object : TextWatcher {
@@ -159,6 +169,7 @@ class PlaylistAddFragment: Fragment() {
                 .into(binding.playlistCover)
             //putImage(Uri.parse(playlist.cover))
         }
+        binding.createPlaylist.setEnabled(!binding.textInputEditTextName.text.isNullOrEmpty())
     }
 
     private fun showConfirmationDialog() {
@@ -203,8 +214,16 @@ class PlaylistAddFragment: Fragment() {
 
     private fun savePlaylist() {
         var cover = ""
-        imageUri?.let { cover = saveFileToPrivateStorage(it) }
+        if (playlistId > 0 && imageUri != null) { //обновляем фото
+            cover = imageUri.toString()
+        } else if (playlistId > 0 && imageUri == null) { //НЕ обновляем фото
+            cover = playlistAddViewModel.playlist.cover
+        } else { //новый плейлист
+            imageUri?.let { cover = saveFileToPrivateStorage(it) }
+        }
+
         playlistAddViewModel.savePlaylist(Playlist(
+            id = playlistId,
             name = binding.textInputEditTextName.text.toString(),
             description = binding.textInputEditTextDescr.text.toString(),
             cover = cover,

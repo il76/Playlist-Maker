@@ -19,7 +19,6 @@ class PlaylistAddViewModel(
     fun observePlaylist(): LiveData<Playlist> = playlistLiveData
 
     init {
-        Log.i("pls", playlistId.toString())
         if (playlistId > 0) {
             viewModelScope.launch {
                 playlistInteractor.getSinglePlaylist(playlistId)?.collect { playlistData ->
@@ -35,7 +34,11 @@ class PlaylistAddViewModel(
 
     fun savePlaylist(playlist: Playlist) {
         viewModelScope.launch {
-            playlistInteractor.createPlaylist(playlist)
+            if (playlist.id > 0) {
+                playlistInteractor.updatePlaylist(playlist)
+            } else {
+                playlistInteractor.createPlaylist(playlist)
+            }
             successLiveData.postValue(true)
         }
     }

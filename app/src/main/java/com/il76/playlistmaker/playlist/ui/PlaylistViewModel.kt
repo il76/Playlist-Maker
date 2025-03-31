@@ -35,13 +35,20 @@ class PlaylistViewModel(
     fun observeShowToast(): LiveData<String> = showToast
 
     init {
+        loadPlaylist()
+        viewModelScope.launch {
+
+            if (playlist != null) {
+                loadTracks()
+            }
+        }
+    }
+
+    fun loadPlaylist() {
         viewModelScope.launch {
             playlistInteractor.getSinglePlaylist(playlistId)?.collect { playlistData ->
                 playlist = playlistData
                 playlistLiveData.postValue(playlist)
-            }
-            if (playlist != null) {
-                loadTracks()
             }
         }
     }

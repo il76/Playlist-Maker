@@ -176,6 +176,7 @@ class PlaylistFragment: Fragment() {
         super.onResume()
         bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        viewModel.loadPlaylist()
         // без кода ниже едет вёрстка
         // Получаем ширину экрана
         val windowMetrics = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
