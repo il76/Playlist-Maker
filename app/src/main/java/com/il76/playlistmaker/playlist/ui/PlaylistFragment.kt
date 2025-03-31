@@ -162,9 +162,9 @@ class PlaylistFragment: Fragment() {
         }
 
         binding.bottomSheetEdit.setOnClickListener {
-            Log.i("pls", viewModel.playlist.toString())
+            val id = viewModel.playlist?.id ?: 0
             findNavController().navigate(R.id.action_fragment_playlist_to_fragment_playlistadd,
-                viewModel.playlist?.let { it1 -> PlaylistAddFragment.createArgs(it1.id) }
+                PlaylistAddFragment.createArgs(id)
             )
         }
 

@@ -35,9 +35,10 @@ class PlaylistAddFragment: Fragment() {
 
     private lateinit var binding: FragmentPlaylistaddBinding
 
-    private val playlistAddViewModel: PlaylistAddViewModel by viewModel<PlaylistAddViewModel> {
+    private val playlistAddViewModel: PlaylistAddViewModel by viewModel{
         parametersOf(playlistId)
     }
+
 
     private var imageUri: Uri? = null // Переменная для хранения Uri
 
@@ -68,6 +69,7 @@ class PlaylistAddFragment: Fragment() {
             showConfirmationDialog()
 
         }
+        playlistId = arguments?.getInt(PLAYLIST_ID) ?: 0
         //регистрируем событие, которое вызывает photo picker
         val pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -98,8 +100,8 @@ class PlaylistAddFragment: Fragment() {
                 //ошибка
             }
         }
+
         if (playlistId > 0) {
-            Log.i("pls", playlistId.toString())
             playlistAddViewModel.observePlaylist().observe(viewLifecycleOwner) { playlistData ->
                 renderPlaylist(playlistData)
             }
@@ -149,7 +151,13 @@ class PlaylistAddFragment: Fragment() {
         binding.textInputEditTextName.setText(playlist.name)
         binding.textInputEditTextDescr.setText(playlist.description)
         if (playlist.cover.isNotEmpty()) {
-            putImage(Uri.parse(playlist.cover))
+            binding.playlistCreateImage.isVisible = false
+            Glide.with(binding.playlistCover)
+                .load(playlist.cover)
+                .placeholder(R.drawable.search_cover_placeholder)
+                .transform(CenterCrop(), RoundedCorners(binding.root.context.resources.getDimensionPixelSize(R.dimen.track_cover_border_radius)))
+                .into(binding.playlistCover)
+            //putImage(Uri.parse(playlist.cover))
         }
     }
 
