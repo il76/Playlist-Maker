@@ -1,12 +1,11 @@
 package com.il76.playlistmaker.playlist.ui
 
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.core.bundle.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -21,8 +20,6 @@ import com.il76.playlistmaker.databinding.FragmentPlaylistBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.media.ui.PlaylistAddFragment
-import com.il76.playlistmaker.media.ui.PlaylistsFragment
-import com.il76.playlistmaker.media.ui.PlaylistsFragment.Companion
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchFragment.Companion.CLICK_DEBOUNCE_DELAY
@@ -113,8 +110,6 @@ class PlaylistFragment: Fragment() {
         bottomSheetInfoBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetPlaylistInfo)
 
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-
         bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         binding.playlistIconSubmenu.setOnClickListener {
             bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -123,10 +118,8 @@ class PlaylistFragment: Fragment() {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
                             binding.overlay.isVisible = false
-                            if (viewModel.tracksList.isNullOrEmpty()) {
-                                bottomSheetBehavior.isHideable = false
-                                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                            }
+                            bottomSheetBehavior.isHideable = false
+                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                         }
                         else -> {
                             binding.overlay.isVisible = true
@@ -179,6 +172,27 @@ class PlaylistFragment: Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        // без кода ниже едет вёрстка
+        // Получаем ширину экрана
+        val windowMetrics = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Для API 30+
+            requireActivity().windowManager.currentWindowMetrics.bounds.width()
+        } else {
+            // Для API 28-29
+            resources.displayMetrics.widthPixels
+        }
+        // Устанавливаем высоту FrameLayout равной ширине экрана
+        binding.frameLayout.layoutParams = binding.frameLayout.layoutParams.apply {
+            height = windowMetrics
+        }
+        // Обновляем разметку (если изменения не применяются автоматически)
+        binding.frameLayout.requestLayout()
+    }
+
     private fun showToast(additionalMessage: String) {
         Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
     }
@@ -187,6 +201,7 @@ class PlaylistFragment: Fragment() {
         if (playlist.cover.isNotEmpty()) {
             binding.playlistCover.setPadding(0,0,0,0) //для реальной картинки в макете отступы отсутствуют
             Glide.with(this).load(playlist.cover).into(binding.playlistCover)
+            binding.frameLayout.requestLayout()
             Glide.with(this).load(playlist.cover).into(binding.bottomSheetPlaylistinfoBlock.playlistCover)
         }
         binding.playlistName.text = playlist.name
