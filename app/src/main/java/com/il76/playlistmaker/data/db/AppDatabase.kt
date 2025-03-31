@@ -11,7 +11,7 @@ import com.il76.playlistmaker.media.data.db.PlaylistTrackEntity
 import com.il76.playlistmaker.media.data.db.dao.PlaylistTrackDao
 
 @Database(
-    version = 4,
+    version = 6,
     entities = [TrackEntity::class, PlaylistEntity::class, PlaylistTrackEntity::class],
 //    autoMigrations = [
 //        AutoMigration (

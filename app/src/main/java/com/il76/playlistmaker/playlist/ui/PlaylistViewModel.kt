@@ -39,7 +39,6 @@ class PlaylistViewModel(
             playlistInteractor.getSinglePlaylist(playlistId)?.collect { playlistData ->
                 playlist = playlistData
                 playlistLiveData.postValue(playlist)
-                Log.i("pls", playlist.toString())
             }
             if (playlist != null) {
                 loadTracks()

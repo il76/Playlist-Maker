@@ -2,10 +2,12 @@ package com.il76.playlistmaker.media.data.db
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "playlists_tracks",
-    primaryKeys = ["playlistId", "trackId"],
+    indices = [Index(value = ["playlistId", "trackId"], unique = true)],
     foreignKeys = [
         ForeignKey(
             entity = PlaylistEntity::class,
@@ -16,6 +18,8 @@ import androidx.room.ForeignKey
     ]
 )
 data class PlaylistTrackEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val playlistId: Int,
     val trackId: Int,
 )

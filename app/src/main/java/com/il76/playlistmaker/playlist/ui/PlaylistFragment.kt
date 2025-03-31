@@ -41,6 +41,9 @@ class PlaylistFragment: Fragment() {
 
     private lateinit var onTrackLongClick: (PlaylistTrack) -> Boolean
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+    private lateinit var bottomSheetInfoBehavior: BottomSheetBehavior<*>
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,6 +78,8 @@ class PlaylistFragment: Fragment() {
             viewLifecycleOwner.lifecycleScope,
             false
         ) { track ->
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             findNavController().navigate(
                 R.id.action_fragment_playlist_to_playerFragment,
                 PlayerFragment.createArgs(viewModel.provideTrackData(track))
@@ -104,13 +109,14 @@ class PlaylistFragment: Fragment() {
 //            }
 //        }
 
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetTracks)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetTracks)
+        bottomSheetInfoBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetPlaylistInfo)
+
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-        val bottomSheetInfoBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetPlaylistInfo)
+
         bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         binding.playlistIconSubmenu.setOnClickListener {
-            val bottomSheetInfoBehavior = BottomSheetBehavior.from(binding.playlistBottomSheetPlaylistInfo)
             bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetInfoBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -163,6 +169,8 @@ class PlaylistFragment: Fragment() {
 
         binding.bottomSheetEdit.setOnClickListener {
             val id = viewModel.playlist?.id ?: 0
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             findNavController().navigate(R.id.action_fragment_playlist_to_fragment_playlistadd,
                 PlaylistAddFragment.createArgs(id)
             )
