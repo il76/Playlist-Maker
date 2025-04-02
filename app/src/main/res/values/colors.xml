@@ -29,4 +29,5 @@
     <color name="playlist_create_empty_field">#FFDADADA</color>
     <color name="playlist_create_filled_field">#FF3772E7</color>
     <color name="dialog_color">#FF000000</color>
+    <color name="playlist_icon_fill">#FF1A1B22</color>
 </resources>

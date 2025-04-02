@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface PlaylistInteractor {
     fun getPlaylists(): Flow<List<Playlist>?>
+    fun getSinglePlaylist(playlistInd: Int): Flow<Playlist>?
     suspend fun createPlaylist(playlist: Playlist)
     suspend fun addTrackToPlaylist(playlistTrack: PlaylistTrack): InsertStatus
+    suspend fun deletePlaylist(playlist: Playlist)
+    suspend fun deleteTrackFromPlaylist(playlistTrack: PlaylistTrack)
+    suspend fun updatePlaylist(playlist: Playlist)
 }

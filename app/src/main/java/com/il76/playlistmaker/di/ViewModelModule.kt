@@ -6,6 +6,7 @@ import com.il76.playlistmaker.media.ui.PlaylistAddViewModel
 import com.il76.playlistmaker.media.ui.PlaylistsViewModel
 import com.il76.playlistmaker.media.ui.TracksViewModel
 import com.il76.playlistmaker.player.ui.PlayerViewModel
+import com.il76.playlistmaker.playlist.ui.PlaylistViewModel
 import com.il76.playlistmaker.search.ui.SearchViewModel
 import com.il76.playlistmaker.settings.ui.SettingsViewModel
 import org.koin.android.ext.koin.androidContext
@@ -55,9 +56,20 @@ val viewModelModule = module {
     viewModel {
         MediaViewModel()
     }
-    viewModel {
+    viewModel { (playlistId: Int) ->
         PlaylistAddViewModel(
+            get(),
+            playlistId
+        )
+    }
+    viewModel { (playlistId: Int) ->
+        PlaylistViewModel(
+            playlistId,
+            get(),
+            get(),
+            get(),
             get()
         )
+
     }
 }

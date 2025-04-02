@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface TracksRepository {
     fun searchTracks(term: String): Flow<List<Track>?>
+    fun getPlaylistTracks(playlistId: Int): Flow<List<Track>?>
 }

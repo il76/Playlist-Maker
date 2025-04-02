@@ -12,11 +12,27 @@ class PlaylistInteractorImpl(private val repository: PlaylistRepository): Playli
         return repository.getPlaylists()
     }
 
+    override fun getSinglePlaylist(playlistInd: Int): Flow<Playlist> {
+        return repository.getSinglePlaylist(playlistInd)
+    }
+
     override suspend fun createPlaylist(playlist: Playlist) {
         repository.createPlaylist(playlist)
     }
 
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        repository.updatePlaylist(playlist)
+    }
+
     override suspend fun addTrackToPlaylist(playlistTrack: PlaylistTrack): InsertStatus {
         return repository.addTrackToPlaylist(playlistTrack)
+    }
+
+    override suspend fun deleteTrackFromPlaylist(playlistTrack: PlaylistTrack) {
+        return repository.deleteTrackFromPlaylist(playlistTrack)
+    }
+
+    override suspend fun deletePlaylist(playlist: Playlist) {
+        repository.deletePlaylist(playlist)
     }
 }

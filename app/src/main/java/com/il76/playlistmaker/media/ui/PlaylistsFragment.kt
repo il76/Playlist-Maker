@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.bundle.Bundle
+import androidx.core.bundle.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.MediaPlaylistsBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
@@ -55,6 +55,7 @@ class PlaylistsFragment: Fragment() {
             viewLifecycleOwner.lifecycleScope,
             false
         ) { playlistTrack ->
+            findNavController().navigate(R.id.action_media_fragment_to_fragment_playlist, createArgs(playlistTrack.playlist.id))
             //playlistsViewModel.addToPlaylist(playlistTrack) //TODO in 23
         }
         playlistsViewModel.loadPlaylists()
@@ -83,6 +84,10 @@ class PlaylistsFragment: Fragment() {
 
             }
         }
+        private const val ARGS_PLAYLISTID = "playlistid"
+
+        fun createArgs(playlistId: Int): android.os.Bundle =
+            bundleOf(ARGS_PLAYLISTID to playlistId)
     }
 
 }

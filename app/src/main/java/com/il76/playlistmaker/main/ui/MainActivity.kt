@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainFragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
         navController.addOnDestinationChangedListener { _, nd: NavDestination, _ ->
-            if (nd.label == "fragment_player" || nd.label == "fragment_playlistadd") { //прячем нижнее меню на экране плеера
+            if (nd.label == "fragment_player" || nd.label == "fragment_playlistadd" || nd.label == "fragment_playlist") { //прячем нижнее меню на некоторых экранах
                 binding.bottomNavigationView.isVisible = false
                 binding.bottomNavigationViewBorder.isVisible = false
             } else {

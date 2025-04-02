@@ -126,8 +126,8 @@ class SearchFragment: Fragment() {
         recyclerView = binding.trackList
 
         trackAdapter = TrackAdapter(trackList, onTrackClickDebounce)
-        recyclerView.layoutManager = LinearLayoutManager(requireActivity())
-        recyclerView.adapter = trackAdapter
+        binding.trackList.layoutManager = LinearLayoutManager(requireActivity())
+        binding.trackList.adapter = trackAdapter
 
         binding.searchErrorRefresh.setOnClickListener {
             viewModel.doSearch(searchValue)
@@ -155,25 +155,25 @@ class SearchFragment: Fragment() {
                 binding.searchErrorRefresh.isVisible = true
                 binding.searchErrorImage.setImageResource(R.drawable.search_network_error)
                 binding.searchErrorText.text = getText(R.string.search_network_error)
-                recyclerView.isVisible = false
+                binding.trackList.isVisible = false
             }
             SearchState.ErrorStatus.EMPTY_RESULT -> {
                 binding.searchError.isVisible = true
                 binding.searchErrorRefresh.isVisible = false
                 binding.searchErrorImage.setImageResource(R.drawable.search_nothing_found)
                 binding.searchErrorText.text = getText(R.string.search_nothing_found)
-                recyclerView.isVisible = false
+                binding.trackList.isVisible = false
             }
             SearchState.ErrorStatus.LOADING -> {
                 binding.searchHistoryTitle.isVisible = false
                 binding.searchHistoryClear.isVisible = false
                 binding.searchError.isVisible = false
                 binding.searchErrorRefresh.isVisible = false
-                recyclerView.isVisible = false
+                binding.trackList.isVisible = false
             }
             SearchState.ErrorStatus.SUCCESS -> {
                 binding.searchError.isVisible = false
-                recyclerView.isVisible = true
+                binding.trackList.isVisible = true
                 trackList.clear()
                 trackList.addAll(state.trackList)
                 trackAdapter.notifyDataSetChanged()

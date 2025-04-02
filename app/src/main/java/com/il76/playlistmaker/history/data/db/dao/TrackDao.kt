@@ -18,9 +18,17 @@ interface TrackDao {
     @Query("DELETE FROM tracks_list WHERE trackId = :trackId")
     suspend fun deleteTrackById(trackId: Int)
 
-    @Query("SELECT * FROM tracks_list ORDER BY id DESC")
+    @Query("SELECT * FROM tracks_list WHERE isFavourite = 1 ORDER BY id DESC")
     suspend fun getTracks(): List<TrackEntity>
 
     @Query("SELECT trackId FROM tracks_list")
     suspend fun getTracksIds(): List<Int>
+
+    @Query("""
+        SELECT tl.* FROM playlists_tracks AS plt
+         INNER JOIN tracks_list AS tl ON tl.trackId = plt.trackId  
+        WHERE plt.playlistId = :playlistId
+        ORDER BY plt.id DESC
+    """)
+    suspend fun getPlaylistTracks(playlistId: Int): List<TrackEntity>
 }
