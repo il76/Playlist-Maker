@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.RectF
 import android.graphics.drawable.VectorDrawable
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -32,10 +34,6 @@ class PlaybackButtonView @JvmOverloads constructor(
             updateBitmap()
             invalidate() // Пересчитываем изображение
         }
-
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        Log.i("pls", "size changed")
-    }
 
     init {
         // Получение атрибутов
@@ -74,8 +72,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     // Рендеринг кнопки
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        // Отрисовываем текущую иконку
-        canvas.drawBitmap(currentBitmap!!, 0f, 0f, null)
+        canvas.drawBitmap(currentBitmap!!, null, rectF, null)
     }
 
     // Обновление битмапы в зависимости от состояния
@@ -89,6 +86,30 @@ class PlaybackButtonView @JvmOverloads constructor(
     // Вспомогательная функция для загрузки иконок из атрибута
     private fun loadBitmapFromAttribute(typedArray: TypedArray, attributeId: Int): Bitmap? {
         return (ResourcesCompat.getDrawable(this.resources, typedArray.getResourceId(attributeId, 0), null) as VectorDrawable).toBitmap()
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        when (event?.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                // Можно дополнительно обработать начало нажатия (например, изменить внешний вид кнопки)
+            }
+            MotionEvent.ACTION_UP -> {
+                // Меняем состояние кнопки
+                setStatus(playerStatus)
+                //return true
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    private lateinit var rectF: RectF
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+
+        // Определяем размеры области для отрисовки
+        val size = Math.min(width, height).toFloat()
+        rectF = RectF((width - size) / 2, (height - size) / 2, (width + size) / 2, (height + size) / 2)
     }
 
     // Хранение текущего битмапа
