@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PlaybackButton">
+        <attr name="iconPlaying" format="reference" />
+        <attr name="iconPaused" format="reference" />
+    </declare-styleable>
+</resources>

@@ -27,7 +27,7 @@ class PlayerViewModel(
 
     var track: Track = Track()
 
-    private var playerStatus = PlayerStatus.DEFAULT
+    var playerStatus = PlayerStatus.DEFAULT
 
     private val playerLiveData = MutableLiveData<PlayerState>()
     private val playerStatusLiveData = MutableLiveData<PlayerStatus>()
