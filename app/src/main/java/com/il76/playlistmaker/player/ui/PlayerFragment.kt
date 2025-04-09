@@ -222,8 +222,8 @@ class PlayerFragment: Fragment() {
      * Запуск
      */
     private fun startPlayer() {
-        viewModel.changePlayerStatus(PlayerStatus.PLAYIND)
-        viewModel.playerStatus = PlayerStatus.PLAYIND
+        viewModel.changePlayerStatus(PlayerStatus.PLAYING)
+        viewModel.playerStatus = PlayerStatus.PLAYING
     }
 
     /**
@@ -241,7 +241,7 @@ class PlayerFragment: Fragment() {
         when(viewModel.playerStatus) {
             PlayerStatus.DEFAULT -> {}
             PlayerStatus.PREPARED, PlayerStatus.PAUSED -> startPlayer()
-            PlayerStatus.PLAYIND -> pausePlayer()
+            PlayerStatus.PLAYING -> pausePlayer()
         }
     }
 
@@ -279,7 +279,7 @@ class PlayerFragment: Fragment() {
                 //binding.buttonPlay.setImageResource(R.drawable.icon_play)
                 binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
             }
-            PlayerStatus.PLAYIND -> {
+            PlayerStatus.PLAYING -> {
                 //binding.buttonPlay.setStatus(viewModel.playerStatus)
                 //binding.buttonPlay.setImageResource(R.drawable.icon_pause)
             }

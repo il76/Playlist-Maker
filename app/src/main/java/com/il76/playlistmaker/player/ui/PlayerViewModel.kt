@@ -71,10 +71,10 @@ class PlayerViewModel(
             PlayerStatus.PREPARED -> {
                 playerStatusLiveData.postValue(PlayerStatus.PREPARED)
             }
-            PlayerStatus.PLAYIND -> {
+            PlayerStatus.PLAYING -> {
                 playerInteractor.start()
                 startTimer()
-                playerStatusLiveData.postValue(PlayerStatus.PLAYIND)
+                playerStatusLiveData.postValue(PlayerStatus.PLAYING)
             }
             PlayerStatus.PAUSED -> {
                 playerInteractor.pause()
@@ -87,7 +87,7 @@ class PlayerViewModel(
 
     private fun startTimer() {
         timerJob = viewModelScope.launch {
-            while (playerStatus == PlayerStatus.PLAYIND) {
+            while (playerStatus == PlayerStatus.PLAYING) {
                 delay(TIME_REFRESH_INTERVAL)
                 currentTimeLiveData.postValue(playerInteractor.getCurrentTime())
             }

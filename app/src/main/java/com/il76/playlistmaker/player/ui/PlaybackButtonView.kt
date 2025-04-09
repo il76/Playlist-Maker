@@ -55,10 +55,10 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     // Обработка клика
     override fun performClick(): Boolean {
-        playerStatus = if (playerStatus == PlayerStatus.PLAYIND) {
+        playerStatus = if (playerStatus == PlayerStatus.PLAYING) {
             PlayerStatus.PAUSED
         } else {
-            PlayerStatus.PLAYIND
+            PlayerStatus.PLAYING
         }
         setStatus(playerStatus)
         return super.performClick()
@@ -73,7 +73,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     // Обновление битмапа в зависимости от состояния
     private fun updateBitmap() {
         currentBitmap = when (playerStatus) {
-            PlayerStatus.PLAYIND -> iconPaused
+            PlayerStatus.PLAYING -> iconPaused
             else -> iconPlaying
         }
     }
