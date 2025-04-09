@@ -67,7 +67,9 @@ class PlaybackButtonView @JvmOverloads constructor(
     // Рендеринг кнопки
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawBitmap(currentBitmap!!, null, rectF, null)
+        currentBitmap?.let { bitmap ->
+            canvas.drawBitmap(bitmap, null, rectF, null)
+        }
     }
 
     // Обновление битмапа в зависимости от состояния
