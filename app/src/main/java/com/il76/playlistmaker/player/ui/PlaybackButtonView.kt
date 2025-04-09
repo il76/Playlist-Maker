@@ -53,17 +53,6 @@ class PlaybackButtonView @JvmOverloads constructor(
         playerStatus = status
     }
 
-    // Обработка клика
-    override fun performClick(): Boolean {
-        playerStatus = if (playerStatus == PlayerStatus.PLAYING) {
-            PlayerStatus.PAUSED
-        } else {
-            PlayerStatus.PLAYING
-        }
-        setStatus(playerStatus)
-        return super.performClick()
-    }
-
     // Рендеринг кнопки
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -88,15 +77,23 @@ class PlaybackButtonView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                // Можно дополнительно обработать начало нажатия (например, изменить внешний вид кнопки)
             }
             MotionEvent.ACTION_UP -> {
-                // Меняем состояние кнопки
-                setStatus(playerStatus)
-                //return true
+                // Переключаем состояние кнопки при отпускании пальца
+                toggleStatus()
             }
         }
         return super.onTouchEvent(event)
+    }
+
+    // переключение состояния кнопки
+    fun toggleStatus() {
+        playerStatus = if (playerStatus == PlayerStatus.PLAYING) {
+            PlayerStatus.PAUSED
+        } else {
+            PlayerStatus.PLAYING
+        }
+        setStatus(playerStatus)
     }
 
     private lateinit var rectF: RectF

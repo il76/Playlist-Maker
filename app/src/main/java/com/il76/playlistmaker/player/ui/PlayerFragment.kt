@@ -109,12 +109,6 @@ class PlayerFragment: Fragment() {
             playbackControl()
         }
 
-//        onPlaylistClickDebounce = debounce<Playlist, Track>(
-//            CLICK_DEBOUNCE_DELAY,
-//            viewLifecycleOwner.lifecycleScope,
-//            false
-//        ) {}
-
         onPlaylistClickDebounce = debounce<PlaylistTrack>(
             CLICK_DEBOUNCE_DELAY,
             viewLifecycleOwner.lifecycleScope,
@@ -275,17 +269,11 @@ class PlayerFragment: Fragment() {
             PlayerStatus.DEFAULT -> fillTrackInfo()
             PlayerStatus.PREPARED -> {
                 binding.buttonPlay.isEnabled = true
-                //binding.buttonPlay.setStatus(viewModel.playerStatus)
-                //binding.buttonPlay.setImageResource(R.drawable.icon_play)
                 binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
             }
             PlayerStatus.PLAYING -> {
-                //binding.buttonPlay.setStatus(viewModel.playerStatus)
-                //binding.buttonPlay.setImageResource(R.drawable.icon_pause)
             }
             PlayerStatus.PAUSED -> {
-                //binding.buttonPlay.setStatus(viewModel.playerStatus)
-                //binding.buttonPlay.setImageResource(R.drawable.icon_play)
             }
         }
     }
