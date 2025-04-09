@@ -7,7 +7,6 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.graphics.drawable.VectorDrawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.AttrRes
@@ -29,7 +28,6 @@ class PlaybackButtonView @JvmOverloads constructor(
     // Состояние кнопки
     private var playerStatus = PlayerStatus.DEFAULT
         set(value) {
-            Log.i("pls", value.toString())
             field = value
             updateBitmap()
             invalidate() // Пересчитываем изображение
@@ -45,7 +43,6 @@ class PlaybackButtonView @JvmOverloads constructor(
         } finally {
             typedArray.recycle()
         }
-        Log.i("pls", "init")
         // Установка начального состояния
         playerStatus = PlayerStatus.PAUSED
     }
@@ -53,13 +50,11 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     // Переключатель состояния
     fun setStatus(status: PlayerStatus) {
-        Log.i("pls", "set status"+status.toString())
         playerStatus = status
     }
 
     // Обработка клика
     override fun performClick(): Boolean {
-        Log.i("pls", "click")
         playerStatus = if (playerStatus == PlayerStatus.PLAYIND) {
             PlayerStatus.PAUSED
         } else {
@@ -75,7 +70,7 @@ class PlaybackButtonView @JvmOverloads constructor(
         canvas.drawBitmap(currentBitmap!!, null, rectF, null)
     }
 
-    // Обновление битмапы в зависимости от состояния
+    // Обновление битмапа в зависимости от состояния
     private fun updateBitmap() {
         currentBitmap = when (playerStatus) {
             PlayerStatus.PLAYIND -> iconPaused
