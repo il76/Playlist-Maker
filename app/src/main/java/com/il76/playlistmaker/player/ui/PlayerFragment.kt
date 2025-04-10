@@ -47,11 +47,6 @@ class PlayerFragment: Fragment() {
      */
     private var isPlaylisted = false
 
-    /**
-     * Текущее состояние плеера
-     */
-    private var playerSatus = PlayerStatus.DEFAULT
-
     private lateinit var playlistsAdapter: PlaylistPlayerAdapter
 
     private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
@@ -73,7 +68,7 @@ class PlayerFragment: Fragment() {
             render(it)
         }
         viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
-            playerSatus = it
+            viewModel.playerStatus = it
             renderPlayer(it)
         }
         viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
@@ -113,12 +108,6 @@ class PlayerFragment: Fragment() {
         binding.buttonPlay.setOnClickListener {
             playbackControl()
         }
-
-//        onPlaylistClickDebounce = debounce<Playlist, Track>(
-//            CLICK_DEBOUNCE_DELAY,
-//            viewLifecycleOwner.lifecycleScope,
-//            false
-//        ) {}
 
         onPlaylistClickDebounce = debounce<PlaylistTrack>(
             CLICK_DEBOUNCE_DELAY,
@@ -227,8 +216,8 @@ class PlayerFragment: Fragment() {
      * Запуск
      */
     private fun startPlayer() {
-        viewModel.changePlayerStatus(PlayerStatus.PLAYIND)
-        playerSatus = PlayerStatus.PLAYIND
+        viewModel.changePlayerStatus(PlayerStatus.PLAYING)
+        viewModel.playerStatus = PlayerStatus.PLAYING
     }
 
     /**
@@ -236,17 +225,17 @@ class PlayerFragment: Fragment() {
      */
     private fun pausePlayer() {
         viewModel.changePlayerStatus(PlayerStatus.PAUSED)
-        playerSatus = PlayerStatus.PAUSED
+        viewModel.playerStatus = PlayerStatus.PAUSED
     }
 
     /**
      * Старт-стоп
      */
     private fun playbackControl() {
-        when(playerSatus) {
+        when(viewModel.playerStatus) {
             PlayerStatus.DEFAULT -> {}
             PlayerStatus.PREPARED, PlayerStatus.PAUSED -> startPlayer()
-            PlayerStatus.PLAYIND -> pausePlayer()
+            PlayerStatus.PLAYING -> pausePlayer()
         }
     }
 
@@ -275,18 +264,16 @@ class PlayerFragment: Fragment() {
     }
 
     private fun renderPlayer(status: PlayerStatus) {
+        binding.buttonPlay.setStatus(viewModel.playerStatus)
         when (status) {
             PlayerStatus.DEFAULT -> fillTrackInfo()
             PlayerStatus.PREPARED -> {
                 binding.buttonPlay.isEnabled = true
-                binding.buttonPlay.setImageResource(R.drawable.icon_play)
                 binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
             }
-            PlayerStatus.PLAYIND -> {
-                binding.buttonPlay.setImageResource(R.drawable.icon_pause)
+            PlayerStatus.PLAYING -> {
             }
             PlayerStatus.PAUSED -> {
-                binding.buttonPlay.setImageResource(R.drawable.icon_play)
             }
         }
     }

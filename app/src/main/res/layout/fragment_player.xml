@@ -95,13 +95,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/artistName" />
 
-            <ImageView
+            <com.il76.playlistmaker.player.ui.PlaybackButtonView
                 android:id="@+id/buttonPlay"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginTop="28dp"
                 android:contentDescription="Воспроизвести"
-                android:src="@drawable/icon_play"
+                app:iconPlaying="@drawable/icon_play"
+                app:iconPaused="@drawable/icon_pause"
                 android:textColor="@color/settings_text"
                 app:layout_constraintEnd_toStartOf="@+id/buttonLike"
                 app:layout_constraintStart_toEndOf="@+id/buttonPlaylistAdd"
