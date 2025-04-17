@@ -1,11 +1,14 @@
 package com.il76.playlistmaker.player.ui
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.bundle.bundleOf
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +23,7 @@ import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -50,6 +54,8 @@ class PlayerFragment: Fragment() {
     private lateinit var playlistsAdapter: PlaylistPlayerAdapter
 
     private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
+
+    private val internetBroadcastReceiver = InternetBroadcastReceiver()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -246,12 +252,24 @@ class PlayerFragment: Fragment() {
         binding.trackCurrentTime.text = time
     }
 
+    override fun onResume() {
+        super.onResume()
+        @Suppress("DEPRECATION")
+        ContextCompat.registerReceiver(requireContext(), internetBroadcastReceiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
+    }
+
     /**
      * Свернули приложение
      */
     override fun onPause() {
         super.onPause()
         pausePlayer()
+        try {
+            requireContext().unregisterReceiver(internetBroadcastReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Ресивер не был зарегистрирован
+        }
     }
 
     private fun render(state: PlayerState) {
