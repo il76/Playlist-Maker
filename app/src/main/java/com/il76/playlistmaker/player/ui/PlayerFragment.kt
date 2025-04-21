@@ -255,29 +255,13 @@ class PlayerFragment: Fragment() {
     }
 
     /**
-     * Запуск
-     */
-    private fun startPlayer() {
-        viewModel.changePlayerStatus(PlayerStatus.PLAYING)
-        viewModel.playerStatus = PlayerStatus.PLAYING
-    }
-
-    /**
-     * Пауза
-     */
-    private fun pausePlayer() {
-        viewModel.changePlayerStatus(PlayerStatus.PAUSED)
-        viewModel.playerStatus = PlayerStatus.PAUSED
-    }
-
-    /**
      * Старт-стоп
      */
     private fun playbackControl() {
         when(viewModel.playerStatus) {
             PlayerStatus.DEFAULT -> {}
-            PlayerStatus.PREPARED, PlayerStatus.PAUSED -> startPlayer()
-            PlayerStatus.PLAYING -> pausePlayer()
+            PlayerStatus.PREPARED, PlayerStatus.PAUSED -> playerService?.startPlayer()
+            PlayerStatus.PLAYING -> playerService?.pausePlayer()
         }
     }
 
@@ -300,7 +284,7 @@ class PlayerFragment: Fragment() {
      */
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        playerService?.pausePlayer()
         try {
             requireContext().unregisterReceiver(internetBroadcastReceiver)
         } catch (e: IllegalArgumentException) {

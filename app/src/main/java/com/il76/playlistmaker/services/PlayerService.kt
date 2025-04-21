@@ -14,8 +14,6 @@ class PlayerService(private val gson: Gson, private val playerRepository: MediaP
 
     private val binder = PlayerServiceBinder()
 
-    private var mediaPlayer: MediaPlayer? = null
-
     private lateinit var track: Track
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -45,28 +43,20 @@ class PlayerService(private val gson: Gson, private val playerRepository: MediaP
         })
 
     }
-    override fun onCreate() {
-        super.onCreate()
-        mediaPlayer = MediaPlayer()
-    }
 
     // Запуск воспроизведения
     fun startPlayer() {
-        mediaPlayer?.start()
+        playerRepository.start()
     }
 
     // Приостановка воспроизведения
     fun pausePlayer() {
-        mediaPlayer?.pause()
+        playerRepository.pause()
     }
 
     // Освобождаем все ресурсы, выделенные для плеера
     private fun releasePlayer() {
-        mediaPlayer?.stop()
-        mediaPlayer?.setOnPreparedListener(null)
-        mediaPlayer?.setOnCompletionListener(null)
-        mediaPlayer?.release()
-        mediaPlayer = null
+        playerRepository.release()
     }
 
 
