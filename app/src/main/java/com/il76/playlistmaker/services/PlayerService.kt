@@ -2,19 +2,26 @@ package com.il76.playlistmaker.services
 
 import android.app.Service
 import android.content.Intent
-import android.media.MediaPlayer
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import com.google.gson.Gson
-import com.il76.playlistmaker.player.domain.api.MediaPlayerRepository
+import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
+import com.il76.playlistmaker.player.ui.PlayerStatus
 import com.il76.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class PlayerService(private val gson: Gson, private val playerRepository: MediaPlayerRepository): Service() {
+class PlayerService(private val gson: Gson, private val playerInteractor: MediaPlayerInteractor): Service() {
 
     private val binder = PlayerServiceBinder()
 
     private lateinit var track: Track
+
+    private var playerStatus = PlayerStatus.DEFAULT
 
     override fun onBind(intent: Intent?): IBinder? {
         val trackData =  intent?.getStringExtra("track_data") ?: ""
@@ -36,32 +43,54 @@ class PlayerService(private val gson: Gson, private val playerRepository: MediaP
     // Первичная инициализация плеера
     private fun initMediaPlayer() {
         if (track.previewUrl.isEmpty()) return
-        playerRepository.init(track.previewUrl,{
+        playerInteractor.init(track.previewUrl,{
+            playerStatus = PlayerStatus.PREPARED
             Log.d("pls", "Media Player prepared")
         }, {
+            playerStatus = PlayerStatus.PREPARED
+            stopTimer()
             Log.d("pls", "Playback completed")
         })
 
     }
+    private var timerJob: Job? = null
+    private fun startTimer() {
+        timerJob = CoroutineScope(Dispatchers.Default).launch {
+            while (playerStatus == PlayerStatus.PLAYING) {
+                delay(TIME_REFRESH_INTERVAL)
+                //currentTimeLiveData.postValue(playerInteractor.getCurrentTime())
+            }
+        }
+    }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+    }
+
 
     // Запуск воспроизведения
     fun startPlayer() {
-        playerRepository.start()
+        playerInteractor.start()
+        playerStatus == PlayerStatus.PLAYING
     }
 
     // Приостановка воспроизведения
     fun pausePlayer() {
-        playerRepository.pause()
+        playerInteractor.pause()
+        stopTimer()
+        playerStatus == PlayerStatus.PAUSED
     }
 
     // Освобождаем все ресурсы, выделенные для плеера
     private fun releasePlayer() {
-        playerRepository.release()
+        playerInteractor.release()
     }
 
 
     inner class PlayerServiceBinder : Binder() {
         fun getService(): PlayerService = this@PlayerService
     }
-
+    companion object {
+        private const val TIME_REFRESH_INTERVAL = 300L
+    }
 }
