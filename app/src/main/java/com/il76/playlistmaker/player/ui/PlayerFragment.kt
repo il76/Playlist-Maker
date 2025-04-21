@@ -1,8 +1,13 @@
 package com.il76.playlistmaker.player.ui
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +28,7 @@ import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.services.PlayerService
 import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
@@ -44,7 +50,7 @@ class PlayerFragment: Fragment() {
     /**
      * Данные о треке, прилетают с экрана поиска
      */
-    private var trackData = ""
+    var trackData = ""
 
     /**
      * Добавлено ли в плейлист
@@ -56,6 +62,36 @@ class PlayerFragment: Fragment() {
     private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
 
     private val internetBroadcastReceiver = InternetBroadcastReceiver()
+
+    private var playerService: PlayerService? = null
+    private var isServiceBound = false
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as PlayerService.PlayerServiceBinder
+            playerService = binder.getService()
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            playerService = null
+        }
+    }
+
+    private fun bindPlayerService() {
+        val intent = Intent(requireContext(), PlayerService::class.java).apply {
+            putExtra("track_data", viewModel.trackData)
+        }
+        requireActivity().bindService(
+            intent,
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+        isServiceBound = true
+    }
+
+    private fun unbindPlayerService() {
+        requireActivity().unbindService(serviceConnection)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -300,6 +336,19 @@ class PlayerFragment: Fragment() {
         Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
     }
 
+
+    override fun onStart() {
+        super.onStart()
+        bindPlayerService()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isServiceBound) {
+            unbindPlayerService()
+            isServiceBound = false
+        }
+    }
 
     companion object {
 

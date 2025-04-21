@@ -18,7 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    trackData: String,
+    val trackData: String,
     private val playerInteractor: MediaPlayerInteractor,
     gson: Gson,
     private val historyInteractor: HistoryInteractor,

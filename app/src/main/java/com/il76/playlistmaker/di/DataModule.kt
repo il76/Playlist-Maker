@@ -8,6 +8,7 @@ import com.il76.playlistmaker.data.db.AppDatabase
 import com.il76.playlistmaker.search.data.network.NetworkClient
 import com.il76.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.il76.playlistmaker.search.data.network.TrackAPIService
+import com.il76.playlistmaker.services.PlayerService
 import com.il76.playlistmaker.sharing.api.ExternalNavigator
 import com.il76.playlistmaker.sharing.data.ExternalNavigatorImpl
 import org.koin.android.ext.koin.androidContext
@@ -50,6 +51,13 @@ val dataModule = module {
         databaseBuilder(androidContext(), AppDatabase::class.java, "playlistmaker.db")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    single {
+        PlayerService(
+            get(),
+            get()
+        )
     }
 
 }
