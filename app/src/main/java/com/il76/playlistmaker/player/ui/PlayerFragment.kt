@@ -1,17 +1,22 @@
 package com.il76.playlistmaker.player.ui
 
+import android.Manifest
+import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -66,6 +71,9 @@ class PlayerFragment: Fragment() {
     private var playerService: PlayerService? = null
     private var isServiceBound = false
 
+    // Объявляем launcher как переменную класса фрагмента
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as PlayerService.PlayerServiceBinder
@@ -89,8 +97,49 @@ class PlayerFragment: Fragment() {
         isServiceBound = true
     }
 
+    private fun askForPermission() {
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                bindPlayerService()
+            } else {
+                // Пользователь отказал в разрешении
+                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                    showPermissionRationaleDialog()
+                } else {
+                    showToast(getString(R.string.cant_bind_service))
+                }
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            // Для версий ниже Android 13 разрешение не требуется
+            bindPlayerService()
+        }
+    }
+
+    // Показать диалог с объяснением
+    private fun showPermissionRationaleDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Требуется доступ к уведомлениям")
+            .setMessage("Приложению требуется доступ к уведомленям для воспроизведения аудио в фоновом режиме")
+            .setPositiveButton("Предоставить") { _, _ ->
+                requestNotificationPermission()
+            }
+            .setNegativeButton("Отменить", null)
+            .show()
+    }
+
     private fun unbindPlayerService() {
-        requireActivity().unbindService(serviceConnection)
+        if (isServiceBound) {
+            requireActivity().unbindService(serviceConnection)
+            isServiceBound = false
+        }
     }
 
     override fun onCreateView(
@@ -328,10 +377,7 @@ class PlayerFragment: Fragment() {
 
     override fun onStop() {
         super.onStop()
-        if (isServiceBound) {
-            unbindPlayerService()
-            isServiceBound = false
-        }
+        unbindPlayerService()
     }
 
     companion object {
