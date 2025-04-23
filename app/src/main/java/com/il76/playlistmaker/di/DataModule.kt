@@ -52,12 +52,4 @@ val dataModule = module {
             .fallbackToDestructiveMigration()
             .build()
     }
-
-    single {
-        PlayerService(
-            get(),
-            get()
-        )
-    }
-
 }

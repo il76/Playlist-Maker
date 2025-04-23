@@ -11,6 +11,7 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,6 +67,8 @@ class PlayerFragment: Fragment() {
 
     private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+
     private val internetBroadcastReceiver = InternetBroadcastReceiver()
 
     private var playerService: PlayerService? = null
@@ -112,6 +115,7 @@ class PlayerFragment: Fragment() {
                 }
             }
         }
+        requestNotificationPermission()
     }
 
     private fun requestNotificationPermission() {
@@ -155,6 +159,74 @@ class PlayerFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         trackData = requireArguments().getString(ARGS_TRACKDATA).orEmpty()
 
+        onPlaylistClickDebounce = debounce<PlaylistTrack>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { playlistTrack ->
+            viewModel.addToPlaylist(playlistTrack)
+        }
+        initBottomSheet()
+        initObservers()
+        initOnclicks()
+        viewModel.loadPlaylists()
+
+        binding.playlistsList.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    private fun initBottomSheet() {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.isVisible = false
+                    }
+                    else -> {
+                        binding.overlay.isVisible = true
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = (slideOffset + 1f) / 2
+            }
+        })
+    }
+
+    private fun initOnclicks() {
+        binding.activityPlayerToolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        binding.buttonPlay.setOnClickListener {
+            playbackControl()
+        }
+
+        binding.buttonPlaylistAdd.setOnClickListener {
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+            if (isPlaylisted) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
+            }
+            isPlaylisted = !isPlaylisted
+        }
+        binding.buttonLike.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.toggleFavouriteStatus()
+            }
+        }
+        binding.newPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
+        }
+    }
+
+    private fun initObservers() {
         viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
         }
@@ -191,72 +263,6 @@ class PlayerFragment: Fragment() {
         viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
         }
-
-        binding.activityPlayerToolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.buttonPlay.setOnClickListener {
-            playbackControl()
-        }
-
-        onPlaylistClickDebounce = debounce<PlaylistTrack>(
-            CLICK_DEBOUNCE_DELAY,
-            viewLifecycleOwner.lifecycleScope,
-            false
-        ) { playlistTrack ->
-            viewModel.addToPlaylist(playlistTrack)
-        }
-        viewModel.loadPlaylists()
-
-
-
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        //bottomSheetBehavior.isHideable = true // Разрешить скрытие
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                // newState — новое состояние BottomSheet
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.isVisible = false
-                        // загружаем список плейлистов
-                    }
-                    else -> {
-                        binding.overlay.isVisible = true
-                    }
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.overlay.alpha = (slideOffset + 1f) / 2
-            }
-        })
-
-
-        binding.buttonPlaylistAdd.setOnClickListener {
-            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
-            if (isPlaylisted) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
-            }
-            isPlaylisted = !isPlaylisted
-        }
-        binding.buttonLike.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.toggleFavouriteStatus()
-            }
-        }
-
-        binding.newPlaylist.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
-        }
-
-        binding.playlistsList.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun renderPlaylists(playlists: List<Playlist>) {
@@ -272,7 +278,6 @@ class PlayerFragment: Fragment() {
             binding.buttonLike.setImageResource(R.drawable.icon_like)
         }
     }
-
 
     /**
      * Заполняем вью информацией о выбранном треке
@@ -333,7 +338,8 @@ class PlayerFragment: Fragment() {
      */
     override fun onPause() {
         super.onPause()
-        playerService?.pausePlayer()
+        // теперь не нужно
+        // playerService?.pausePlayer()
         try {
             requireContext().unregisterReceiver(internetBroadcastReceiver)
         } catch (e: IllegalArgumentException) {
@@ -369,14 +375,13 @@ class PlayerFragment: Fragment() {
         Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
     }
 
-
-    override fun onStart() {
-        super.onStart()
-        bindPlayerService()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        askForPermission()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         unbindPlayerService()
     }
 

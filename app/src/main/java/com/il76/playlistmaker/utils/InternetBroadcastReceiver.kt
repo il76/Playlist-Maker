@@ -15,7 +15,6 @@ import com.il76.playlistmaker.R
 class InternetBroadcastReceiver: BroadcastReceiver() {
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.i("pls", "rr")
         if (intent?.action != "android.net.conn.CONNECTIVITY_CHANGE") {
             return
         }

@@ -14,8 +14,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
-class PlayerService(private val gson: Gson, private val playerInteractor: MediaPlayerInteractor): Service() {
+class PlayerService(): Service() {
+
+    private val gson: Gson by inject()
+    private val playerInteractor: MediaPlayerInteractor by inject()
 
     private val binder = PlayerServiceBinder()
 
@@ -24,16 +28,21 @@ class PlayerService(private val gson: Gson, private val playerInteractor: MediaP
     private var playerStatus = PlayerStatus.DEFAULT
 
     override fun onBind(intent: Intent?): IBinder? {
+        Log.i("pls", "onbind")
         val trackData =  intent?.getStringExtra("track_data") ?: ""
         track = gson.fromJson(trackData, Track::class.java)
         initMediaPlayer()
         return binder
     }
-    override fun onDestroy() {
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        Log.i("pls", "unbind")
         releasePlayer()
+        return super.onUnbind(intent)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.i("pls", "startcommand")
         return Service.START_NOT_STICKY
     }
 
@@ -42,6 +51,7 @@ class PlayerService(private val gson: Gson, private val playerInteractor: MediaP
 
     // Первичная инициализация плеера
     private fun initMediaPlayer() {
+        Log.i("pls", "initmp")
         if (track.previewUrl.isEmpty()) return
         playerInteractor.init(track.previewUrl,{
             playerStatus = PlayerStatus.PREPARED
@@ -70,12 +80,14 @@ class PlayerService(private val gson: Gson, private val playerInteractor: MediaP
 
     // Запуск воспроизведения
     fun startPlayer() {
+        Log.i("pls", "start")
         playerInteractor.start()
         playerStatus == PlayerStatus.PLAYING
     }
 
     // Приостановка воспроизведения
     fun pausePlayer() {
+        Log.i("pls", "pause")
         playerInteractor.pause()
         stopTimer()
         playerStatus == PlayerStatus.PAUSED
@@ -83,6 +95,7 @@ class PlayerService(private val gson: Gson, private val playerInteractor: MediaP
 
     // Освобождаем все ресурсы, выделенные для плеера
     private fun releasePlayer() {
+        Log.i("pls", "release")
         playerInteractor.release()
     }
 
