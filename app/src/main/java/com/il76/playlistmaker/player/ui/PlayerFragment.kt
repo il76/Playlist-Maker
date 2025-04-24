@@ -353,6 +353,7 @@ class PlayerFragment: Fragment() {
         @Suppress("DEPRECATION")
         ContextCompat.registerReceiver(requireContext(), internetBroadcastReceiver,
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
+        playerService?.hideNotification()
     }
 
     /**
@@ -367,6 +368,7 @@ class PlayerFragment: Fragment() {
         } catch (e: IllegalArgumentException) {
             // Ресивер не был зарегистрирован
         }
+        playerService?.showNotification()
     }
 
     private fun render(status: PlayerStatus) {

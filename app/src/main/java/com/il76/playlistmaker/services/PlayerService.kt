@@ -45,16 +45,23 @@ class PlayerService(): Service() {
         track = gson.fromJson(trackData, Track::class.java)
         initMediaPlayer()
         _playerStatus.value = PlayerStatus.Loading(track)
-
         //createNotificationChannel()
+
+
+        return binder
+    }
+
+    fun showNotification() {
         ServiceCompat.startForeground(
             this,
             SERVICE_NOTIFICATION_ID,
             createServiceNotification(),
             getForegroundServiceTypeConstant()
         )
+    }
 
-        return binder
+    fun hideNotification() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
