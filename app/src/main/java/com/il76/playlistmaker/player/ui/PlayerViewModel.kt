@@ -27,76 +27,19 @@ class PlayerViewModel(
 
     var track: Track = Track()
 
-    var playerStatus = PlayerStatus.DEFAULT
+    var playerStatus: PlayerStatus = PlayerStatus.Default
 
-    private val playerLiveData = MutableLiveData<PlayerState>()
-    private val playerStatusLiveData = MutableLiveData<PlayerStatus>()
-    private val currentTimeLiveData = MutableLiveData<String>()
     private val favouriteLiveData = MutableLiveData<Boolean>()
-
-    private var timerJob: Job? = null
 
     init {
         track = gson.fromJson(trackData, Track::class.java)
-        //первичная загрузка трека
-        playerLiveData.postValue(
-            PlayerState.Loading(track)
-        )
-        playerInteractor.init(
-            dataSource = track.previewUrl,
-            onPreparedListener = {
-                playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-            },
-            onCompletionListener = {
-                playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-                stopTimer()
-            }
-        )
+        playerStatus = PlayerStatus.Prepared
     }
 
     private val showToast = SingleLiveEvent<String>()
     fun observeShowToast(): LiveData<String> = showToast
 
-
-    fun observeState(): LiveData<PlayerState> = playerLiveData
-
-    fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
-    fun observeCurrentTime(): LiveData<String> = currentTimeLiveData
     fun observeFavourite(): LiveData<Boolean> = favouriteLiveData
-
-    fun changePlayerStatus(status: PlayerStatus) {
-        playerStatus = status
-        when (status) {
-            PlayerStatus.DEFAULT -> {}
-            PlayerStatus.PREPARED -> {
-                playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-            }
-            PlayerStatus.PLAYING -> {
-                playerInteractor.start()
-                startTimer()
-                playerStatusLiveData.postValue(PlayerStatus.PLAYING)
-            }
-            PlayerStatus.PAUSED -> {
-                playerInteractor.pause()
-                playerStatusLiveData.postValue(PlayerStatus.PAUSED)
-                stopTimer()
-            }
-        }
-
-    }
-
-    private fun startTimer() {
-        timerJob = viewModelScope.launch {
-            while (playerStatus == PlayerStatus.PLAYING) {
-                delay(TIME_REFRESH_INTERVAL)
-                currentTimeLiveData.postValue(playerInteractor.getCurrentTime())
-            }
-        }
-    }
-
-    private fun stopTimer() {
-        timerJob?.cancel()
-    }
 
     suspend fun toggleFavouriteStatus() {
         track.isFavourite = !track.isFavourite
@@ -131,14 +74,6 @@ class PlayerViewModel(
                 showToast.postValue("Трек уже добавлен в плейлист \"" + playlistTrack.playlist.name + "\"")
             }
         }
-    }
-
-    override fun onCleared() {
-        playerInteractor.release()
-    }
-
-    companion object {
-        private const val TIME_REFRESH_INTERVAL = 300L
     }
 
 }

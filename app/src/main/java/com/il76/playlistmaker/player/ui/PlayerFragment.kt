@@ -40,6 +40,8 @@ import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class PlayerFragment: Fragment() {
@@ -81,6 +83,21 @@ class PlayerFragment: Fragment() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as PlayerService.PlayerServiceBinder
             playerService = binder.getService()
+
+            lifecycleScope.launch {
+                playerService?.playerStatus?.collect {
+                    Log.i("pls", "collect")
+                    Log.i("pls", it.toString())
+                    viewModel.playerStatus = it
+                    renderPlayer(it)
+//                    if (it is PlayerStatus.Playing) {
+//                        renderCurrentTime(it.progress)
+//                    } else if (it is PlayerStatus.Loading) {
+//                        render(it)
+//                    }
+                }
+            }
+
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -172,6 +189,8 @@ class PlayerFragment: Fragment() {
         viewModel.loadPlaylists()
 
         binding.playlistsList.layoutManager = LinearLayoutManager(requireContext())
+
+        askForPermission()
     }
 
     private fun initBottomSheet() {
@@ -199,7 +218,6 @@ class PlayerFragment: Fragment() {
         binding.activityPlayerToolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
-
         binding.buttonPlay.setOnClickListener {
             playbackControl()
         }
@@ -227,16 +245,18 @@ class PlayerFragment: Fragment() {
     }
 
     private fun initObservers() {
-        viewModel.observeState().observe(viewLifecycleOwner) {
-            render(it)
-        }
-        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
-            viewModel.playerStatus = it
-            renderPlayer(it)
-        }
-        viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
-            renderCurrentTime(it)
-        }
+//        viewModel.observeState().observe(viewLifecycleOwner) {
+//            render(it)
+//        }
+//        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
+//            Log.i("pls", it.toString())
+//            if (it is PlayerStatus.Loading) {
+//                render(it)
+//            }
+//        }
+//        viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
+//            renderCurrentTime(it)
+//        }
         viewModel.observeFavourite().observe(viewLifecycleOwner) {
             renderFavourite(it)
         }
@@ -312,18 +332,20 @@ class PlayerFragment: Fragment() {
      * Старт-стоп
      */
     private fun playbackControl() {
+        Log.i("pls", viewModel.playerStatus.toString())
         when(viewModel.playerStatus) {
-            PlayerStatus.DEFAULT -> {}
-            PlayerStatus.PREPARED, PlayerStatus.PAUSED -> playerService?.startPlayer()
-            PlayerStatus.PLAYING -> playerService?.pausePlayer()
+            PlayerStatus.Default -> {}
+            PlayerStatus.Prepared, PlayerStatus.Paused -> playerService?.startPlayer()
+            is PlayerStatus.Playing -> playerService?.pausePlayer()
+            is PlayerStatus.Loading -> render(viewModel.playerStatus)
         }
     }
 
     /**
      * Обновляем текущее время
      */
-    private fun renderCurrentTime(time: String) {
-        binding.trackCurrentTime.text = time
+    private fun renderCurrentTime(time: Int) {
+        binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(time)
     }
 
     override fun onResume() {
@@ -347,27 +369,28 @@ class PlayerFragment: Fragment() {
         }
     }
 
-    private fun render(state: PlayerState) {
-        when(state) {
-            is PlayerState.Loading -> {
-                track = state.track
-            }
+    private fun render(status: PlayerStatus) {
+        if (status is PlayerStatus.Loading) {
+           track = status.track
+            fillTrackInfo()
         }
-        fillTrackInfo()
     }
 
     private fun renderPlayer(status: PlayerStatus) {
         binding.buttonPlay.setStatus(viewModel.playerStatus)
         when (status) {
-            PlayerStatus.DEFAULT -> fillTrackInfo()
-            PlayerStatus.PREPARED -> {
+            PlayerStatus.Default -> {}
+            PlayerStatus.Prepared -> {
                 binding.buttonPlay.isEnabled = true
                 binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
             }
-            PlayerStatus.PLAYING -> {
+            is PlayerStatus.Playing -> {
+                renderCurrentTime(status.progress)
             }
-            PlayerStatus.PAUSED -> {
+            PlayerStatus.Paused -> {
             }
+
+            is PlayerStatus.Loading -> render(status)
         }
     }
 
@@ -377,7 +400,6 @@ class PlayerFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        askForPermission()
     }
 
     override fun onDestroy() {
