@@ -11,6 +11,7 @@ import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.services.PlayerControl
 import com.il76.playlistmaker.utils.SingleLiveEvent
 import kotlinx.coroutines.launch
 
@@ -23,13 +24,15 @@ class PlayerViewModel(
 
     var track: Track = Track()
 
-    var playerStatus: PlayerStatus = PlayerStatus.Default
+    private val playerStatusLiveData = MutableLiveData<PlayerStatus>(PlayerStatus.Default)
+    fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
 
     private val favouriteLiveData = MutableLiveData<Boolean>()
 
+    private var playerControl: PlayerControl? = null
+
     init {
         track = gson.fromJson(trackData, Track::class.java)
-        playerStatus = PlayerStatus.Prepared
     }
 
     private val showToast = SingleLiveEvent<String>()
@@ -70,6 +73,42 @@ class PlayerViewModel(
                 showToast.postValue("Трек уже добавлен в плейлист \"" + playlistTrack.playlist.name + "\"")
             }
         }
+    }
+
+
+    fun setPlayerControl(playerControl: PlayerControl) {
+        this.playerControl = playerControl
+
+        viewModelScope.launch {
+            playerControl.getPlayerStatus().collect {
+                playerStatusLiveData.postValue(it)
+            }
+        }
+    }
+
+    fun playbackControl() {
+        if (playerStatusLiveData.value is PlayerStatus.Playing) {
+            playerControl?.pausePlayer()
+        } else {
+            playerControl?.startPlayer()
+        }
+    }
+
+    fun hideNotification() {
+        playerControl?.hideNotification()
+    }
+
+    fun showNotification() {
+        playerControl?.showNotification()
+    }
+
+    fun removePlayerControl() {
+        playerControl = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        removePlayerControl()
     }
 
 }

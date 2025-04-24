@@ -24,11 +24,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
-class PlayerService(): Service() {
+class PlayerService(): Service(), PlayerControl {
 
     private val gson: Gson by inject()
     private val playerInteractor: MediaPlayerInteractor by inject()
@@ -38,7 +39,7 @@ class PlayerService(): Service() {
     private lateinit var track: Track
 
     private val _playerStatus = MutableStateFlow<PlayerStatus>(PlayerStatus.Default)
-    val playerStatus = _playerStatus.asStateFlow()
+    val playerStatusFlow = _playerStatus.asStateFlow()
 
     override fun onBind(intent: Intent?): IBinder? {
         val trackData =  intent?.getStringExtra("track_data") ?: ""
@@ -48,7 +49,7 @@ class PlayerService(): Service() {
         return binder
     }
 
-    fun showNotification() {
+    override fun showNotification() {
         if (_playerStatus.value is PlayerStatus.Playing) {
             ServiceCompat.startForeground(
                 this,
@@ -59,7 +60,7 @@ class PlayerService(): Service() {
         }
     }
 
-    fun hideNotification() {
+    override fun hideNotification() {
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
@@ -94,16 +95,20 @@ class PlayerService(): Service() {
         timerJob?.cancel()
     }
 
+    override fun getPlayerStatus(): StateFlow<PlayerStatus> {
+        return playerStatusFlow
+    }
+
 
     // Запуск воспроизведения
-    fun startPlayer() {
+    override fun startPlayer() {
         playerInteractor.start()
         _playerStatus.value = PlayerStatus.Playing(0)
         startTimer()
     }
 
     // Приостановка воспроизведения
-    fun pausePlayer() {
+    override fun pausePlayer() {
         playerInteractor.pause()
         stopTimer()
         _playerStatus.value = PlayerStatus.Paused

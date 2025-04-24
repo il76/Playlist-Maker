@@ -82,19 +82,11 @@ class PlayerFragment: Fragment() {
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as PlayerService.PlayerServiceBinder
-            playerService = binder.getService()
-
-            lifecycleScope.launch {
-                playerService?.playerStatus?.collect {
-                    viewModel.playerStatus = it
-                    renderPlayer(it)
-                }
-            }
-
+            viewModel.setPlayerControl(binder.getService())
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            playerService = null
+            viewModel.removePlayerControl()
         }
     }
 
@@ -212,7 +204,7 @@ class PlayerFragment: Fragment() {
             findNavController().navigateUp()
         }
         binding.buttonPlay.setOnClickListener {
-            playbackControl()
+            viewModel.playbackControl()
         }
 
         binding.buttonPlaylistAdd.setOnClickListener {
@@ -245,6 +237,10 @@ class PlayerFragment: Fragment() {
         viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
         }
+        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
+            renderPlayer(it)
+        }
+
 
         viewModel.observePlaylistsList().observe(viewLifecycleOwner) { playlists ->
             if (playlists != null) {
@@ -310,18 +306,6 @@ class PlayerFragment: Fragment() {
     }
 
     /**
-     * Старт-стоп
-     */
-    private fun playbackControl() {
-        when(viewModel.playerStatus) {
-            PlayerStatus.Default -> {}
-            PlayerStatus.Prepared, PlayerStatus.Paused -> playerService?.startPlayer()
-            is PlayerStatus.Playing -> playerService?.pausePlayer()
-            is PlayerStatus.Loading -> render(viewModel.playerStatus)
-        }
-    }
-
-    /**
      * Обновляем текущее время
      */
     private fun renderCurrentTime(time: Int) {
@@ -333,7 +317,7 @@ class PlayerFragment: Fragment() {
         @Suppress("DEPRECATION")
         ContextCompat.registerReceiver(requireContext(), internetBroadcastReceiver,
             IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
-        playerService?.hideNotification()
+        viewModel.hideNotification()
     }
 
     /**
@@ -346,7 +330,7 @@ class PlayerFragment: Fragment() {
         } catch (e: IllegalArgumentException) {
             // Ресивер не был зарегистрирован
         }
-        playerService?.showNotification()
+        viewModel.showNotification()
     }
 
     private fun render(status: PlayerStatus) {
@@ -357,7 +341,7 @@ class PlayerFragment: Fragment() {
     }
 
     private fun renderPlayer(status: PlayerStatus) {
-        binding.buttonPlay.setStatus(viewModel.playerStatus)
+        binding.buttonPlay.setStatus(status)
         when (status) {
             PlayerStatus.Default -> {}
             PlayerStatus.Prepared -> {
