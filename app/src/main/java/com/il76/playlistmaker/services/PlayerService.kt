@@ -11,7 +11,6 @@ import android.content.pm.ServiceInfo
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.google.gson.Gson
@@ -42,7 +41,6 @@ class PlayerService(): Service() {
     val playerStatus = _playerStatus.asStateFlow()
 
     override fun onBind(intent: Intent?): IBinder? {
-        Log.i("pls", "onbind")
         val trackData =  intent?.getStringExtra("track_data") ?: ""
         track = gson.fromJson(trackData, Track::class.java)
         initMediaPlayer()
@@ -66,27 +64,19 @@ class PlayerService(): Service() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.i("pls", "unbind")
         releasePlayer()
         return super.onUnbind(intent)
     }
-
-//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        Log.i("pls", "startcommand")
-//        return Service.START_NOT_STICKY
-//    }
 
     // Первичная инициализация плеера
     private fun initMediaPlayer() {
         if (track.previewUrl.isEmpty()) return
         playerInteractor.init(track.previewUrl,{
             _playerStatus.value = PlayerStatus.Prepared
-            Log.d("pls", "Media Player prepared")
         }, {
             _playerStatus.value = PlayerStatus.Prepared
             stopTimer()
             hideNotification()
-            Log.d("pls", "Playback completed")
         })
 
     }
@@ -107,7 +97,6 @@ class PlayerService(): Service() {
 
     // Запуск воспроизведения
     fun startPlayer() {
-        Log.i("pls", "start")
         playerInteractor.start()
         _playerStatus.value = PlayerStatus.Playing(0)
         startTimer()
@@ -115,7 +104,6 @@ class PlayerService(): Service() {
 
     // Приостановка воспроизведения
     fun pausePlayer() {
-        Log.i("pls", "pause")
         playerInteractor.pause()
         stopTimer()
         _playerStatus.value = PlayerStatus.Paused
@@ -123,7 +111,6 @@ class PlayerService(): Service() {
 
     // Освобождаем все ресурсы, выделенные для плеера
     private fun releasePlayer() {
-        Log.i("pls", "release")
         _playerStatus.value = PlayerStatus.Default
         playerInteractor.release()
     }

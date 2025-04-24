@@ -10,16 +10,12 @@ import com.il76.playlistmaker.history.domain.db.HistoryInteractor
 import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
-import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.utils.SingleLiveEvent
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     val trackData: String,
-    private val playerInteractor: MediaPlayerInteractor,
     gson: Gson,
     private val historyInteractor: HistoryInteractor,
     private val playlistsInteractor: PlaylistInteractor

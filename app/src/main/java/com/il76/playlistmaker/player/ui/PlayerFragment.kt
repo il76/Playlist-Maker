@@ -86,15 +86,8 @@ class PlayerFragment: Fragment() {
 
             lifecycleScope.launch {
                 playerService?.playerStatus?.collect {
-                    Log.i("pls", "collect")
-                    Log.i("pls", it.toString())
                     viewModel.playerStatus = it
                     renderPlayer(it)
-//                    if (it is PlayerStatus.Playing) {
-//                        renderCurrentTime(it.progress)
-//                    } else if (it is PlayerStatus.Loading) {
-//                        render(it)
-//                    }
                 }
             }
 
@@ -245,18 +238,6 @@ class PlayerFragment: Fragment() {
     }
 
     private fun initObservers() {
-//        viewModel.observeState().observe(viewLifecycleOwner) {
-//            render(it)
-//        }
-//        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
-//            Log.i("pls", it.toString())
-//            if (it is PlayerStatus.Loading) {
-//                render(it)
-//            }
-//        }
-//        viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
-//            renderCurrentTime(it)
-//        }
         viewModel.observeFavourite().observe(viewLifecycleOwner) {
             renderFavourite(it)
         }
@@ -332,7 +313,6 @@ class PlayerFragment: Fragment() {
      * Старт-стоп
      */
     private fun playbackControl() {
-        Log.i("pls", viewModel.playerStatus.toString())
         when(viewModel.playerStatus) {
             PlayerStatus.Default -> {}
             PlayerStatus.Prepared, PlayerStatus.Paused -> playerService?.startPlayer()
@@ -361,8 +341,6 @@ class PlayerFragment: Fragment() {
      */
     override fun onPause() {
         super.onPause()
-        // теперь не нужно
-        // playerService?.pausePlayer()
         try {
             requireContext().unregisterReceiver(internetBroadcastReceiver)
         } catch (e: IllegalArgumentException) {
@@ -398,10 +376,6 @@ class PlayerFragment: Fragment() {
 
     private fun showToast(additionalMessage: String) {
         Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onDestroy() {
