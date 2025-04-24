@@ -3,6 +3,7 @@ package com.il76.playlistmaker.services
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -15,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.google.gson.Gson
 import com.il76.playlistmaker.R
+import com.il76.playlistmaker.main.ui.MainActivity
 import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.player.ui.PlayerStatus
 import com.il76.playlistmaker.search.domain.models.Track
@@ -45,19 +47,18 @@ class PlayerService(): Service() {
         track = gson.fromJson(trackData, Track::class.java)
         initMediaPlayer()
         _playerStatus.value = PlayerStatus.Loading(track)
-        //createNotificationChannel()
-
-
         return binder
     }
 
     fun showNotification() {
-        ServiceCompat.startForeground(
-            this,
-            SERVICE_NOTIFICATION_ID,
-            createServiceNotification(),
-            getForegroundServiceTypeConstant()
-        )
+        if (_playerStatus.value is PlayerStatus.Playing) {
+            ServiceCompat.startForeground(
+                this,
+                SERVICE_NOTIFICATION_ID,
+                createServiceNotification(),
+                getForegroundServiceTypeConstant()
+            )
+        }
     }
 
     fun hideNotification() {
@@ -70,17 +71,13 @@ class PlayerService(): Service() {
         return super.onUnbind(intent)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("pls", "startcommand")
-        return Service.START_NOT_STICKY
-    }
-
-
-    // Методы управления Media Player
+//    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+//        Log.i("pls", "startcommand")
+//        return Service.START_NOT_STICKY
+//    }
 
     // Первичная инициализация плеера
     private fun initMediaPlayer() {
-        Log.i("pls", "initmp")
         if (track.previewUrl.isEmpty()) return
         playerInteractor.init(track.previewUrl,{
             _playerStatus.value = PlayerStatus.Prepared
@@ -88,6 +85,7 @@ class PlayerService(): Service() {
         }, {
             _playerStatus.value = PlayerStatus.Prepared
             stopTimer()
+            hideNotification()
             Log.d("pls", "Playback completed")
         })
 
@@ -138,6 +136,11 @@ class PlayerService(): Service() {
         }
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
     private fun createNotificationChannel() {
         // Создание каналов доступно только с Android 8.0
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -146,10 +149,10 @@ class PlayerService(): Service() {
 
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
-            "Player service",
+            "Воспроизведение музыки",
             NotificationManager.IMPORTANCE_DEFAULT
         )
-        channel.description = "Service for playing music"
+        channel.description = "Сервис для фонового воспроизведения музыки"
 
         // Регистрируем канал уведомлений
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -157,12 +160,26 @@ class PlayerService(): Service() {
     }
 
     private fun createServiceNotification(): Notification {
+        // если Activity уже запущена, не создает новую копию
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
+        // для Android 12+ обязателен FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(getString(R.string.app_name))
             .setContentText("${track.artistName} - ${track.trackName}")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.icon_play)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setContentIntent(pendingIntent) // кликабельное уведомление
+            .setAutoCancel(true) // Уведомление исчезнет после клика
             .build()
     }
 
