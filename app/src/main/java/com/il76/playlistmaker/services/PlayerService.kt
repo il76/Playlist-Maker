@@ -39,7 +39,7 @@ class PlayerService(): Service(), PlayerControl {
     private lateinit var track: Track
 
     private val _playerStatus = MutableStateFlow<PlayerStatus>(PlayerStatus.Default)
-    val playerStatusFlow = _playerStatus.asStateFlow()
+    private val playerStatusFlow = _playerStatus.asStateFlow()
 
     override fun onBind(intent: Intent?): IBinder? {
         val trackData =  intent?.getStringExtra("track_data") ?: ""
@@ -141,10 +141,10 @@ class PlayerService(): Service(), PlayerControl {
 
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
-            "Воспроизведение музыки",
+            getString(R.string.service_name),
             NotificationManager.IMPORTANCE_DEFAULT
         )
-        channel.description = "Сервис для фонового воспроизведения музыки"
+        channel.description = getString(R.string.service_description)
 
         // Регистрируем канал уведомлений
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

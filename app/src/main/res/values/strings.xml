@@ -51,4 +51,10 @@
     <string name="internet_connection_restored">Подключение к интернету восстановлено</string>
     <string name="bind_service_about">Разрешение необходимо для корректной работы плеера</string>
     <string name="cant_bind_service">Ошибка привязки сервиса</string>
+    <string name="service_name">Воспроизведение музыки</string>
+    <string name="service_description">Сервис для фонового воспроизведения музыки</string>
+    <string name="notifications_access_required_title">Требуется доступ к уведомлениям</string>
+    <string name="notifications_access_required_description">Приложению требуется доступ к уведомленям для воспроизведения аудио в фоновом режиме</string>
+    <string name="notifications_access_required_ok">Предоставить</string>
+    <string name="notifications_access_required_cancel">Отменить</string>
 </resources>

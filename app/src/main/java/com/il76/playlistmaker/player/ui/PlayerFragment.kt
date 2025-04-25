@@ -132,12 +132,12 @@ class PlayerFragment: Fragment() {
     // Показать диалог с объяснением
     private fun showPermissionRationaleDialog() {
         AlertDialog.Builder(requireContext())
-            .setTitle("Требуется доступ к уведомлениям")
-            .setMessage("Приложению требуется доступ к уведомленям для воспроизведения аудио в фоновом режиме")
-            .setPositiveButton("Предоставить") { _, _ ->
+            .setTitle(getString(R.string.notifications_access_required_title))
+            .setMessage(getString(R.string.notifications_access_required_description))
+            .setPositiveButton(getString(R.string.notifications_access_required_ok)) { _, _ ->
                 requestNotificationPermission()
             }
-            .setNegativeButton("Отменить", null)
+            .setNegativeButton(getString(R.string.notifications_access_required_cancel), null)
             .show()
     }
 
