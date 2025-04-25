@@ -1,5 +1,7 @@
 package com.il76.playlistmaker.search.ui
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -20,6 +23,7 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentSearchBinding
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -38,6 +42,8 @@ class SearchFragment: Fragment() {
     private lateinit var textWatcher: TextWatcher
 
     private lateinit var onTrackClickDebounce: (Track) -> Unit
+
+    private val internetBroadcastReceiver = InternetBroadcastReceiver()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -192,6 +198,22 @@ class SearchFragment: Fragment() {
                 trackList.clear()
                 trackAdapter.notifyDataSetChanged()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        @Suppress("DEPRECATION")
+        ContextCompat.registerReceiver(requireContext(), internetBroadcastReceiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        try {
+            requireContext().unregisterReceiver(internetBroadcastReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Ресивер не был зарегистрирован
         }
     }
 

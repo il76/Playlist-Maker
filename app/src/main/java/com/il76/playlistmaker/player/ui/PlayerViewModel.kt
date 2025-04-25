@@ -10,16 +10,13 @@ import com.il76.playlistmaker.history.domain.db.HistoryInteractor
 import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
-import com.il76.playlistmaker.player.domain.api.MediaPlayerInteractor
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.services.PlayerControl
 import com.il76.playlistmaker.utils.SingleLiveEvent
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    trackData: String,
-    private val playerInteractor: MediaPlayerInteractor,
+    val trackData: String,
     gson: Gson,
     private val historyInteractor: HistoryInteractor,
     private val playlistsInteractor: PlaylistInteractor
@@ -27,76 +24,21 @@ class PlayerViewModel(
 
     var track: Track = Track()
 
-    var playerStatus = PlayerStatus.DEFAULT
+    private val playerStatusLiveData = MutableLiveData<PlayerStatus>(PlayerStatus.Default)
+    fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
 
-    private val playerLiveData = MutableLiveData<PlayerState>()
-    private val playerStatusLiveData = MutableLiveData<PlayerStatus>()
-    private val currentTimeLiveData = MutableLiveData<String>()
     private val favouriteLiveData = MutableLiveData<Boolean>()
 
-    private var timerJob: Job? = null
+    private var playerControl: PlayerControl? = null
 
     init {
         track = gson.fromJson(trackData, Track::class.java)
-        //первичная загрузка трека
-        playerLiveData.postValue(
-            PlayerState.Loading(track)
-        )
-        playerInteractor.init(
-            dataSource = track.previewUrl,
-            onPreparedListener = {
-                playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-            },
-            onCompletionListener = {
-                playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-                stopTimer()
-            }
-        )
     }
 
     private val showToast = SingleLiveEvent<String>()
     fun observeShowToast(): LiveData<String> = showToast
 
-
-    fun observeState(): LiveData<PlayerState> = playerLiveData
-
-    fun observePlayerStatus(): LiveData<PlayerStatus> = playerStatusLiveData
-    fun observeCurrentTime(): LiveData<String> = currentTimeLiveData
     fun observeFavourite(): LiveData<Boolean> = favouriteLiveData
-
-    fun changePlayerStatus(status: PlayerStatus) {
-        playerStatus = status
-        when (status) {
-            PlayerStatus.DEFAULT -> {}
-            PlayerStatus.PREPARED -> {
-                playerStatusLiveData.postValue(PlayerStatus.PREPARED)
-            }
-            PlayerStatus.PLAYING -> {
-                playerInteractor.start()
-                startTimer()
-                playerStatusLiveData.postValue(PlayerStatus.PLAYING)
-            }
-            PlayerStatus.PAUSED -> {
-                playerInteractor.pause()
-                playerStatusLiveData.postValue(PlayerStatus.PAUSED)
-                stopTimer()
-            }
-        }
-
-    }
-
-    private fun startTimer() {
-        timerJob = viewModelScope.launch {
-            while (playerStatus == PlayerStatus.PLAYING) {
-                delay(TIME_REFRESH_INTERVAL)
-                currentTimeLiveData.postValue(playerInteractor.getCurrentTime())
-            }
-        }
-    }
-
-    private fun stopTimer() {
-        timerJob?.cancel()
-    }
 
     suspend fun toggleFavouriteStatus() {
         track.isFavourite = !track.isFavourite
@@ -133,12 +75,40 @@ class PlayerViewModel(
         }
     }
 
-    override fun onCleared() {
-        playerInteractor.release()
+
+    fun setPlayerControl(playerControl: PlayerControl) {
+        this.playerControl = playerControl
+
+        viewModelScope.launch {
+            playerControl.getPlayerStatus().collect {
+                playerStatusLiveData.postValue(it)
+            }
+        }
     }
 
-    companion object {
-        private const val TIME_REFRESH_INTERVAL = 300L
+    fun playbackControl() {
+        if (playerStatusLiveData.value is PlayerStatus.Playing) {
+            playerControl?.pausePlayer()
+        } else {
+            playerControl?.startPlayer()
+        }
+    }
+
+    fun hideNotification() {
+        playerControl?.hideNotification()
+    }
+
+    fun showNotification() {
+        playerControl?.showNotification()
+    }
+
+    fun removePlayerControl() {
+        playerControl = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        removePlayerControl()
     }
 
 }

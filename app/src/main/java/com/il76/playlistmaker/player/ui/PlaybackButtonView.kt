@@ -26,7 +26,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     private var iconPaused: Bitmap? = null
 
     // Состояние кнопки
-    private var playerStatus = PlayerStatus.DEFAULT
+    private var playerStatus: PlayerStatus = PlayerStatus.Default
         set(value) {
             field = value
             updateBitmap()
@@ -44,7 +44,7 @@ class PlaybackButtonView @JvmOverloads constructor(
             typedArray.recycle()
         }
         // Установка начального состояния
-        playerStatus = PlayerStatus.PAUSED
+        playerStatus = PlayerStatus.Paused
     }
 
 
@@ -64,7 +64,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     // Обновление битмапа в зависимости от состояния
     private fun updateBitmap() {
         currentBitmap = when (playerStatus) {
-            PlayerStatus.PLAYING -> iconPaused
+            is PlayerStatus.Playing -> iconPaused
             else -> iconPlaying
         }
     }
@@ -88,10 +88,10 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     // переключение состояния кнопки
     fun toggleStatus() {
-        playerStatus = if (playerStatus == PlayerStatus.PLAYING) {
-            PlayerStatus.PAUSED
+        playerStatus = if (playerStatus is PlayerStatus.Playing) {
+            PlayerStatus.Paused
         } else {
-            PlayerStatus.PLAYING
+            PlayerStatus.Playing(0)
         }
         setStatus(playerStatus)
     }

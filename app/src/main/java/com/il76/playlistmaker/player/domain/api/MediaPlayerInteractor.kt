@@ -10,5 +10,5 @@ interface MediaPlayerInteractor {
     fun stop()
     fun pause()
     fun release()
-    fun getCurrentTime(): String
+    fun getCurrentTime(): Int
 }

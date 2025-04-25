@@ -31,8 +31,8 @@ class MediaPlayerInteractorImpl(private val playerRepository: MediaPlayerReposit
         playerRepository.release()
     }
 
-    override fun getCurrentTime(): String {
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(playerRepository.getCurrentTime())
+    override fun getCurrentTime(): Int {
+        return playerRepository.getCurrentTime()
     }
 
 }

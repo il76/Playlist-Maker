@@ -1,11 +1,25 @@
 package com.il76.playlistmaker.player.ui
 
+import android.Manifest
+import android.app.AlertDialog
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.net.ConnectivityManager
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.bundle.bundleOf
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -20,10 +34,14 @@ import com.il76.playlistmaker.databinding.FragmentPlayerBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.services.PlayerService
+import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class PlayerFragment: Fragment() {
@@ -40,7 +58,7 @@ class PlayerFragment: Fragment() {
     /**
      * Данные о треке, прилетают с экрана поиска
      */
-    private var trackData = ""
+    var trackData = ""
 
     /**
      * Добавлено ли в плейлист
@@ -50,6 +68,85 @@ class PlayerFragment: Fragment() {
     private lateinit var playlistsAdapter: PlaylistPlayerAdapter
 
     private lateinit var onPlaylistClickDebounce: (PlaylistTrack) -> Unit
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+
+    private val internetBroadcastReceiver = InternetBroadcastReceiver()
+
+    private var playerService: PlayerService? = null
+    private var isServiceBound = false
+
+    // Объявляем launcher как переменную класса фрагмента
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as PlayerService.PlayerServiceBinder
+            viewModel.setPlayerControl(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            viewModel.removePlayerControl()
+        }
+    }
+
+    private fun bindPlayerService() {
+        val intent = Intent(requireContext(), PlayerService::class.java).apply {
+            putExtra("track_data", viewModel.trackData)
+        }
+        requireActivity().bindService(
+            intent,
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+        isServiceBound = true
+    }
+
+    private fun askForPermission() {
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                bindPlayerService()
+            } else {
+                // Пользователь отказал в разрешении
+                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                    showPermissionRationaleDialog()
+                } else {
+                    showToast(getString(R.string.cant_bind_service))
+                }
+            }
+        }
+        requestNotificationPermission()
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            // Для версий ниже Android 13 разрешение не требуется
+            bindPlayerService()
+        }
+    }
+
+    // Показать диалог с объяснением
+    private fun showPermissionRationaleDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.notifications_access_required_title))
+            .setMessage(getString(R.string.notifications_access_required_description))
+            .setPositiveButton(getString(R.string.notifications_access_required_ok)) { _, _ ->
+                requestNotificationPermission()
+            }
+            .setNegativeButton(getString(R.string.notifications_access_required_cancel), null)
+            .show()
+    }
+
+    private fun unbindPlayerService() {
+        if (isServiceBound) {
+            requireActivity().unbindService(serviceConnection)
+            isServiceBound = false
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,16 +161,75 @@ class PlayerFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         trackData = requireArguments().getString(ARGS_TRACKDATA).orEmpty()
 
-        viewModel.observeState().observe(viewLifecycleOwner) {
-            render(it)
+        onPlaylistClickDebounce = debounce<PlaylistTrack>(
+            CLICK_DEBOUNCE_DELAY,
+            viewLifecycleOwner.lifecycleScope,
+            false
+        ) { playlistTrack ->
+            viewModel.addToPlaylist(playlistTrack)
         }
-        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
-            viewModel.playerStatus = it
-            renderPlayer(it)
+        initBottomSheet()
+        initObservers()
+        initOnclicks()
+        viewModel.loadPlaylists()
+
+        binding.playlistsList.layoutManager = LinearLayoutManager(requireContext())
+
+        askForPermission()
+    }
+
+    private fun initBottomSheet() {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.isVisible = false
+                    }
+                    else -> {
+                        binding.overlay.isVisible = true
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = (slideOffset + 1f) / 2
+            }
+        })
+    }
+
+    private fun initOnclicks() {
+        binding.activityPlayerToolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
         }
-        viewModel.observeCurrentTime().observe(viewLifecycleOwner) {
-            renderCurrentTime(it)
+        binding.buttonPlay.setOnClickListener {
+            viewModel.playbackControl()
         }
+
+        binding.buttonPlaylistAdd.setOnClickListener {
+            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+            if (isPlaylisted) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
+            }
+            isPlaylisted = !isPlaylisted
+        }
+        binding.buttonLike.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.toggleFavouriteStatus()
+            }
+        }
+        binding.newPlaylist.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
+        }
+    }
+
+    private fun initObservers() {
         viewModel.observeFavourite().observe(viewLifecycleOwner) {
             renderFavourite(it)
         }
@@ -81,6 +237,10 @@ class PlayerFragment: Fragment() {
         viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
         }
+        viewModel.observePlayerStatus().observe(viewLifecycleOwner) {
+            renderPlayer(it)
+        }
+
 
         viewModel.observePlaylistsList().observe(viewLifecycleOwner) { playlists ->
             if (playlists != null) {
@@ -100,72 +260,6 @@ class PlayerFragment: Fragment() {
         viewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
         }
-
-        binding.activityPlayerToolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.buttonPlay.setOnClickListener {
-            playbackControl()
-        }
-
-        onPlaylistClickDebounce = debounce<PlaylistTrack>(
-            CLICK_DEBOUNCE_DELAY,
-            viewLifecycleOwner.lifecycleScope,
-            false
-        ) { playlistTrack ->
-            viewModel.addToPlaylist(playlistTrack)
-        }
-        viewModel.loadPlaylists()
-
-
-
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-        //bottomSheetBehavior.isHideable = true // Разрешить скрытие
-        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                // newState — новое состояние BottomSheet
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        binding.overlay.isVisible = false
-                        // загружаем список плейлистов
-                    }
-                    else -> {
-                        binding.overlay.isVisible = true
-                    }
-                }
-            }
-
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                binding.overlay.alpha = (slideOffset + 1f) / 2
-            }
-        })
-
-
-        binding.buttonPlaylistAdd.setOnClickListener {
-            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
-            if (isPlaylisted) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add)
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                binding.buttonPlaylistAdd.setImageResource(R.drawable.icon_playlist_add_active)
-            }
-            isPlaylisted = !isPlaylisted
-        }
-        binding.buttonLike.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.toggleFavouriteStatus()
-            }
-        }
-
-        binding.newPlaylist.setOnClickListener {
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            findNavController().navigate(R.id.action_playerFragment_to_fragment_playlistadd)
-        }
-
-        binding.playlistsList.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun renderPlaylists(playlists: List<Playlist>) {
@@ -181,7 +275,6 @@ class PlayerFragment: Fragment() {
             binding.buttonLike.setImageResource(R.drawable.icon_like)
         }
     }
-
 
     /**
      * Заполняем вью информацией о выбранном треке
@@ -213,37 +306,18 @@ class PlayerFragment: Fragment() {
     }
 
     /**
-     * Запуск
-     */
-    private fun startPlayer() {
-        viewModel.changePlayerStatus(PlayerStatus.PLAYING)
-        viewModel.playerStatus = PlayerStatus.PLAYING
-    }
-
-    /**
-     * Пауза
-     */
-    private fun pausePlayer() {
-        viewModel.changePlayerStatus(PlayerStatus.PAUSED)
-        viewModel.playerStatus = PlayerStatus.PAUSED
-    }
-
-    /**
-     * Старт-стоп
-     */
-    private fun playbackControl() {
-        when(viewModel.playerStatus) {
-            PlayerStatus.DEFAULT -> {}
-            PlayerStatus.PREPARED, PlayerStatus.PAUSED -> startPlayer()
-            PlayerStatus.PLAYING -> pausePlayer()
-        }
-    }
-
-    /**
      * Обновляем текущее время
      */
-    private fun renderCurrentTime(time: String) {
-        binding.trackCurrentTime.text = time
+    private fun renderCurrentTime(time: Int) {
+        binding.trackCurrentTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(time)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        @Suppress("DEPRECATION")
+        ContextCompat.registerReceiver(requireContext(), internetBroadcastReceiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED)
+        viewModel.hideNotification()
     }
 
     /**
@@ -251,30 +325,36 @@ class PlayerFragment: Fragment() {
      */
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        try {
+            requireContext().unregisterReceiver(internetBroadcastReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Ресивер не был зарегистрирован
+        }
+        viewModel.showNotification()
     }
 
-    private fun render(state: PlayerState) {
-        when(state) {
-            is PlayerState.Loading -> {
-                track = state.track
-            }
+    private fun render(status: PlayerStatus) {
+        if (status is PlayerStatus.Loading) {
+           track = status.track
+            fillTrackInfo()
         }
-        fillTrackInfo()
     }
 
     private fun renderPlayer(status: PlayerStatus) {
-        binding.buttonPlay.setStatus(viewModel.playerStatus)
+        binding.buttonPlay.setStatus(status)
         when (status) {
-            PlayerStatus.DEFAULT -> fillTrackInfo()
-            PlayerStatus.PREPARED -> {
+            PlayerStatus.Default -> {}
+            PlayerStatus.Prepared -> {
                 binding.buttonPlay.isEnabled = true
                 binding.trackCurrentTime.text = getString(R.string.track_time_placeholder)
             }
-            PlayerStatus.PLAYING -> {
+            is PlayerStatus.Playing -> {
+                renderCurrentTime(status.progress)
             }
-            PlayerStatus.PAUSED -> {
+            PlayerStatus.Paused -> {
             }
+
+            is PlayerStatus.Loading -> render(status)
         }
     }
 
@@ -282,6 +362,10 @@ class PlayerFragment: Fragment() {
         Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG).show()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindPlayerService()
+    }
 
     companion object {
 
