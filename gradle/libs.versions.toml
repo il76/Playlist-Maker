@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.1"
+agp = "8.9.2"
 compiler = "4.16.0"
 converterGson = "2.11.0"
 glide = "4.16.0"
@@ -20,9 +20,9 @@ koinAndroid = "4.1.0-Beta1"
 fragment = "1.8.6"
 navigationFragment = "2.8.9"
 navigationFragmentKtx = "2.8.9"
-roomRuntime = "2.7.0"
-roomKtx = "2.7.0"
-window = "1.4.0-rc01"
+roomRuntime = "2.7.1"
+roomKtx = "2.7.1"
+window = "1.4.0-rc02"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
