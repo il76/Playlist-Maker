@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,10 +25,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.il76.playlistmaker.R
@@ -36,6 +39,8 @@ import com.il76.playlistmaker.sharing.data.EmailData
 import com.il76.playlistmaker.ui.theme.PlaylistMakerTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+//import com.il76.playlistmaker.ui.theme.LocalColors
+import org.koin.androidx.compose.koinViewModel
 
 class SettingsFragment: Fragment() {
     private lateinit var binding: FragmentSettingsBinding
@@ -96,25 +101,26 @@ class SettingsFragment: Fragment() {
 }
 
 @Composable
-fun SettingsScreen(
-    viewModel: SettingsViewModel = viewModel(),
-    onShareApp: (String) -> Unit,
-    onWriteSupport: (EmailData) -> Unit,
-    onOpenTOS: (String) -> Unit
-) {
+fun SettingsScreen() {
+    val viewModel: SettingsViewModel = koinViewModel()
     val state by viewModel.observeState().observeAsState()
     val toastMessage by viewModel.observeShowToast().observeAsState(initial = null)
+    val colors = PlaylistMakerTheme.currentColors
+
+    val context = LocalContext.current
+
 
     // Обработка Toast
     LaunchedEffect(toastMessage) {
         toastMessage?.let { message ->
-            //Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(colors.backgroundSecondary)
             //.background(MaterialTheme.colors.background)
     ) {
         // Toolbar
@@ -137,7 +143,7 @@ fun SettingsScreen(
         SettingsButton(
             text = stringResource(R.string.settings_button_share),
             icon = painterResource(R.drawable.icon_share),
-            onClick = { onShareApp(shareText) }
+            onClick = { viewModel.shareApp(shareText) }
         )
 
         // Кнопка "Написать в поддержку"
@@ -149,7 +155,7 @@ fun SettingsScreen(
             text = stringResource(R.string.settings_button_support),
             icon = painterResource(R.drawable.icon_support),
             onClick = {
-                onWriteSupport(
+                viewModel.writeSupport(
                     EmailData(
                         title = emailTitle,
                         subject = emailSubject,
@@ -165,7 +171,7 @@ fun SettingsScreen(
         SettingsButton(
             text = stringResource(R.string.settings_button_user_agreement),
             icon = painterResource(R.drawable.icon_arrow_right),
-            onClick = { onOpenTOS(uaLink) }
+            onClick = { viewModel.openTOS(uaLink) }
         )
     }
 }
@@ -177,6 +183,7 @@ private fun SwitchItem(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val colors = PlaylistMakerTheme.currentColors
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,6 +194,7 @@ private fun SwitchItem(
     ) {
         Text(
             text = text,
+            color = colors.settingsText,
         )
         Switch(
             checked = checked,
@@ -202,16 +210,18 @@ private fun SettingsButton(
     icon: Painter,
     onClick: () -> Unit
 ) {
+    val colors = PlaylistMakerTheme.currentColors
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(16.dp)
+        ,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyLarge,
+            color = colors.settingsText,
             modifier = Modifier.weight(1f)
         )
         Icon(
@@ -219,4 +229,10 @@ private fun SettingsButton(
             contentDescription = null
         )
     }
+}
+
+@Composable
+@Preview
+fun SettingsScreenPreview() {
+    SettingsScreen()
 }

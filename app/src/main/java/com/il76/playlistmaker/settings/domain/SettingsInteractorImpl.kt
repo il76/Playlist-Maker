@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import com.il76.playlistmaker.settings.domain.api.SettingsInteractor
 import com.il76.playlistmaker.settings.domain.models.ThemeSettings
+import com.il76.playlistmaker.ui.theme.PlaylistMakerTheme
 
 class SettingsInteractorImpl(private val sharedPreferences: SharedPreferences, private val context: Context):
     SettingsInteractor {
@@ -22,6 +23,7 @@ class SettingsInteractorImpl(private val sharedPreferences: SharedPreferences, p
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+        PlaylistMakerTheme.setTheme(theme.isDark)
     }
 
     override fun getThemeSettings(): ThemeSettings {

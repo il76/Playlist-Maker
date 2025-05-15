@@ -1,5 +1,6 @@
 package com.il76.playlistmaker.ui.theme
 
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
@@ -24,21 +25,20 @@ import androidx.compose.ui.unit.sp
 //    primary = Color.Black,
 //    onPrimary = Color.White,
 //)
-val LocalColors = staticCompositionLocalOf { LightThemeColors }
+//val LocalColors = staticCompositionLocalOf { LightThemeColors }
+enum class ThemeType {
+    LIGHT, DARK
+}
 
-@Composable
-fun PlaylistMakerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
-    val colors = if (darkTheme) DarkThemeColors else LightThemeColors
+object PlaylistMakerTheme{
+    private val lightColors = ThemeColors()
+    private val darkColors = ThemeDarkColors
 
-    CompositionLocalProvider(LocalColors provides colors as LightThemeColors) {
-        MaterialTheme(
-            colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme(),
-            content = content,
-            typography = Typography
-        )
+    var currentColors: ThemeColors = lightColors
+        private set
+
+    fun setTheme(darkTheme: Boolean) {
+        currentColors = if (darkTheme) darkColors else lightColors
     }
 }
 val Typography = Typography(
@@ -49,5 +49,6 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     )
+
 )
 
