@@ -23,7 +23,6 @@ class SettingsInteractorImpl(private val sharedPreferences: SharedPreferences, p
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-        PlaylistMakerTheme.setTheme(theme.isDark)
     }
 
     override fun getThemeSettings(): ThemeSettings {

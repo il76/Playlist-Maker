@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.navigation.compose)
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -39,6 +39,7 @@ import com.il76.playlistmaker.sharing.data.EmailData
 import com.il76.playlistmaker.ui.theme.PlaylistMakerTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 //import com.il76.playlistmaker.ui.theme.LocalColors
 import org.koin.androidx.compose.koinViewModel
 
@@ -101,11 +102,10 @@ class SettingsFragment: Fragment() {
 }
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(navController: NavController) {
     val viewModel: SettingsViewModel = koinViewModel()
     val state by viewModel.observeState().observeAsState()
     val toastMessage by viewModel.observeShowToast().observeAsState(initial = null)
-    val colors = PlaylistMakerTheme.currentColors
 
     val context = LocalContext.current
 
@@ -120,7 +120,7 @@ fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.backgroundSecondary)
+            .background(MaterialTheme.colorScheme.background)
             //.background(MaterialTheme.colors.background)
     ) {
         // Toolbar
@@ -183,7 +183,6 @@ private fun SwitchItem(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val colors = PlaylistMakerTheme.currentColors
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -194,7 +193,7 @@ private fun SwitchItem(
     ) {
         Text(
             text = text,
-            color = colors.settingsText,
+            color = MaterialTheme.colorScheme.onBackground,
         )
         Switch(
             checked = checked,
@@ -210,7 +209,6 @@ private fun SettingsButton(
     icon: Painter,
     onClick: () -> Unit
 ) {
-    val colors = PlaylistMakerTheme.currentColors
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -221,7 +219,7 @@ private fun SettingsButton(
     ) {
         Text(
             text = text,
-            color = colors.settingsText,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.weight(1f)
         )
         Icon(
@@ -231,8 +229,8 @@ private fun SettingsButton(
     }
 }
 
-@Composable
-@Preview
-fun SettingsScreenPreview() {
-    SettingsScreen()
-}
+//@Composable
+//@Preview
+//fun SettingsScreenPreview() {
+//    SettingsScreen()
+//}

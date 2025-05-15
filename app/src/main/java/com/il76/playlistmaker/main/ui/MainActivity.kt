@@ -16,13 +16,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,24 +44,30 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commit
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.media.ui.MediaFragment
 import com.il76.playlistmaker.search.ui.SearchFragment
 import com.il76.playlistmaker.settings.ui.SettingsScreen
+import com.il76.playlistmaker.ui.theme.PlaylistMakerTheme
 
+//ComponentActivity
 class MainActivity : AppCompatActivity() {
-    private var selectedItem by mutableIntStateOf(R.id.media_fragment)
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.BLACK))
 
         setContent {
-            MainScreen()
+            PlaylistMakerTheme {
+                AppNavigation()
+            }
         }
 
 
@@ -85,59 +95,176 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+sealed class Screen(val route: String, val titleResId: Int) {
+    object Search : Screen("search", R.string.button_search)
+    object Media : Screen("media", R.string.button_media)
+    object Settings : Screen("settings", R.string.button_settings)
+
+    // Экраны без нижней навигации
+    object Player : Screen("details", R.string.button_media)
+}
+
+data class ScreenUIConfig(
+    val showTopBar: Boolean = true,
+    val showBottomBar: Boolean = true,
+    val title: String? = null
+)
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    var selectedTab by remember { mutableIntStateOf(0) }
+fun AppNavigation() {
+    val navController = rememberNavController()
 
-    // Tabs data
-    val tabs = listOf(
-        BottomNavItem.Search,
-        BottomNavItem.Media,
-        BottomNavItem.Settings
-    )
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    val currentScreen = currentBackStack?.destination?.route
+
+    val screenConfig = when (currentScreen) {
+        Screen.Search.route -> ScreenUIConfig(title = "Поиск")
+        Screen.Media.route -> ScreenUIConfig(title = "Медиа")
+        Screen.Settings.route -> ScreenUIConfig(title = "Настройки")
+        Screen.Player.route -> ScreenUIConfig(title = "Медиа")
+        else -> ScreenUIConfig()
+    }
 
     Scaffold(
+        topBar = {
+            if (screenConfig.showTopBar) {
+                TopAppBar(
+                    title = { Text(text = screenConfig.title ?: "") },
+//                    navigationIcon = {
+//                        if (navController.previousBackStackEntry != null) {
+//                            IconButton(onClick = { navController.popBackStack() }) {
+//                                Icon(Icons.Default.ArrowBack, contentDescription = "Назад")
+//                            }
+//                        }
+//                    }
+                )
+            }
+        },
         bottomBar = {
-            NavigationBar {
-                tabs.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = item.iconRes),
-                                contentDescription = stringResource(id = item.title)
-                            )
-                        },
-                        label = { Text(stringResource(id = item.title)) },
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index }
-                    )
-                }
+            if (screenConfig.showBottomBar) {
+                BottomNavigationBar(navController = navController)
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            when (tabs[selectedTab]) {
-                is BottomNavItem.Search -> LegacyFragmentContainer(SearchFragment::class.java)
-                is BottomNavItem.Media -> LegacyFragmentContainer(MediaFragment::class.java)
-                is BottomNavItem.Settings -> SettingsScreen()
-            }
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Settings.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            //composable(Screen.Search.route) { SearchScreen(navController) }
+            composable(Screen.Search.route) { LegacyFragmentContainer(SearchFragment::class.java) }
+
+            composable(Screen.Media.route) { MediaScreen(navController) }
+            composable(Screen.Settings.route) { SettingsScreen(navController) }
+            //composable(Screen.Settings.route) { SettingsScreen(navController) }
         }
     }
 }
 
-// Модель для пунктов навигации
-sealed class BottomNavItem(
-    @DrawableRes val iconRes: Int,  // ID ресурса иконки
-    @StringRes val title: Int       // ID строки заголовка
-) {
-    object Search : BottomNavItem(R.drawable.icon_search, R.string.button_search)
-    object Media : BottomNavItem(R.drawable.icon_media, R.string.button_media)
-    object Settings : BottomNavItem(R.drawable.icon_settings, R.string.button_settings)
+
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    val items = listOf(
+        Screen.Search,
+        Screen.Media,
+        Screen.Settings
+    )
+
+    NavigationBar {
+        val currentRoute = currentRoute(navController)
+        items.forEach { screen ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        painter = painterResource(id = when (screen) {
+                            Screen.Search -> R.drawable.icon_search
+                            Screen.Media -> R.drawable.icon_media
+                            Screen.Settings -> R.drawable.icon_settings
+                            else -> R.drawable.icon_arrow_right
+                        }),
+                        contentDescription = stringResource(id = screen.titleResId!!)
+                    )
+                },
+                label = { Text(stringResource(id = screen.titleResId)) },
+                selected = currentRoute == screen.route,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(Screen.Search.route) {
+                            saveState = true
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
-fun MediaScreen() { /* ... */ }
+private fun currentRoute(navController: NavController): String? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.destination?.route
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun MainScreen() {
+//    var selectedTab by remember { mutableIntStateOf(0) }
+//
+//    // Tabs data
+//    val tabs = listOf(
+//        BottomNavItem.Search,
+//        BottomNavItem.Media,
+//        BottomNavItem.Settings
+//    )
+//
+//    Scaffold(
+//        bottomBar = {
+//            NavigationBar {
+//                tabs.forEachIndexed { index, item ->
+//                    NavigationBarItem(
+//                        icon = {
+//                            Icon(
+//                                painter = painterResource(id = item.iconRes),
+//                                contentDescription = stringResource(id = item.title)
+//                            )
+//                        },
+//                        label = { Text(stringResource(id = item.title)) },
+//                        selected = selectedTab == index,
+//                        onClick = { selectedTab = index }
+//                    )
+//                }
+//            }
+//        }
+//    ) { innerPadding ->
+//        Box(modifier = Modifier.padding(innerPadding)) {
+//            when (tabs[selectedTab]) {
+//                is BottomNavItem.Search -> LegacyFragmentContainer(SearchFragment::class.java)
+//                is BottomNavItem.Media -> LegacyFragmentContainer(MediaFragment::class.java)
+//                is BottomNavItem.Settings -> SettingsScreen()
+//            }
+//        }
+//    }
+//}
+//
+//// Модель для пунктов навигации
+//sealed class BottomNavItem(
+//    @DrawableRes val iconRes: Int,  // ID ресурса иконки
+//    @StringRes val title: Int       // ID строки заголовка
+//) {
+//    object Search : BottomNavItem(R.drawable.icon_search, R.string.button_search)
+//    object Media : BottomNavItem(R.drawable.icon_media, R.string.button_media)
+//    object Settings : BottomNavItem(R.drawable.icon_settings, R.string.button_settings)
+//}
+
+@Composable
+fun SearchScreen(navController: NavController) { /* ... */ }
+@Composable
+fun MediaScreen(navController: NavController) { /* ... */ }
 
 @Composable
 fun LegacyFragmentContainer(fragmentClass: Class<out Fragment>) {
