@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -319,7 +320,15 @@ fun SearchScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .background(Color.White),
+                .background(Color.White)
+                .onFocusChanged { focusState ->
+
+                    viewModel.toggleHistory(focusState.isFocused && currentQuery.value.isNotEmpty())
+                },
+//                .onFocusChanged() {
+//                    viewModel.toggleHistory(hasFocus && binding.searchEditText.text.isNullOrEmpty())
+//                }
+
             placeholder = { Text("Поиск") }
         )
 
@@ -342,6 +351,7 @@ fun SearchScreen(navController: NavController) {
                         Text("Ничего не найдено", modifier = Modifier.padding(16.dp))
                     }
                     SearchState.ErrorStatus.HISTORY -> {
+                        Log.i("pls", "History: "+state.trackList.toString())
                         TrackList(state.trackList ?: emptyList()) { track ->
                             viewModel.onTrackClicked(track)
                         }
@@ -365,6 +375,7 @@ fun SearchScreen(navController: NavController) {
 
 @Composable
 fun TrackList(tracks: List<Track>, onItemClick: (Track) -> Unit) {
+    Log.d("pls", "Треки: "+tracks.toString())
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(tracks) { track ->
             TrackItem(
