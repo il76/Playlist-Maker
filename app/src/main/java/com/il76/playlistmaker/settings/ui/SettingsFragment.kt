@@ -102,7 +102,7 @@ class SettingsFragment: Fragment() {
 }
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen() {
     val viewModel: SettingsViewModel = koinViewModel()
     val state by viewModel.observeState().observeAsState()
     val toastMessage by viewModel.observeShowToast().observeAsState(initial = null)
@@ -121,7 +121,6 @@ fun SettingsScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            //.background(MaterialTheme.colors.background)
     ) {
         // Toolbar
 //        TopAppBar(

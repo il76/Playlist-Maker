@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" // this version matches your Kotlin version
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.21" // this version matches your Kotlin version
     id("com.google.devtools.ksp")
 
 }
@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.coil.compose)
 
     ksp(libs.androidx.room.compiler)
 
