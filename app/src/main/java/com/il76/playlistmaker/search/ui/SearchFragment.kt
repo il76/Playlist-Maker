@@ -14,9 +14,13 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,30 +32,42 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -312,21 +328,28 @@ fun SearchScreen(navController: NavController) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TextField(
-            value = currentQuery.value,
-            onValueChange = {
+        SearchTextField(
+            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp),
+            onSearchTextChanged = {
                 currentQuery.value = it
                 viewModel.searchDebounce(it)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(Color.White)
-                .onFocusChanged { focusState ->
-                    viewModel.toggleHistory(focusState.isFocused && currentQuery.value.isEmpty())
-                },
-            placeholder = { Text("Поиск") }
+            }
         )
+//        TextField(
+//            value = currentQuery.value,
+//            onValueChange = {
+//                currentQuery.value = it
+//                viewModel.searchDebounce(it)
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//                .background(Color.White)
+//                .onFocusChanged { focusState ->
+//                    viewModel.toggleHistory(focusState.isFocused && currentQuery.value.isEmpty())
+//                },
+//            placeholder = { Text("Поиск") }
+//        )
 
         when (val state = uiState) {
             null -> {}
@@ -363,6 +386,94 @@ fun SearchScreen(navController: NavController) {
         }
 
 
+    }
+}
+
+@Composable
+fun SearchTextField(
+    modifier: Modifier = Modifier,
+    hint: String = stringResource(id = R.string.button_search),
+    onSearchTextChanged: (String) -> Unit
+) {
+    var searchText by remember { mutableStateOf("") }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp)
+            .background(
+                color = colorResource(id = R.color.search_edit_bg),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clip(RoundedCornerShape(8.dp))
+            .border(
+                width = 1.dp,
+                color = Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.icon_search),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(dimensionResource(id = R.dimen.settings_icon_height))
+                    .padding(3.dp),
+                colorFilter = ColorFilter.tint(color = colorResource(id = R.color.search_edit_main))
+            )
+
+            BasicTextField(
+                value = searchText,
+                onValueChange = {
+                    searchText = it
+                    onSearchTextChanged(it)
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(36.dp)
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                singleLine = true,
+                maxLines = 1,
+                textStyle = LocalTextStyle.current.copy(
+                    fontFamily = FontFamily(Font(R.font.ys_display_regular)),
+                    //fontSize = dimensionResource(id = R.dimen.settings_btn_text),
+                    color = colorResource(id = R.color.main_icon_fill)
+                ),
+                cursorBrush = SolidColor(colorResource(id = R.color.search_edit_main)),
+                decorationBox = { innerTextField ->
+                    if (searchText.isEmpty()) {
+                        Text(
+                            text = hint,
+                            style = LocalTextStyle.current.copy(
+                                color = colorResource(id = R.color.search_edit_main)
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+            )
+
+            // Clear Icon
+            if (searchText.isNotEmpty()) {
+                IconButton(
+                    onClick = { searchText = "" },
+                    modifier = Modifier.size(16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icon_clear),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = colorResource(id = R.color.search_edit_main))
+                    )
+                }
+            }
+        }
     }
 }
 
