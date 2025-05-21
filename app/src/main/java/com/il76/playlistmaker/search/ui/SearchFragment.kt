@@ -51,6 +51,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -302,7 +304,6 @@ fun SearchScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         viewModel.trackClicks
             .onEach {
-                Log.d("pls", "tohistory")
                 viewModel.addToHistory(it)
             }
             .collect { track ->
@@ -322,13 +323,8 @@ fun SearchScreen(navController: NavController) {
                 .padding(16.dp)
                 .background(Color.White)
                 .onFocusChanged { focusState ->
-
-                    viewModel.toggleHistory(focusState.isFocused && currentQuery.value.isNotEmpty())
+                    viewModel.toggleHistory(focusState.isFocused && currentQuery.value.isEmpty())
                 },
-//                .onFocusChanged() {
-//                    viewModel.toggleHistory(hasFocus && binding.searchEditText.text.isNullOrEmpty())
-//                }
-
             placeholder = { Text("Поиск") }
         )
 
@@ -340,43 +336,82 @@ fun SearchScreen(navController: NavController) {
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     SearchState.ErrorStatus.SUCCESS -> {
-                        TrackList(state.trackList ?: emptyList()) { track ->
-                            viewModel.onTrackClicked(track)
-                        }
+                        TrackScreen(
+                            tracks = state.trackList ?: emptyList(),
+                            onTrackClick = { viewModel.onTrackClicked(it) }
+                        )
                     }
                     SearchState.ErrorStatus.ERROR_NET -> {
-                        Text("Ошибка сети", modifier = Modifier.padding(16.dp))
+                        ErrorImageText(R.drawable.search_network_error, R.string.search_network_error)
                     }
                     SearchState.ErrorStatus.EMPTY_RESULT -> {
-                        Text("Ничего не найдено", modifier = Modifier.padding(16.dp))
+                        ErrorImageText(R.drawable.search_nothing_found, R.string.search_nothing_found)
                     }
                     SearchState.ErrorStatus.HISTORY -> {
-                        Log.i("pls", "History: "+state.trackList.toString())
-                        TrackList(state.trackList ?: emptyList()) { track ->
-                            viewModel.onTrackClicked(track)
-                        }
+                        TrackScreen(
+                            tracks = state.trackList ?: emptyList(),
+                            onTrackClick = { viewModel.onTrackClicked(it) },
+                            onClearHistoryClick = { viewModel.clearHistory() }
+                        )
                     }
                     SearchState.ErrorStatus.EMPTY_HISTORY -> {
-                        Text("История пуста", modifier = Modifier.padding(16.dp))
+                        //Text("История пуста", modifier = Modifier.padding(16.dp))
                     }
                     SearchState.ErrorStatus.NONE -> {}
                 }
             }
         }
 
-        Button(
-            onClick = { viewModel.clearHistory() },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("Очистить историю")
+
+    }
+}
+
+
+@Composable
+fun ErrorImageText(imageResourceId: Int, stringResourceId: Int) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Image(
+            painter = painterResource(id = imageResourceId),
+            contentDescription = null,
+            modifier = Modifier.padding(vertical = 16.dp).align(Alignment.CenterHorizontally)
+        )
+        Text(stringResource(stringResourceId), modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+fun TrackScreen(
+    tracks: List<Track>,
+    onTrackClick: (Track) -> Unit,
+    onClearHistoryClick: (() -> Unit)? = null // Необязательный параметр
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        TrackList(
+            tracks = tracks,
+            onItemClick = onTrackClick,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        if (onClearHistoryClick != null) {
+            Button(
+                onClick = onClearHistoryClick,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+            ) {
+                Text("Очистить историю")
+            }
         }
     }
 }
 
 @Composable
-fun TrackList(tracks: List<Track>, onItemClick: (Track) -> Unit) {
-    Log.d("pls", "Треки: "+tracks.toString())
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+fun TrackList(
+    tracks: List<Track>,
+    onItemClick: (Track) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
         items(tracks) { track ->
             TrackItem(
                 track = track,
@@ -399,6 +434,7 @@ fun TrackItem(
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable(onClick = onClick)
+            //.padding(horizontal = 16.dp, vertical = 8.dp),
             .padding(horizontal = dimensionResource(id = R.dimen.btn_margin), vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
