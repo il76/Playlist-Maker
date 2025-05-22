@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.material.tabs.TabLayoutMediator
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentMediaBinding
+import com.il76.playlistmaker.search.ui.ErrorImageText
 import com.il76.playlistmaker.search.ui.SearchViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -138,15 +143,23 @@ fun MediaScreen(navController: NavController) {
 @Composable
 fun FavoriteTracksScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
-        //TODO
-        Text("Избранные треки", modifier = Modifier.align(Alignment.Center))
+        ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_tracks)
     }
 }
 
 @Composable
 fun PlaylistsScreen() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        //TODO
-        Text("Плейлисты", modifier = Modifier.align(Alignment.Center))
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(
+            onClick = {},
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onBackground
+            ),
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text(stringResource(R.string.new_playlist))
+        }
+        ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_playlists)
     }
 }

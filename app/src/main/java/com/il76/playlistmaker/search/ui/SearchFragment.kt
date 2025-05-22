@@ -480,7 +480,7 @@ fun SearchTextField(
 
 @Composable
 fun ErrorImageText(imageResourceId: Int, stringResourceId: Int) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Image(
             painter = painterResource(id = imageResourceId),
             contentDescription = null,
