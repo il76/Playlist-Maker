@@ -47,6 +47,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.il76.playlistmaker.R
+import com.il76.playlistmaker.media.ui.MediaScreen
 import com.il76.playlistmaker.playlist.ui.PlayerScreen
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchScreen
@@ -132,13 +133,6 @@ fun AppNavigation() {
                         if (!screenConfig.showBottomBar) {
                             IconButton(onClick = { navController.popBackStack() }) {
                                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
-
-//                                Icon(
-//                                    painter = painterResource(R.drawable.icon_back),
-//                                    tint = MaterialTheme.colorScheme.inverseOnSurface,
-//                                    contentDescription = "Назад",
-//                                )
-
                             }
                         }
                     }
@@ -157,7 +151,7 @@ fun AppNavigation() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Search.route) { SearchScreen(navController) }
-            composable(Screen.Media.route) { MediaScreen() }
+            composable(Screen.Media.route) { MediaScreen(navController) }
             composable(Screen.Settings.route) { SettingsScreen() }
             composable(
                 route = Screen.Player.route,
@@ -222,9 +216,6 @@ private fun currentRoute(navController: NavController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     return navBackStackEntry?.destination?.route
 }
-
-@Composable
-fun MediaScreen() { /* ... */ }
 
 @Composable
 fun LegacyFragmentContainer(fragmentClass: Class<out Fragment>) {
