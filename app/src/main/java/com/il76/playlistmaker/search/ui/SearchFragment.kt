@@ -88,6 +88,8 @@ import com.il76.playlistmaker.databinding.FragmentSearchBinding
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.settings.ui.SettingsViewModel
+import com.il76.playlistmaker.ui.shared.ErrorImageText
+import com.il76.playlistmaker.ui.shared.TrackList
 import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.Dispatchers
@@ -335,22 +337,6 @@ fun SearchScreen(navController: NavController) {
                 viewModel.searchDebounce(it)
             }
         )
-//        TextField(
-//            value = currentQuery.value,
-//            onValueChange = {
-//                currentQuery.value = it
-//                viewModel.searchDebounce(it)
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp)
-//                .background(Color.White)
-//                .onFocusChanged { focusState ->
-//                    viewModel.toggleHistory(focusState.isFocused && currentQuery.value.isEmpty())
-//                },
-//            placeholder = { Text("Поиск") }
-//        )
-
         when (val state = uiState) {
             null -> {}
             else -> {
@@ -366,16 +352,33 @@ fun SearchScreen(navController: NavController) {
                     }
                     SearchState.ErrorStatus.ERROR_NET -> {
                         ErrorImageText(R.drawable.search_network_error, R.string.search_network_error)
+                        Button(
+                            onClick = {viewModel.doSearch(currentQuery.value)},
+                            modifier = Modifier
+                                .padding(16.dp).align(Alignment.CenterHorizontally)
+                        ) {
+                            Text(stringResource(R.string.search_refresh))
+                        }
                     }
                     SearchState.ErrorStatus.EMPTY_RESULT -> {
                         ErrorImageText(R.drawable.search_nothing_found, R.string.search_nothing_found)
                     }
                     SearchState.ErrorStatus.HISTORY -> {
-                        TrackScreen(
-                            tracks = state.trackList ?: emptyList(),
-                            onTrackClick = { viewModel.onTrackClicked(it) },
-                            onClearHistoryClick = { viewModel.clearHistory() }
-                        )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            TrackScreen(
+                                tracks = state.trackList ?: emptyList(),
+                                onTrackClick = { viewModel.onTrackClicked(it) },
+                                //onClearHistoryClick = { viewModel.clearHistory() }
+                            )
+                            Button(
+                                onClick = { viewModel.clearHistory() },
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(16.dp)
+                            ) {
+                                Text(stringResource(R.string.search_history_clear))
+                            }
+                        }
                     }
                     SearchState.ErrorStatus.EMPTY_HISTORY -> {
                         //Text("История пуста", modifier = Modifier.padding(16.dp))
@@ -443,7 +446,6 @@ fun SearchTextField(
                 maxLines = 1,
                 textStyle = LocalTextStyle.current.copy(
                     fontFamily = FontFamily(Font(R.font.ys_display_regular)),
-                    //fontSize = dimensionResource(id = R.dimen.settings_btn_text),
                     color = colorResource(id = R.color.main_icon_fill)
                 ),
                 cursorBrush = SolidColor(colorResource(id = R.color.search_edit_main)),
@@ -479,131 +481,14 @@ fun SearchTextField(
 
 
 @Composable
-fun ErrorImageText(imageResourceId: Int, stringResourceId: Int) {
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(
-            painter = painterResource(id = imageResourceId),
-            contentDescription = null,
-            modifier = Modifier.padding(vertical = 16.dp).align(Alignment.CenterHorizontally)
-        )
-        Text(stringResource(stringResourceId), modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center)
-    }
-}
-
-@Composable
 fun TrackScreen(
     tracks: List<Track>,
-    onTrackClick: (Track) -> Unit,
-    onClearHistoryClick: (() -> Unit)? = null // Необязательный параметр
+    onTrackClick: (Track) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
         TrackList(
             tracks = tracks,
             onItemClick = onTrackClick,
             modifier = Modifier.fillMaxSize()
         )
-
-        if (onClearHistoryClick != null) {
-            Button(
-                onClick = onClearHistoryClick,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
-            ) {
-                Text("Очистить историю")
-            }
-        }
-    }
 }
 
-@Composable
-fun TrackList(
-    tracks: List<Track>,
-    onItemClick: (Track) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(tracks) { track ->
-            TrackItem(
-                track = track,
-                onClick = {
-                    onItemClick(track)
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun TrackItem(
-    track: Track,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable(onClick = onClick)
-            //.padding(horizontal = 16.dp, vertical = 8.dp),
-            .padding(horizontal = dimensionResource(id = R.dimen.btn_margin), vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        // Обложка
-        Image(
-            painter = rememberAsyncImagePainter(track.poster),
-            contentDescription = null,
-            modifier = Modifier
-                .size(56.dp)
-                .clip(MaterialTheme.shapes.medium),
-            contentScale = ContentScale.Crop
-        )
-
-        // Основная информация о треке
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp)
-        ) {
-            Text(
-                text = track.trackName,
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = track.artistName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Image(
-                    painter = painterResource(id = R.drawable.circle),
-                    contentDescription = null,
-                    modifier = Modifier.size(4.dp)
-                )
-
-                Text(
-                    text = track.trackTime,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-        }
-
-        // Иконка стрелки
-        Image(
-            painter = painterResource(id = R.drawable.icon_arrow_right),
-            contentDescription = null,
-            modifier = Modifier.size(dimensionResource(id = R.dimen.settings_icon_height)),
-            colorFilter = ColorFilter.tint(LocalContentColor.current)
-        )
-    }
-}

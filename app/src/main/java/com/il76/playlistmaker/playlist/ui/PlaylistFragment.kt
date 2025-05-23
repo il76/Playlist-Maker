@@ -26,6 +26,7 @@ import com.il76.playlistmaker.media.ui.PlaylistAddFragment
 import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.TrackAdapter
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -250,7 +251,6 @@ class PlaylistFragment: Fragment() {
     companion object {
 
         private const val ARGS_PLAYLISTID = "playlistid"
-        const val CLICK_DEBOUNCE_DELAY = 1000L
 
         fun createArgs(trackData: String): Bundle =
             bundleOf(ARGS_PLAYLISTID to trackData)

@@ -15,6 +15,7 @@ import com.il76.playlistmaker.databinding.MediaPlaylistsBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -77,7 +78,6 @@ class PlaylistsFragment: Fragment() {
 
     companion object {
         private const val NUMBER = "tracks"
-        private const val CLICK_DEBOUNCE_DELAY = 300L
         fun newInstance(number: Int) = PlaylistsFragment().apply {
             arguments = Bundle().apply {
                 putInt(NUMBER, number)

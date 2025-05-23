@@ -35,6 +35,7 @@ import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.services.PlayerService
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
@@ -370,8 +371,6 @@ class PlayerFragment: Fragment() {
     companion object {
 
         private const val ARGS_TRACKDATA = "track"
-
-        private const val CLICK_DEBOUNCE_DELAY = 300L
 
         fun createArgs(trackData: String): Bundle =
             bundleOf(ARGS_TRACKDATA to trackData)

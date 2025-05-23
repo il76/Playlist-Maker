@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 
 class SearchViewModel(
     val trackInteractor: TracksInteractor,
@@ -134,7 +135,5 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
-
-        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

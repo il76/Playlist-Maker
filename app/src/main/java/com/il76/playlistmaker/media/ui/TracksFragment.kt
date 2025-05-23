@@ -3,10 +3,13 @@ package com.il76.playlistmaker.media.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.bundle.Bundle
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.il76.playlistmaker.R
@@ -14,7 +17,11 @@ import com.il76.playlistmaker.databinding.MediaTracksBinding
 import com.il76.playlistmaker.media.ui.MediaFragment.Companion.createArgs
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.TrackAdapter
+import com.il76.playlistmaker.search.ui.TrackScreen
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.debounce
+import kotlinx.coroutines.flow.onEach
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -75,7 +82,23 @@ class TracksFragment: Fragment() {
                 putInt(NUMBER, number)
             }
         }
-        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
+}
+
+@Composable
+fun TracksScreen(navController: NavController) {
+    val viewModel: TracksViewModel = koinViewModel()
+
+    LaunchedEffect(Unit) {
+        viewModel.trackClicks
+            .collect { track ->
+                navController.navigate("player/${viewModel.provideTrackData(track)}")
+            }
+    }
+
+//    TrackScreen(
+//        tracks = state.trackList ?: emptyList(),
+//        onTrackClick = { viewModel.onTrackClicked(it) }
+//    )
 }
