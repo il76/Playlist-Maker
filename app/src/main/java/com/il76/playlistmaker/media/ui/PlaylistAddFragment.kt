@@ -414,10 +414,15 @@ fun PlaylistAddScreen(
                 .fillMaxWidth()
         )
 
-        // Create Button
         Button(
-            //onClick = { onCreatePlaylist(playlistName, playlistDescription) },
-            onClick = {  },
+            onClick = {
+                val playlist = Playlist(
+                    name = playlistName,
+                    description = playlistDescription,
+                    cover = imageUri.toString()
+                )
+                viewModel.savePlaylist(playlist)
+            },
             modifier = Modifier
                 .padding(horizontal = 17.dp, vertical = 32.dp)
                 .fillMaxWidth(),
