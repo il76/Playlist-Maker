@@ -18,11 +18,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -376,4 +378,9 @@ class PlayerFragment: Fragment() {
             bundleOf(ARGS_TRACKDATA to trackData)
     }
 
+}
+
+@Composable
+fun PlayerScreen(navController: NavController, track: Track) {
+    Log.d("pls", "trackData: " + track.toString())
 }

@@ -257,8 +257,3 @@ class PlaylistFragment: Fragment() {
     }
 
 }
-
-@Composable
-fun PlayerScreen(navController: NavController, track: Track) {
-    Log.d("pls", "trackData: " + track.toString())
-}

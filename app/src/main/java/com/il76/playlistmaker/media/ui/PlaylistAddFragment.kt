@@ -9,13 +9,62 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -24,6 +73,7 @@ import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistaddBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
@@ -239,4 +289,149 @@ class PlaylistAddFragment: Fragment() {
 
     }
 
+}
+
+@Composable
+fun PlaylistAddScreen(
+    navController: NavController,
+    playlistId: Int = 0
+) {
+    val context = LocalContext.current
+    val viewModel: PlaylistAddViewModel = koinViewModel {
+        parametersOf(playlistId)
+    }
+    var playlistName by remember { mutableStateOf("") }
+    var playlistDescription by remember { mutableStateOf("") }
+
+    val scrollState = rememberScrollState()
+
+    val imageUri by viewModel.imageUri.collectAsState()
+    val isImageSelected = imageUri != null
+
+    val pickMediaLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                viewModel.setImageUri(uri)
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
+    )
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(scrollState)
+    ) {
+
+//        // Toolbar
+//        TopAppBar(
+//            title = {
+//                Text(
+//                    text = stringResource(id = R.string.new_playlist),
+//                    style = MaterialTheme.typography.titleLarge
+//                )
+//            },
+//            navigationIcon = {
+//                IconButton(onClick = { /* Handle back */ }) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.icon_back),
+//                        contentDescription = "Back"
+//                    )
+//                }
+//            }
+//        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .aspectRatio(1f)
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(8.dp),
+                )
+                .clip(MaterialTheme.shapes.medium),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .clickable {
+                        pickMediaLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                if (isImageSelected) {
+                    // Отображаем выбранное изображение — растянуто по ширине
+                    Image(
+                        painter = rememberAsyncImagePainter(imageUri),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 100.dp), // минимум как заглушка
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    // Отображаем заглушку — фиксированный размер 100.dp
+                    Image(
+                        painter = painterResource(id = R.drawable.icon_playlist_create),
+                        contentDescription = null,
+                        modifier = Modifier.size(100.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+//            Image(
+//                painter = painterResource(id = R.drawable.icon_playlist_create),
+//                contentDescription = null,
+//                modifier = Modifier.size(100.dp).clickable {
+//                    pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+//                },
+//                contentScale = ContentScale.Crop,
+//            )
+            }
+        }
+
+        OutlinedTextField(
+            value = playlistName,
+            onValueChange = { playlistName = it },
+            label = { Text(stringResource(R.string.new_playlist_title)) },
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = playlistDescription,
+            onValueChange = { playlistDescription = it },
+            label = { Text(stringResource(R.string.new_playlist_description)) },
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth()
+        )
+
+        // Create Button
+        Button(
+            //onClick = { onCreatePlaylist(playlistName, playlistDescription) },
+            onClick = {  },
+            modifier = Modifier
+                .padding(horizontal = 17.dp, vertical = 32.dp)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Text(text = stringResource(R.string.new_playlist_create))
+        }
+    }
+}
+
+@Composable
+@Preview
+fun PlaylistAddScreenPreview() {
+    PlaylistAddScreen(rememberNavController())
 }

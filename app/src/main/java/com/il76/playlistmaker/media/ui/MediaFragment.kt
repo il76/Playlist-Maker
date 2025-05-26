@@ -126,24 +126,26 @@ fun MediaScreen(navController: NavController) {
             }
         }
         when (currentTab) {
-            0 -> FavoriteTracksScreen()
-            1 -> PlaylistsScreen()
+            0 -> FavoriteTracksScreen(navController)
+            1 -> PlaylistsScreen(navController)
         }
     }
 }
 
 @Composable
-fun FavoriteTracksScreen() {
+fun FavoriteTracksScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_tracks)
     }
 }
 
 @Composable
-fun PlaylistsScreen() {
+fun PlaylistsScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Button(
-            onClick = {},
+            onClick = {
+                navController.navigate("playlistinfo")
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.onBackground
             ),

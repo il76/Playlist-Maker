@@ -48,7 +48,8 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.media.ui.MediaScreen
-import com.il76.playlistmaker.playlist.ui.PlayerScreen
+import com.il76.playlistmaker.media.ui.PlaylistAddScreen
+import com.il76.playlistmaker.player.ui.PlayerScreen
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.SearchScreen
 import com.il76.playlistmaker.settings.ui.SettingsScreen
@@ -95,6 +96,7 @@ sealed class Screen(val route: String, val titleResId: Int) {
     object Search : Screen("search", R.string.button_search)
     object Media : Screen("media", R.string.button_media)
     object Settings : Screen("settings", R.string.button_settings)
+    object PlaylistInfo : Screen("playlistinfo", R.string.new_playlist)
 
     // Экраны без нижней навигации
     object Player : Screen("player/{trackJson}", R.string.button_media)
@@ -119,6 +121,7 @@ fun AppNavigation() {
         Screen.Search.route -> ScreenUIConfig(title = "Поиск")
         Screen.Media.route -> ScreenUIConfig(title = "Медиа")
         Screen.Settings.route -> ScreenUIConfig(title = "Настройки")
+        Screen.PlaylistInfo.route -> ScreenUIConfig(title = stringResource(R.string.new_playlist))
         Screen.Player.route -> ScreenUIConfig(title = "Плеер", showBottomBar = false)
         else -> ScreenUIConfig()
     }
@@ -160,12 +163,23 @@ fun AppNavigation() {
                     defaultValue = ""
                 })
             ) { backStackEntry ->
-                Log.d("pls", "route_player")
+                //Log.d("pls", "route_player")
                 val trackJson = backStackEntry.arguments?.getString("trackJson") ?: ""
                 val track = remember(trackJson) {
                     Gson().fromJson(trackJson, Track::class.java)
                 }
                 PlayerScreen(navController, track = track)
+            }
+            composable(
+                route = Screen.PlaylistInfo.route,
+                arguments = listOf(navArgument("playlistId") {
+                    type = NavType.IntType
+                    defaultValue = 0
+                })
+            ) { backStackEntry ->
+                Log.d("pls", "route_playlistinfo")
+                val playlistId = backStackEntry.arguments?.getInt("playlistId") ?: 0
+                PlaylistAddScreen(navController, playlistId = playlistId)
             }
         }
     }
