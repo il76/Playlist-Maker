@@ -1,5 +1,6 @@
 package com.il76.playlistmaker.media.ui
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -11,6 +12,10 @@ import com.il76.playlistmaker.media.domain.models.Playlist
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.util.UUID
 
 class PlaylistAddViewModel(
     private val playlistInteractor: PlaylistInteractor,
@@ -24,9 +29,16 @@ class PlaylistAddViewModel(
     private val _imageUri = MutableStateFlow<Uri?>(null)
     val imageUri: StateFlow<Uri?> = _imageUri
 
-    fun setImageUri(uri: Uri?) {
-        _imageUri.value = uri
+    fun setImageUri(uri: Uri?, context: Context) {
+        viewModelScope.launch {
+            _imageUri.value = uri
+            _coverPath.value = uri?.let { saveFileToPrivateStorage(it, context) } ?: ""
+        }
     }
+
+    private val _coverPath = MutableStateFlow("")
+    val coverPath: StateFlow<String> = _coverPath
+
 
 
     init {
@@ -52,5 +64,27 @@ class PlaylistAddViewModel(
             }
             successLiveData.postValue(true)
         }
+    }
+
+    fun saveFileToPrivateStorage(uri: Uri, context: Context): String {
+        val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+
+        val file = File(context.filesDir, UUID.randomUUID().toString().take(16)) //генерим случайное имя файла
+
+        try {
+            val outputStream = FileOutputStream(file)
+            inputStream?.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
+                }
+            }
+            return file.absolutePath
+            //Log.d("MyFragment", "File saved to: ${file.absolutePath}")
+        } catch (e: Exception) {
+            //Log.e("MyFragment", "Error saving file", e)
+        } finally {
+            inputStream?.close()
+        }
+        return ""
     }
 }

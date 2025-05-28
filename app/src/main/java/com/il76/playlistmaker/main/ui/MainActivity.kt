@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -153,9 +154,9 @@ fun AppNavigation() {
             startDestination = Screen.Search.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Search.route) { SearchScreen(navController) }
-            composable(Screen.Media.route) { MediaScreen(navController) }
-            composable(Screen.Settings.route) { SettingsScreen() }
+            composable(Screen.Search.route) { Surface {SearchScreen(navController) }}
+            composable(Screen.Media.route) { Surface {MediaScreen(navController)} }
+            composable(Screen.Settings.route) { Surface {SettingsScreen() }}
             composable(
                 route = Screen.Player.route,
                 arguments = listOf(navArgument("trackJson") {
@@ -168,7 +169,9 @@ fun AppNavigation() {
                 val track = remember(trackJson) {
                     Gson().fromJson(trackJson, Track::class.java)
                 }
-                PlayerScreen(navController, track = track)
+                Surface {
+                    PlayerScreen(navController, track = track)
+                }
             }
             composable(
                 route = Screen.PlaylistInfo.route,
@@ -179,7 +182,9 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 Log.d("pls", "route_playlistinfo")
                 val playlistId = backStackEntry.arguments?.getInt("playlistId") ?: 0
-                PlaylistAddScreen(navController, playlistId = playlistId)
+                Surface {
+                    PlaylistAddScreen(navController, playlistId = playlistId)
+                }
             }
         }
     }

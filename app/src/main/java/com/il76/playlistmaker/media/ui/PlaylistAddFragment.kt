@@ -31,7 +31,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -200,9 +202,9 @@ class PlaylistAddFragment: Fragment() {
         })
         binding.createPlaylist.setEnabled(!binding.textInputEditTextName.text.isNullOrEmpty())
 
-        binding.createPlaylist.setOnClickListener {
-            savePlaylist()
-        }
+//        binding.createPlaylist.setOnClickListener {
+//            savePlaylist()
+//        }
 
     }
 
@@ -262,25 +264,25 @@ class PlaylistAddFragment: Fragment() {
         return ""
     }
 
-    private fun savePlaylist() {
-        var cover = ""
-        if (playlistId > 0 && imageUri != null) { //обновляем фото
-            cover = imageUri.toString()
-        } else if (playlistId > 0 && imageUri == null) { //НЕ обновляем фото
-            cover = playlistAddViewModel.playlist.cover
-        } else { //новый плейлист
-            imageUri?.let { cover = saveFileToPrivateStorage(it) }
-        }
-
-        playlistAddViewModel.savePlaylist(Playlist(
-            id = playlistId,
-            name = binding.textInputEditTextName.text.toString(),
-            description = binding.textInputEditTextDescr.text.toString(),
-            cover = cover,
-            cnt = 0
-        ))
-        findNavController().navigateUp()
-    }
+//    private fun savePlaylist() {
+//        var cover = ""
+//        if (playlistId > 0 && imageUri != null) { //обновляем фото
+//            cover = imageUri.toString()
+//        } else if (playlistId > 0 && imageUri == null) { //НЕ обновляем фото
+//            cover = playlistAddViewModel.playlist.cover
+//        } else { //новый плейлист
+//            imageUri?.let { cover = saveFileToPrivateStorage(it) }
+//        }
+//
+//        playlistAddViewModel.savePlaylist(Playlist(
+//            id = playlistId,
+//            name = binding.textInputEditTextName.text.toString(),
+//            description = binding.textInputEditTextDescr.text.toString(),
+//            cover = cover,
+//            cnt = 0
+//        ))
+//        findNavController().navigateUp()
+//    }
 
     companion object {
         private const val PLAYLIST_ID = "playlist"
@@ -296,6 +298,8 @@ fun PlaylistAddScreen(
     navController: NavController,
     playlistId: Int = 0
 ) {
+
+
     val context = LocalContext.current
     val viewModel: PlaylistAddViewModel = koinViewModel {
         parametersOf(playlistId)
@@ -306,13 +310,19 @@ fun PlaylistAddScreen(
     val scrollState = rememberScrollState()
 
     val imageUri by viewModel.imageUri.collectAsState()
+    val coverPath by viewModel.coverPath.collectAsState()
     val isImageSelected = imageUri != null
+
+    val isFormValid = playlistName.isNotBlank()
+    val inactiveColor = MaterialTheme.colorScheme.surfaceTint
+    val activeColor = MaterialTheme.colorScheme.primary
+
 
     val pickMediaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             if (uri != null) {
-                viewModel.setImageUri(uri)
+                viewModel.setImageUri(uri, context)
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -402,7 +412,16 @@ fun PlaylistAddScreen(
             label = { Text(stringResource(R.string.new_playlist_title)) },
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
+                unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor
+            ),
+//            colors = TextFieldDefaults.outlinedTextFieldColors(
+//                focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
+//                unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
+//                containerColor = Color.Transparent // очень важно!
+//            )
         )
 
         OutlinedTextField(
@@ -411,7 +430,19 @@ fun PlaylistAddScreen(
             label = { Text(stringResource(R.string.new_playlist_description)) },
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+//            colors = TextFieldDefaults.outlinedTextFieldColors(
+//                focusedBorderColor = if (isDescriptionFilled) activeBorder else inactiveBorder,
+//                unfocusedBorderColor = if (isDescriptionFilled) activeBorder else inactiveBorder,
+//                cursorColor = if (isDescriptionFilled) activeBorder else inactiveBorder,
+//                containerColor = Color.Transparent
+//            )
+            colors = OutlinedTextFieldDefaults.colors(
+//                focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
+//                unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor
+                focusedBorderColor = activeColor,
+                unfocusedBorderColor = activeColor,
+            )
         )
 
         Button(
@@ -419,7 +450,7 @@ fun PlaylistAddScreen(
                 val playlist = Playlist(
                     name = playlistName,
                     description = playlistDescription,
-                    cover = imageUri.toString()
+                    cover = coverPath
                 )
                 viewModel.savePlaylist(playlist)
             },
@@ -427,8 +458,10 @@ fun PlaylistAddScreen(
                 .padding(horizontal = 17.dp, vertical = 32.dp)
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+                containerColor = if (isFormValid) activeColor else inactiveColor
+            ),
+            enabled = isFormValid,
+            shape = RoundedCornerShape(8.dp)
         ) {
             Text(text = stringResource(R.string.new_playlist_create))
         }
