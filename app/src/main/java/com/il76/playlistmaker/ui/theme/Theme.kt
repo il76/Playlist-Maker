@@ -36,7 +36,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = Color(0xFFAEAFB4),  // Серый (playlistCreateIconFill)
 
     // Additional colors
-    outline = Color(0xFFE6E8EB),  // Светло-серый (bottomNavigationBorder)
+    outline = Color(0xFFFFFFFF),  // Светло-серый (bottomNavigationBorder)
     inverseSurface = Color(0xFFFFFFFF),  // Белый (playerIconPlay)
     inverseOnSurface = Color(0xFF000000),  // Черный (playerIconPlayInner)
 

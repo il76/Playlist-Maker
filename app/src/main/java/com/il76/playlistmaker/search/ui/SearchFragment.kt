@@ -369,7 +369,7 @@ fun SearchTextField(
             .height(IntrinsicSize.Min)
             .padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp)
             .background(
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(8.dp)
             )
             .clip(RoundedCornerShape(8.dp))
