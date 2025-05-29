@@ -58,6 +58,9 @@ class SearchViewModel(
     }
 
     fun searchDebounce(changedText: String) {
+        if (changedText.isNullOrEmpty()) {
+            toggleHistory(true)
+        }
         if (latestSearchText == changedText) return
         latestSearchText = changedText
         searchJob?.cancel()

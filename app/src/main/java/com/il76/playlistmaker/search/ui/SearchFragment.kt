@@ -31,7 +31,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -393,7 +395,12 @@ fun SearchTextField(
                 modifier = Modifier
                     .weight(1f)
                     .height(36.dp)
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .onFocusChanged {
+                        if (it.isFocused && searchText.isEmpty()) {
+                            viewModel.toggleHistory(true)
+                        }
+                    },
                 singleLine = true,
                 maxLines = 1,
                 textStyle = LocalTextStyle.current.copy(
@@ -401,6 +408,7 @@ fun SearchTextField(
                     color = colorResource(id = R.color.main_icon_fill)
                 ),
                 cursorBrush = SolidColor(colorResource(id = R.color.search_edit_main)),
+
                 decorationBox = { innerTextField ->
                     if (searchText.isEmpty()) {
                         Text(
@@ -441,7 +449,7 @@ fun TrackScreen(
     onTrackClick: (Track) -> Unit
 ) {
         TrackList(
-            tracks = tracks,
+            tracks = tracks.reversed(),
             onItemClick = onTrackClick,
             modifier = Modifier.fillMaxSize()
         )
