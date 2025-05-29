@@ -8,21 +8,23 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,17 +33,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentSettingsBinding
 import com.il76.playlistmaker.sharing.data.EmailData
-import com.il76.playlistmaker.ui.theme.PlaylistMakerTheme
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-//import com.il76.playlistmaker.ui.theme.LocalColors
 import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment: Fragment() {
     private lateinit var binding: FragmentSettingsBinding
@@ -185,20 +184,39 @@ private fun SwitchItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .clickable { onCheckedChange(!checked) },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.labelMedium
         )
+
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier.size(width = 40.dp, height = 24.dp),
+            thumbContent = {
+                val thumbColor = if (checked) Color(0xFF3772E7) else Color(0xFFAEAFB4)
+                CircleIcon(color = thumbColor, size = 16.dp)
+            },
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = Color(0xFF3772E7).copy(alpha = 0.3f),
+                uncheckedTrackColor = Color(0xFFE6E8EB),
+                checkedThumbColor = Color.Transparent,
+                uncheckedThumbColor = Color.Transparent
+            )
         )
     }
+}
+@Composable
+private fun CircleIcon(color: Color, size: Dp) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .background(color = color, shape = CircleShape)
+    )
 }
 
 // Компонент кнопки настроек
@@ -219,7 +237,8 @@ private fun SettingsButton(
         Text(
             text = text,
             color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.labelMedium
         )
         Icon(
             painter = icon,
@@ -228,8 +247,8 @@ private fun SettingsButton(
     }
 }
 
-//@Composable
-//@Preview
-//fun SettingsScreenPreview() {
-//    SettingsScreen()
-//}
+@Composable
+@Preview
+fun SettingsScreenPreview() {
+    SettingsScreen()
+}
