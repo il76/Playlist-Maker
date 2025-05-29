@@ -35,6 +35,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +75,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.databinding.FragmentPlaylistaddBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
+import com.il76.playlistmaker.playlist.ui.PlaylistViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -330,6 +332,17 @@ fun PlaylistAddScreen(
     )
 
 
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is PlaylistAddViewModel.UiEvent.NavigateBack -> {
+                    navController.popBackStack()
+                }
+            }
+        }
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -395,14 +408,6 @@ fun PlaylistAddScreen(
                         contentScale = ContentScale.Crop
                     )
                 }
-//            Image(
-//                painter = painterResource(id = R.drawable.icon_playlist_create),
-//                contentDescription = null,
-//                modifier = Modifier.size(100.dp).clickable {
-//                    pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-//                },
-//                contentScale = ContentScale.Crop,
-//            )
             }
         }
 
@@ -417,11 +422,6 @@ fun PlaylistAddScreen(
                 focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
                 unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor
             ),
-//            colors = TextFieldDefaults.outlinedTextFieldColors(
-//                focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
-//                unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
-//                containerColor = Color.Transparent // очень важно!
-//            )
         )
 
         OutlinedTextField(
@@ -431,17 +431,9 @@ fun PlaylistAddScreen(
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxWidth(),
-//            colors = TextFieldDefaults.outlinedTextFieldColors(
-//                focusedBorderColor = if (isDescriptionFilled) activeBorder else inactiveBorder,
-//                unfocusedBorderColor = if (isDescriptionFilled) activeBorder else inactiveBorder,
-//                cursorColor = if (isDescriptionFilled) activeBorder else inactiveBorder,
-//                containerColor = Color.Transparent
-//            )
             colors = OutlinedTextFieldDefaults.colors(
-//                focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
-//                unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor
-                focusedBorderColor = activeColor,
-                unfocusedBorderColor = activeColor,
+                focusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor,
+                unfocusedBorderColor = if (playlistName.isNotBlank()) activeColor else inactiveColor
             )
         )
 

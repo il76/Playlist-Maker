@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.il76.playlistmaker.media.domain.api.PlaylistInteractor
 import com.il76.playlistmaker.media.domain.models.Playlist
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -55,14 +57,23 @@ class PlaylistAddViewModel(
     private val successLiveData = MutableLiveData<Boolean>()
     fun observeSuccess(): LiveData<Boolean> = successLiveData
 
+
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent
+
+    sealed class UiEvent {
+        object NavigateBack : UiEvent()
+    }
+
     fun savePlaylist(playlist: Playlist) {
+        Log.i("pls", playlist.toString())
         viewModelScope.launch {
             if (playlist.id > 0) {
                 playlistInteractor.updatePlaylist(playlist)
             } else {
                 playlistInteractor.createPlaylist(playlist)
             }
-            successLiveData.postValue(true)
+            _uiEvent.emit(UiEvent.NavigateBack)
         }
     }
 

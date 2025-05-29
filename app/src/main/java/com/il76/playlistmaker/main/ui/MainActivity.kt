@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -139,7 +141,13 @@ fun AppNavigation() {
                                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
                             }
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+//                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+//                        actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 )
             }
         },
@@ -199,7 +207,7 @@ fun BottomNavigationBar(navController: NavController) {
         Screen.Settings
     )
 
-    NavigationBar {
+    BottomAppBar (containerColor = MaterialTheme.colorScheme.background) {
         val currentRoute = currentRoute(navController)
         items.forEach { screen ->
             NavigationBarItem(
@@ -214,7 +222,12 @@ fun BottomNavigationBar(navController: NavController) {
                         contentDescription = stringResource(id = screen.titleResId!!)
                     )
                 },
-                label = { Text(stringResource(id = screen.titleResId)) },
+                label = {
+                    Text(
+                        text = stringResource(id = screen.titleResId),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
                 selected = currentRoute == screen.route,
                 onClick = {
                     navController.navigate(screen.route) {

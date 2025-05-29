@@ -89,7 +89,7 @@ fun MediaScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         TabRow(
             selectedTabIndex = currentTab,
-            modifier = Modifier.background(MaterialTheme.colorScheme.onSecondary),
+            //modifier = Modifier.background(MaterialTheme.colorScheme.onSecondary),
             indicator = { tabPositions ->
                 // Используем Box для кастомного индикатора
                 Box(
@@ -104,6 +104,8 @@ fun MediaScreen(navController: NavController) {
                 // Убираем дефолтный разделитель
                 HorizontalDivider(modifier = Modifier.height(0.dp))
             },
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground
         ) {
             val titles = listOf(
                 stringResource(R.string.media_tab_faforite_tracks),
@@ -129,31 +131,5 @@ fun MediaScreen(navController: NavController) {
             0 -> FavoriteTracksScreen(navController)
             1 -> PlaylistsScreen(navController)
         }
-    }
-}
-
-@Composable
-fun FavoriteTracksScreen(navController: NavController) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_tracks)
-    }
-}
-
-@Composable
-fun PlaylistsScreen(navController: NavController) {
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(
-            onClick = {
-                navController.navigate("playlistinfo")
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onBackground
-            ),
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(stringResource(R.string.new_playlist))
-        }
-        ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_playlists)
     }
 }

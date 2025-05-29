@@ -3,8 +3,11 @@ package com.il76.playlistmaker.media.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.core.bundle.Bundle
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -18,6 +21,7 @@ import com.il76.playlistmaker.media.ui.MediaFragment.Companion.createArgs
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.search.ui.TrackAdapter
 import com.il76.playlistmaker.search.ui.TrackScreen
+import com.il76.playlistmaker.ui.shared.ErrorImageText
 import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.flow.onEach
@@ -87,9 +91,11 @@ class TracksFragment: Fragment() {
 }
 
 @Composable
-fun TracksScreen(navController: NavController) {
+fun FavoriteTracksScreen(navController: NavController) {
     val viewModel: TracksViewModel = koinViewModel()
-
+    Box(modifier = Modifier.fillMaxSize()) {
+        ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_tracks)
+    }
     LaunchedEffect(Unit) {
         viewModel.trackClicks
             .collect { track ->
@@ -102,3 +108,4 @@ fun TracksScreen(navController: NavController) {
 //        onTrackClick = { viewModel.onTrackClicked(it) }
 //    )
 }
+

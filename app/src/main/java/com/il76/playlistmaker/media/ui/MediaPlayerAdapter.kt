@@ -13,7 +13,7 @@ class MediaPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle):
     override fun createFragment(position: Int): Fragment {
         return when(position) {
             0 -> TracksFragment.newInstance(position)
-            1 -> PlaylistsFragment.newInstance(position)
+            //1 -> PlaylistsFragment.newInstance(position)
             else -> {
                 TracksFragment.newInstance(position)
             }
