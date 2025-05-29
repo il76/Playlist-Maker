@@ -99,7 +99,7 @@ sealed class Screen(val route: String, val titleResId: Int) {
     object Search : Screen("search", R.string.button_search)
     object Media : Screen("media", R.string.button_media)
     object Settings : Screen("settings", R.string.button_settings)
-    object PlaylistInfo : Screen("playlistinfo", R.string.new_playlist)
+    object PlaylistAdd : Screen("playlistadd", R.string.new_playlist)
 
     // Экраны без нижней навигации
     object Player : Screen("player/{trackJson}", R.string.button_media)
@@ -124,7 +124,7 @@ fun AppNavigation() {
         Screen.Search.route -> ScreenUIConfig(title = "Поиск")
         Screen.Media.route -> ScreenUIConfig(title = "Медиа")
         Screen.Settings.route -> ScreenUIConfig(title = "Настройки")
-        Screen.PlaylistInfo.route -> ScreenUIConfig(title = stringResource(R.string.new_playlist))
+        Screen.PlaylistAdd.route -> ScreenUIConfig(title = stringResource(R.string.new_playlist))
         Screen.Player.route -> ScreenUIConfig(title = "Плеер", showBottomBar = false)
         else -> ScreenUIConfig()
     }
@@ -162,9 +162,13 @@ fun AppNavigation() {
             startDestination = Screen.Search.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            //поиск
             composable(Screen.Search.route) { Surface {SearchScreen(navController) }}
+            //медиатека
             composable(Screen.Media.route) { Surface {MediaScreen(navController)} }
+            //настройки
             composable(Screen.Settings.route) { Surface {SettingsScreen() }}
+            //плеер
             composable(
                 route = Screen.Player.route,
                 arguments = listOf(navArgument("trackJson") {
@@ -181,14 +185,15 @@ fun AppNavigation() {
                     PlayerScreen(navController, track = track)
                 }
             }
+            //создание плейлиста
             composable(
-                route = Screen.PlaylistInfo.route,
+                route = Screen.PlaylistAdd.route,
                 arguments = listOf(navArgument("playlistId") {
                     type = NavType.IntType
                     defaultValue = 0
                 })
             ) { backStackEntry ->
-                Log.d("pls", "route_playlistinfo")
+                //Log.d("pls", "route_playlistinfo")
                 val playlistId = backStackEntry.arguments?.getInt("playlistId") ?: 0
                 Surface {
                     PlaylistAddScreen(navController, playlistId = playlistId)

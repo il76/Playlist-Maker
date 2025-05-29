@@ -22,6 +22,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -259,7 +260,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SearchScreen(navController: NavController) {
     val viewModel: SearchViewModel = koinViewModel()
     val context = LocalContext.current
-    val uiState by viewModel.uiState.observeAsState()
+    val uiState by viewModel.state.collectAsState()
 
     var currentQuery by rememberSaveable { mutableStateOf("") }
 
@@ -289,7 +290,6 @@ fun SearchScreen(navController: NavController) {
             }
         )
         when (val state = uiState) {
-            null -> {}
             else -> {
                 when (state.status) {
                     SearchState.ErrorStatus.LOADING -> CircularProgressIndicator(
@@ -350,6 +350,7 @@ fun SearchTextField(
     onSearchTextChanged: (String) -> Unit
 ) {
     var searchText by rememberSaveable { mutableStateOf("") }
+    val viewModel: SearchViewModel = koinViewModel()
 
     Box(
         modifier = modifier
@@ -416,7 +417,10 @@ fun SearchTextField(
             // Clear Icon
             if (searchText.isNotEmpty()) {
                 IconButton(
-                    onClick = { searchText = "" },
+                    onClick = {
+                        searchText = ""
+                        viewModel.setSearchText("")
+                    },
                     modifier = Modifier.size(16.dp)
                 ) {
                     Image(

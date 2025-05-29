@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.bundle.Bundle
 import androidx.core.bundle.bundleOf
@@ -142,7 +144,7 @@ fun PlaylistsScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Button(
             onClick = {
-                navController.navigate("playlistinfo")
+                navController.navigate("playlistadd")
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.onBackground,
@@ -168,7 +170,7 @@ fun PlaylistsScreen(navController: NavController) {
                 ) {
                     items(data.size) { index ->
                         val playlist = data[index]
-                        PlaylistItem(playlist = playlist)
+                        PlaylistItem(playlist = playlist, navController)
                     }
                 }
             }
@@ -183,6 +185,7 @@ fun PlaylistsScreen(navController: NavController) {
 @Composable
 fun PlaylistItem(
     playlist: Playlist,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -195,6 +198,10 @@ fun PlaylistItem(
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 8.dp)
             .background(MaterialTheme.colorScheme.background)
+            .clickable(onClick = {
+                navController.navigate("playlist/${playlist.id}")
+            }),
+
     ) {
         Column {
             Box(
@@ -203,9 +210,7 @@ fun PlaylistItem(
                     .aspectRatio(1f)
                     .background(MaterialTheme.colorScheme.background)
             ) {
-                Log.i("pls", playlist.toString())
                 if (playlist.cover.isNotEmpty() && playlist.cover != "null") { //почему-то иногда прилетали
-                    Log.i("pls", "картинка")
                     val imageUrl = playlist.cover
                     Image(
                         painter = rememberAsyncImagePainter(model = imageUrl),
@@ -216,7 +221,6 @@ fun PlaylistItem(
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    Log.i("pls", "заглушка")
                     Image(
                         painter = painterResource(id = R.drawable.search_cover_placeholder),
                         contentDescription = null,
@@ -233,7 +237,7 @@ fun PlaylistItem(
                 text = playlist.name,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
-                //overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             )
 

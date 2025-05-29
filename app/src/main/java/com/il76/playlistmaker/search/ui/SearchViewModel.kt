@@ -1,6 +1,7 @@
 package com.il76.playlistmaker.search.ui
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,10 +14,11 @@ import com.il76.playlistmaker.utils.SingleLiveEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 
 class SearchViewModel(
     val trackInteractor: TracksInteractor,
@@ -24,11 +26,13 @@ class SearchViewModel(
     private val gson: Gson
 ) : ViewModel() {
 
-    private val stateLiveData = MutableLiveData<SearchState>()
     private val _showToast = SingleLiveEvent<String>()
 
     val showToast: LiveData<String> get() = _showToast
-    val uiState: LiveData<SearchState> get() = stateLiveData
+
+
+    private val _state = MutableStateFlow<SearchState>(SearchState())
+    val state: StateFlow<SearchState> = _state
 
     private var latestSearchText: String? = null
     private var searchJob: Job? = null
@@ -37,7 +41,7 @@ class SearchViewModel(
     val trackClicks = _trackClicks.asSharedFlow()
 
     init {
-        stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.NONE))
+        _state.value = SearchState(status = SearchState.ErrorStatus.NONE)
         viewModelScope.launch {
             _trackClicks
                 .debounce(CLICK_DEBOUNCE_DELAY)
@@ -65,29 +69,25 @@ class SearchViewModel(
 
     fun doSearch(text: String) {
         if (text.isEmpty()) return
-
-        stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.LOADING))
+        _state.value = SearchState(status = SearchState.ErrorStatus.NONE)
 
         viewModelScope.launch {
             trackInteractor.searchTracks(text).collect { foundTracks ->
                 when {
                     foundTracks == null -> {
-                        stateLiveData.postValue(
-                            SearchState(status = SearchState.ErrorStatus.ERROR_NET)
-                        )
+                        _state.value = SearchState(status = SearchState.ErrorStatus.ERROR_NET)
+
                     }
                     foundTracks.isNotEmpty() -> {
-                        stateLiveData.postValue(
+                        _state.value =
                             SearchState(
                                 status = SearchState.ErrorStatus.SUCCESS,
                                 trackList = foundTracks
                             )
-                        )
                     }
                     else -> {
-                        stateLiveData.postValue(
+                        _state.value =
                             SearchState(status = SearchState.ErrorStatus.EMPTY_RESULT)
-                        )
                     }
                 }
             }
@@ -96,29 +96,28 @@ class SearchViewModel(
 
     fun clearHistory() {
         tracksHistoryInteractor.clearHistory()
-        stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.EMPTY_HISTORY))
+        _state.value = SearchState(status = SearchState.ErrorStatus.EMPTY_HISTORY)
     }
 
     fun addToHistory(track: Track) {
+        Log.d("pls", track.toString())
         tracksHistoryInteractor.addTrack(track)
-        stateLiveData.postValue(
+        _state.value =
             SearchState(
                 status = SearchState.ErrorStatus.HISTORY,
                 trackList = tracksHistoryInteractor.getTracks()
             )
-        )
     }
 
     fun toggleHistory(show: Boolean) {
         if (tracksHistoryInteractor.getTracks().isEmpty() || !show) {
-            stateLiveData.postValue(SearchState(status = SearchState.ErrorStatus.EMPTY_HISTORY))
+            _state.value = SearchState(status = SearchState.ErrorStatus.EMPTY_HISTORY)
         } else {
-            stateLiveData.postValue(
+            _state.value =
                 SearchState(
                     status = SearchState.ErrorStatus.HISTORY,
                     trackList = tracksHistoryInteractor.getTracks()
                 )
-            )
         }
     }
 
@@ -135,5 +134,7 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_QUERY = "SEARCH_QUERY"
+
+        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
