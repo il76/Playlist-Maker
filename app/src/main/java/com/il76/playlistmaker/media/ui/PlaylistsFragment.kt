@@ -149,7 +149,6 @@ fun PlaylistsScreen(navController: NavController) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.onBackground,
                 contentColor = MaterialTheme.colorScheme.background,
-
             ),
             modifier = Modifier
                 .padding(16.dp)

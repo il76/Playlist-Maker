@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -300,7 +302,8 @@ fun SearchScreen(navController: NavController) {
                     SearchState.ErrorStatus.SUCCESS -> {
                         TrackScreen(
                             tracks = state.trackList ?: emptyList(),
-                            onTrackClick = { viewModel.onTrackClicked(it) }
+                            onTrackClick = { viewModel.onTrackClicked(it) },
+                            modifier = Modifier
                         )
                     }
                     SearchState.ErrorStatus.ERROR_NET -> {
@@ -317,16 +320,21 @@ fun SearchScreen(navController: NavController) {
                         ErrorImageText(R.drawable.search_nothing_found, R.string.search_nothing_found)
                     }
                     SearchState.ErrorStatus.HISTORY -> {
-                        Box(modifier = Modifier.fillMaxSize()) {
+                        Column(modifier = Modifier.fillMaxSize()) {
                             TrackScreen(
                                 tracks = state.trackList ?: emptyList(),
                                 onTrackClick = { viewModel.onTrackClicked(it) },
-                                //onClearHistoryClick = { viewModel.clearHistory() }
+                                modifier = Modifier.weight(1f) // Занимает всё доступное место
                             )
+
                             Button(
                                 onClick = { viewModel.clearHistory() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.onBackground,
+                                    contentColor = MaterialTheme.colorScheme.background,
+                                ),
                                 modifier = Modifier
-                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth()
                                     .padding(16.dp)
                             ) {
                                 Text(stringResource(R.string.search_history_clear))
@@ -446,12 +454,13 @@ fun SearchTextField(
 @Composable
 fun TrackScreen(
     tracks: List<Track>,
-    onTrackClick: (Track) -> Unit
+    onTrackClick: (Track) -> Unit,
+    modifier: Modifier
 ) {
         TrackList(
             tracks = tracks.reversed(),
             onItemClick = onTrackClick,
-            modifier = Modifier.fillMaxSize()
+            modifier = modifier
         )
 }
 
