@@ -46,6 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.search.domain.models.Track
@@ -285,7 +286,7 @@ fun SearchScreen(navController: NavController) {
             }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         SearchTextField(
             modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp),
             onSearchTextChanged = {
@@ -320,7 +321,7 @@ fun SearchScreen(navController: NavController) {
                         ErrorImageText(R.drawable.search_nothing_found, R.string.search_nothing_found)
                     }
                     SearchState.ErrorStatus.HISTORY -> {
-                        Column(modifier = Modifier.fillMaxSize()) {
+                        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                             TrackScreen(
                                 tracks = state.trackList ?: emptyList(),
                                 onTrackClick = { viewModel.onTrackClicked(it) },
@@ -333,9 +334,9 @@ fun SearchScreen(navController: NavController) {
                                     containerColor = MaterialTheme.colorScheme.onBackground,
                                     contentColor = MaterialTheme.colorScheme.background,
                                 ),
+                                shape = RoundedCornerShape(54.dp),
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
+                                    .padding(24.dp)
                             ) {
                                 Text(stringResource(R.string.search_history_clear))
                             }
@@ -362,13 +363,13 @@ fun SearchTextField(
     var searchText by rememberSaveable { mutableStateOf("") }
     val viewModel: SearchViewModel = koinViewModel()
 
-    Box(
+    Box (
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp)
             .background(
-                color = colorResource(id = R.color.search_edit_bg),
+                color = MaterialTheme.colorScheme.secondary,
                 shape = RoundedCornerShape(8.dp)
             )
             .clip(RoundedCornerShape(8.dp))
@@ -413,16 +414,18 @@ fun SearchTextField(
                 maxLines = 1,
                 textStyle = LocalTextStyle.current.copy(
                     fontFamily = FontFamily(Font(R.font.ys_display_regular)),
-                    color = colorResource(id = R.color.main_icon_fill)
+                    color = colorResource(id = R.color.main_icon_fill),
+                    lineHeight = 36.sp
                 ),
-                cursorBrush = SolidColor(colorResource(id = R.color.search_edit_main)),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
 
                 decorationBox = { innerTextField ->
                     if (searchText.isEmpty()) {
                         Text(
                             text = hint,
                             style = LocalTextStyle.current.copy(
-                                color = colorResource(id = R.color.search_edit_main)
+                                color = colorResource(id = R.color.search_edit_main),
+                                lineHeight = 24.sp
                             )
                         )
                     }

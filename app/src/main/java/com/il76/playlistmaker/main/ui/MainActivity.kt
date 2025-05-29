@@ -1,8 +1,7 @@
 package com.il76.playlistmaker.main.ui
 
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
+import android.graphics.Color
 import android.view.View
 import android.widget.FrameLayout
 import androidx.activity.SystemBarStyle
@@ -14,14 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -69,29 +67,6 @@ class MainActivity : AppCompatActivity() {
                 AppNavigation()
             }
         }
-
-
-
-
-//        ViewCompat.setOnApplyWindowInsetsListener(binding.mainActivity) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-//            // Android 15 fix
-//            WindowInsetsCompat.CONSUMED
-//        }
-//
-//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.mainFragmentContainerView) as NavHostFragment
-//        val navController = navHostFragment.navController
-//        navController.addOnDestinationChangedListener { _, nd: NavDestination, _ ->
-//            if (nd.label == "fragment_player" || nd.label == "fragment_playlistadd" || nd.label == "fragment_playlist") { //прячем нижнее меню на некоторых экранах
-//                binding.bottomNavigationView.isVisible = false
-//                binding.bottomNavigationViewBorder.isVisible = false
-//            } else {
-//                binding.bottomNavigationView.isVisible = true
-//                binding.bottomNavigationViewBorder.isVisible = true
-//            }
-//        }
-//        binding.bottomNavigationView.setupWithNavController(navController)
     }
 }
 
@@ -99,6 +74,7 @@ sealed class Screen(val route: String, val titleResId: Int) {
     object Search : Screen("search", R.string.button_search)
     object Media : Screen("media", R.string.button_media)
     object Settings : Screen("settings", R.string.button_settings)
+    object Playlist : Screen("playlist", R.string.new_playlist)
     object PlaylistAdd : Screen("playlistadd", R.string.new_playlist)
 
     // Экраны без нижней навигации
@@ -215,6 +191,7 @@ fun BottomNavigationBar(navController: NavController) {
     BottomAppBar (containerColor = MaterialTheme.colorScheme.background) {
         val currentRoute = currentRoute(navController)
         items.forEach { screen ->
+            val iconColor = if (currentRoute == screen.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -222,15 +199,18 @@ fun BottomNavigationBar(navController: NavController) {
                             Screen.Search -> R.drawable.icon_search
                             Screen.Media -> R.drawable.icon_media
                             Screen.Settings -> R.drawable.icon_settings
-                            else -> R.drawable.icon_arrow_right
+                            else -> R.drawable.icon_search
                         }),
-                        contentDescription = stringResource(id = screen.titleResId!!)
+                        contentDescription = stringResource(id = screen.titleResId!!),
+                        tint = iconColor,
                     )
                 },
                 label = {
                     Text(
                         text = stringResource(id = screen.titleResId),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = iconColor
+                        )
                     )
                 },
                 selected = currentRoute == screen.route,
@@ -242,7 +222,12 @@ fun BottomNavigationBar(navController: NavController) {
                             saveState = true
                         }
                     }
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onBackground,
+
+                ),
             )
         }
     }
