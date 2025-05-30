@@ -18,18 +18,53 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.Gson
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.data.db.InsertStatus
 import com.il76.playlistmaker.databinding.FragmentPlayerBinding
@@ -41,6 +76,7 @@ import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
@@ -381,6 +417,156 @@ class PlayerFragment: Fragment() {
 }
 
 @Composable
-fun PlayerScreen(navController: NavController, track: Track) {
-    Log.d("pls", "trackData: " + track.toString())
+fun PlayerScreen(navController: NavController, trackData: String) {
+    //Log.d("pls", "trackData: " + track.toString())
+    val viewModel: PlayerViewModel = koinViewModel() {
+        parametersOf(trackData)
+    }
+    //TODO
+    val track = remember(trackData) {
+        Gson().fromJson(trackData, Track::class.java)
+    }
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(horizontal = 24.dp)
+    ) {
+        // Обложка трека
+        val trackPainter =
+            if (track.poster.isBlank()) {
+                painterResource(R.drawable.icon_share)
+            } else {
+                rememberAsyncImagePainter(track.poster)
+            }
+        Image(
+            painter = trackPainter,
+            contentDescription = "Обложка трека",
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .padding(top = 26.dp)
+        )
+
+        // Название трека
+        Text(
+            text = track.trackName,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 22.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 24.dp, bottom = 12.dp)
+        )
+
+        // Имя исполнителя
+        Text(
+            text = track.artistName,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 14.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        // Кнопки управления
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            IconButton(onClick = {
+                TODO()
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_playlist_add),
+                    contentDescription = "Добавить в плейлист",
+                    tint = MaterialTheme.colorScheme.inverseSurface
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(modifier = Modifier.size(100.dp)) {
+                Button(
+                    onClick = {
+                        viewModel.viewModelScope.launch {
+                            viewModel.playbackControl()
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_play),
+                        contentDescription = "Воспроизвести",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(onClick = {
+                viewModel.viewModelScope.launch {
+                    viewModel.toggleFavouriteStatus()
+                }
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_like),
+                    contentDescription = "Лайк",
+                    tint = MaterialTheme.colorScheme.inverseSurface
+                )
+            }
+        }
+
+        // Текущее время воспроизведения
+        Text(
+            text = "00:00",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp)
+                .wrapContentWidth(align = Alignment.CenterHorizontally)
+        )
+
+        // Информация о треке
+        TrackInfoRow(label = "Время", value = track.trackTime)
+        TrackInfoRow(label = stringResource(R.string.track_collection_name), value = track.collectionName)
+        TrackInfoRow(label = stringResource(R.string.track_year), value = track.releaseYear)
+        TrackInfoRow(label = stringResource(R.string.track_genre), value = track.primaryGenreName)
+        TrackInfoRow(label = stringResource(R.string.track_country), value = track.country)
+    }
+}
+
+@Composable
+fun TrackInfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 30.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = 13.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 13.sp
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
+    }
 }

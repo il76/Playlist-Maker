@@ -46,6 +46,10 @@ val Typography = Typography(
     ),
     labelMedium = TextStyle(
         fontFamily = FontFamilyYandex400,
+        fontSize = 14.sp,
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamilyYandex400,
         fontSize = 16.sp,
     ),
     /* Other default text styles to override

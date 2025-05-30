@@ -154,11 +154,11 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 //Log.d("pls", "route_player")
                 val trackJson = backStackEntry.arguments?.getString("trackJson") ?: ""
-                val track = remember(trackJson) {
-                    Gson().fromJson(trackJson, Track::class.java)
-                }
+//                val track = remember(trackJson) {
+//                    Gson().fromJson(trackJson, Track::class.java)
+//                }
                 Surface {
-                    PlayerScreen(navController, track = track)
+                    PlayerScreen(navController, trackData = trackJson)
                 }
             }
             //создание плейлиста

@@ -190,7 +190,7 @@ private fun SwitchItem(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelLarge
         )
 
         Switch(
@@ -238,7 +238,7 @@ private fun SettingsButton(
             text = text,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelLarge
         )
         Icon(
             painter = icon,
