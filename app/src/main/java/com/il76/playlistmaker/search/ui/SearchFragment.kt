@@ -1,7 +1,6 @@
 package com.il76.playlistmaker.search.ui
 
 import android.os.Bundle
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,34 +60,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.FragmentSearchBinding
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.ui.shared.ErrorImageText
 import com.il76.playlistmaker.ui.shared.TrackList
-import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment: Fragment() {
-
-    private lateinit var binding: FragmentSearchBinding
-    private val viewModel by viewModel<SearchViewModel>()
-
-    private var searchValue: String = ""
-
-    private val trackList = arrayListOf<Track>()
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var trackAdapter: TrackAdapter
-
-    private lateinit var textWatcher: TextWatcher
-
-    private lateinit var onTrackClickDebounce: (Track) -> Unit
-
-    private val internetBroadcastReceiver = InternetBroadcastReceiver()
 
     override fun onCreateView(
         inflater: LayoutInflater,
