@@ -1,6 +1,5 @@
 package com.il76.playlistmaker.media.ui
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -59,8 +58,11 @@ class MediaFragment: Fragment() {
 fun MediaScreen(navController: NavController) {
     val viewModel: MediaViewModel = koinViewModel()
     val context = LocalContext.current
-    val backgroundColor = ContextCompat.getColor(context, R.color.background_secondary)
+    val backgroundColor = remember {ContextCompat.getColor(context, R.color.background_secondary)}
     val textColor = remember { ContextCompat.getColor(context, R.color.settings_text) }
+    val buttonTextColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
+    val buttonBackgroundColor = remember { ContextCompat.getColor(context, R.color.back_icon_fill) }
+
     val currentTab by viewModel.currentTab.collectAsState()
 
     Scaffold(
@@ -88,15 +90,16 @@ fun MediaScreen(navController: NavController) {
                             .tabIndicatorOffset(tabPositions[currentTab])
                             .height(2.dp)
                             .fillMaxWidth()
-                            .background(color = MaterialTheme.colorScheme.onSurface)
+                            .background(color = Color(textColor))
                     )
                 },
                 divider = {
                     // Убираем дефолтный разделитель
                     HorizontalDivider(modifier = Modifier.height(0.dp))
                 },
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onBackground
+                containerColor = Color(buttonBackgroundColor),
+                contentColor = Color(buttonTextColor),
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 val titles = listOf(
                     stringResource(R.string.media_tab_faforite_tracks),

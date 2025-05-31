@@ -24,7 +24,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,8 +50,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.bundle.bundleOf
@@ -88,10 +85,10 @@ class SearchFragment: Fragment() {
 fun SearchScreen(navController: NavController) {
     val viewModel: SearchViewModel = koinViewModel()
     val context = LocalContext.current
-    val backgroundColor = ContextCompat.getColor(context, R.color.background_secondary)
+    val backgroundColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
     val textColor = remember { ContextCompat.getColor(context, R.color.settings_text) }
-    val buttonTextColor = ContextCompat.getColor(context, R.color.background_secondary)
-    val buttonBackgroundColor = ContextCompat.getColor(context, R.color.back_icon_fill)
+    val buttonTextColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
+    val buttonBackgroundColor = remember { ContextCompat.getColor(context, R.color.back_icon_fill) }
 
     val uiState by viewModel.state.collectAsState()
 
@@ -186,6 +183,14 @@ fun SearchScreen(navController: NavController) {
                             modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            Text(
+                                text = stringResource(R.string.search_history_title),
+                                color = Color(textColor),
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontSize = 19.sp
+                                ),
+                                modifier = Modifier.padding(18.dp)
+                            )
                             TrackScreen(
                                 tracks = state.trackList ?: emptyList(),
                                 onTrackClick = { viewModel.onTrackClicked(it) },
@@ -230,13 +235,13 @@ fun SearchTextField(
     val viewModel: SearchViewModel = koinViewModel()
     val context = LocalContext.current
     val cursorColor = remember { ContextCompat.getColor(context, R.color.background_main) }
-    val searchBackgroundColor = ContextCompat.getColor(context, R.color.search_edit_bg)
+    val searchBackgroundColor = remember { ContextCompat.getColor(context, R.color.search_edit_bg) }
 
     Box (
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp)
+            //.padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp)
             .background(
                 color = Color(searchBackgroundColor),
                 shape = RoundedCornerShape(8.dp)
@@ -281,10 +286,9 @@ fun SearchTextField(
                     },
                 singleLine = true,
                 maxLines = 1,
-                textStyle = LocalTextStyle.current.copy(
-                    fontFamily = FontFamily(Font(R.font.ys_display_regular)),
+                textStyle = MaterialTheme.typography.labelLarge.copy(
                     color = colorResource(id = R.color.main_icon_fill),
-                    lineHeight = 36.sp
+                    lineHeight = 24.sp
                 ),
                 cursorBrush = SolidColor(Color(cursorColor)),
 
@@ -293,9 +297,8 @@ fun SearchTextField(
                     if (searchText.isEmpty()) {
                         Text(
                             text = hint,
-                            style = LocalTextStyle.current.copy(
-                                //color = colorResource(id = R.color.search_edit_main),
-                                color = Color(searchBackgroundColor),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                color = colorResource(id = R.color.search_edit_main),
                                 lineHeight = 24.sp
                             )
                         )

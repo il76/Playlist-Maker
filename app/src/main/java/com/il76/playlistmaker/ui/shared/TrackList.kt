@@ -15,16 +15,20 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.search.domain.models.Track
@@ -35,7 +39,7 @@ fun TrackList(
     onItemClick: (Track) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
+    LazyColumn(modifier = modifier.fillMaxSize().padding(top = 16.dp)) {
         items(tracks) { track ->
             TrackItem(
                 track = track,
@@ -53,12 +57,15 @@ fun TrackItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val textColor = remember { ContextCompat.getColor(context, R.color.settings_text) }
+    val textColor2 = remember { ContextCompat.getColor(context, R.color.settings_icon_fill) }
     Row(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable(onClick = onClick)
-            .padding(horizontal = dimensionResource(id = R.dimen.btn_margin), vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -80,7 +87,10 @@ fun TrackItem(
         ) {
             Text(
                 text = track.trackName,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 16.sp,
+                ),
+                color = Color(textColor),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -88,24 +98,28 @@ fun TrackItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = track.artistName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 11.sp,
+                    ),
+                    color = Color(textColor2),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.padding(end = 5.dp).weight(1f, fill = false)
                 )
 
                 Image(
                     painter = painterResource(id = R.drawable.circle),
                     contentDescription = null,
-                    modifier = Modifier.size(4.dp)
+                    modifier = Modifier.size(3.dp)
                 )
 
                 Text(
                     text = track.trackTime,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 4.dp)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 11.sp,
+                    ),
+                    color = Color(textColor2),
+                    modifier = Modifier.padding(start = 5.dp)
                 )
             }
         }

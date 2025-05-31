@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -66,6 +68,9 @@ class PlaylistsFragment: Fragment() {
 fun PlaylistsScreen(navController: NavController) {
     val viewModel: PlaylistsViewModel = koinViewModel()
     val playlists by viewModel.playlists.collectAsState()
+    val context = LocalContext.current
+    val buttonTextColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
+    val buttonBackgroundColor = remember { ContextCompat.getColor(context, R.color.back_icon_fill) }
 
     LaunchedEffect(Unit) {
         viewModel.loadPlaylists()
@@ -74,11 +79,10 @@ fun PlaylistsScreen(navController: NavController) {
         Button(
             onClick = {
                 navController.navigate(R.id.fragment_playlistadd)
-                //navController.navigate("playlistadd")
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onBackground,
-                contentColor = MaterialTheme.colorScheme.background,
+                containerColor = Color(buttonBackgroundColor),
+                contentColor = Color(buttonTextColor),
             ),
             modifier = Modifier
                 .padding(16.dp)
@@ -118,7 +122,8 @@ fun PlaylistItem(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val backgroundColor = ContextCompat.getColor(context, R.color.background_secondary)
+    val backgroundColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
+    val textColor = remember { ContextCompat.getColor(context, R.color.back_icon_fill) }
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color(backgroundColor)
@@ -128,7 +133,7 @@ fun PlaylistItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 8.dp)
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(backgroundColor))
             .clickable(onClick = {
                 val args = bundleOf("playlistid" to playlist.id)
                 navController.navigate(R.id.fragment_playlist, args)
@@ -168,17 +173,23 @@ fun PlaylistItem(
 
             Text(
                 text = playlist.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 12.sp,
+                    color = Color(textColor),
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
 
             Text(
                 text = "${playlist.cnt} ${stringResource(R.string.playlist_tracks_cnt_description)}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 12.sp,
+                    color = Color(textColor),
+                ),
+
+                modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
     }

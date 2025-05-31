@@ -15,25 +15,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.il76.playlistmaker.R
-import com.il76.playlistmaker.databinding.MediaTracksBinding
-import com.il76.playlistmaker.search.domain.models.Track
-import com.il76.playlistmaker.search.ui.TrackAdapter
 import com.il76.playlistmaker.search.ui.TrackScreen
 import com.il76.playlistmaker.ui.shared.ErrorImageText
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TracksFragment: Fragment() {
-
-    private lateinit var binding: MediaTracksBinding
-
-    private val mediaViewModel by activityViewModel<MediaViewModel>()
-
-    private val tracksViewModel: TracksViewModel by viewModel<TracksViewModel>()
-
-    private lateinit var trackAdapter: TrackAdapter
-    private lateinit var onTrackClickDebounce: (Track) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
