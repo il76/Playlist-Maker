@@ -1,8 +1,5 @@
 package com.il76.playlistmaker.media.ui
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,9 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.bundle.bundleOf
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
 import coil.compose.rememberAsyncImagePainter
 import com.il76.playlistmaker.R
 import com.il76.playlistmaker.media.domain.models.Playlist
@@ -122,7 +116,6 @@ fun PlaylistItem(
             .clickable(onClick = {
                 val args = bundleOf("playlistid" to playlist.id)
                 navController.navigate(R.id.fragment_playlist, args)
-                //navController.navigate("playlist/${playlist.id}")
             }),
 
         ) {
@@ -136,7 +129,11 @@ fun PlaylistItem(
                 if (playlist.cover.isNotEmpty() && playlist.cover != "null") { //почему-то иногда прилетали
                     val imageUrl = playlist.cover
                     Image(
-                        painter = rememberAsyncImagePainter(model = imageUrl),
+                        painter = rememberAsyncImagePainter(
+                            model = imageUrl,
+                            placeholder = painterResource(id = R.drawable.search_cover_placeholder),
+                            error = painterResource(id = R.drawable.search_cover_placeholder),
+                        ),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()

@@ -72,7 +72,7 @@ class SearchViewModel(
 
     fun doSearch(text: String) {
         if (text.isEmpty()) return
-        _state.value = SearchState(status = SearchState.ErrorStatus.NONE)
+        _state.value = SearchState(status = SearchState.ErrorStatus.LOADING)
 
         viewModelScope.launch {
             trackInteractor.searchTracks(text).collect { foundTracks ->

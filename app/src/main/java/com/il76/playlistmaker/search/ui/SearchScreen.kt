@@ -66,6 +66,7 @@ fun SearchScreen(navController: NavController) {
     val textColor = remember { ContextCompat.getColor(context, R.color.settings_text) }
     val buttonTextColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
     val buttonBackgroundColor = remember { ContextCompat.getColor(context, R.color.back_icon_fill) }
+    val indicatorColor = remember { ContextCompat.getColor(context, R.color.progressbar_tint) }
 
     val uiState by viewModel.state.collectAsState()
 
@@ -123,7 +124,8 @@ fun SearchScreen(navController: NavController) {
                 else -> {
                     when (state.status) {
                         SearchState.ErrorStatus.LOADING -> CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 140.dp),
+                            color = Color(indicatorColor),
                         )
 
                         SearchState.ErrorStatus.SUCCESS -> {

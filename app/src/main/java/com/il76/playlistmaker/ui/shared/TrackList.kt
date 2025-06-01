@@ -71,7 +71,11 @@ fun TrackItem(
 
         // Обложка
         Image(
-            painter = rememberAsyncImagePainter(track.poster),
+            painter = rememberAsyncImagePainter(
+                model = track.poster,
+                placeholder = painterResource(id = R.drawable.search_cover_placeholder),
+                error = painterResource(id = R.drawable.search_cover_placeholder),
+            ),
             contentDescription = null,
             modifier = Modifier
                 .size(56.dp)
