@@ -1,7 +1,5 @@
 package com.il76.playlistmaker.media.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,13 +16,18 @@ fun TracksScreen(navController: NavController) {
     val viewModel: TracksViewModel = koinViewModel()
     val tracks = viewModel.tracks.collectAsState()
 
-    TrackScreen(
-        tracks = tracks.value ?: emptyList(),
-        onTrackClick = { viewModel.onTrackClicked(it) },
-        modifier = Modifier
-    )
-    Box(modifier = Modifier.fillMaxSize()) {
-        ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_tracks)
+    when {
+        tracks.value.isEmpty() -> {
+            ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_tracks)
+        }
+
+        else -> {
+            TrackScreen(
+                tracks = tracks.value ?: emptyList(),
+                onTrackClick = { viewModel.onTrackClicked(it) },
+                modifier = Modifier
+            )
+        }
     }
     // Обработка событий
     LaunchedEffect(Unit) {

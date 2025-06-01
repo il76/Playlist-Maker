@@ -21,7 +21,7 @@ interface PlaylistDao {
     suspend fun deletePlaylist(playlist: PlaylistEntity)
 
     @Query("""
-        SELECT p.*, 
+        SELECT p.id, p.name, p.description, p.cover, 
                (SELECT COUNT(*) FROM playlists_tracks WHERE playlistId = p.id) AS cnt
         FROM playlists p
         ORDER BY p.id DESC

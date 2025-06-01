@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +53,7 @@ fun PlaylistsScreen(navController: NavController) {
     val context = LocalContext.current
     val buttonTextColor = remember { ContextCompat.getColor(context, R.color.background_secondary) }
     val buttonBackgroundColor = remember { ContextCompat.getColor(context, R.color.back_icon_fill) }
+    val indicatorColor = remember { ContextCompat.getColor(context, R.color.progressbar_tint) }
 
     LaunchedEffect(Unit) {
         viewModel.loadPlaylists()
@@ -72,19 +74,26 @@ fun PlaylistsScreen(navController: NavController) {
         }
         when (val data = playlists) {
             null -> {
-                ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_playlists)
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 140.dp),
+                    color = Color(indicatorColor),
+                )
             }
             else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), // Фиксируем 2 колонки
-                    contentPadding = PaddingValues(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(data.size) { index ->
-                        val playlist = data[index]
-                        PlaylistItem(playlist = playlist, navController)
+                if (data.isEmpty()) {
+                    ErrorImageText(R.drawable.search_nothing_found, R.string.media_empty_playlists)
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2), // Фиксируем 2 колонки
+                        contentPadding = PaddingValues(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(data.size) { index ->
+                            val playlist = data[index]
+                            PlaylistItem(playlist = playlist, navController)
+                        }
                     }
                 }
             }
