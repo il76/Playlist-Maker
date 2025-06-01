@@ -138,7 +138,11 @@ fun SearchScreen(navController: NavController) {
                             Button(
                                 onClick = { viewModel.doSearch() },
                                 modifier = Modifier
-                                    .padding(16.dp).align(Alignment.CenterHorizontally)
+                                    .padding(16.dp).align(Alignment.CenterHorizontally),
+                                colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(buttonBackgroundColor),
+                                    contentColor = Color(buttonTextColor),
+                            ),
                             ) {
                                 Text(stringResource(R.string.search_refresh))
                             }
