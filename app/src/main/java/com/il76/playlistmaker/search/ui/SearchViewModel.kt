@@ -1,7 +1,8 @@
 package com.il76.playlistmaker.search.ui
 
 import android.net.Uri
-import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,8 +35,10 @@ class SearchViewModel(
     private val _state = MutableStateFlow<SearchState>(SearchState())
     val state: StateFlow<SearchState> = _state
 
-    private var latestSearchText: String? = null
     private var searchJob: Job? = null
+
+    private val _currentQuery = mutableStateOf("")
+    val currentQuery: State<String> get() = _currentQuery
 
     private val _trackClicks = MutableSharedFlow<Track>()
     val trackClicks = _trackClicks.asSharedFlow()
@@ -61,21 +64,21 @@ class SearchViewModel(
         if (changedText.isNullOrEmpty()) {
             toggleHistory(true)
         }
-        if (latestSearchText == changedText) return
-        latestSearchText = changedText
+        if (_currentQuery.value == changedText) return
+        _currentQuery.value = changedText
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(2000L)
-            doSearch(changedText)
+            doSearch()
         }
     }
 
-    fun doSearch(text: String) {
-        if (text.isEmpty()) return
+    fun doSearch() {
+        if (_currentQuery.value.isEmpty()) return
         _state.value = SearchState(status = SearchState.ErrorStatus.LOADING)
 
         viewModelScope.launch {
-            trackInteractor.searchTracks(text).collect { foundTracks ->
+            trackInteractor.searchTracks(_currentQuery.value).collect { foundTracks ->
                 when {
                     foundTracks == null -> {
                         _state.value = SearchState(status = SearchState.ErrorStatus.ERROR_NET)
@@ -103,13 +106,14 @@ class SearchViewModel(
     }
 
     fun addToHistory(track: Track) {
-        Log.d("pls", track.toString())
         tracksHistoryInteractor.addTrack(track)
-        _state.value =
-            SearchState(
-                status = SearchState.ErrorStatus.HISTORY,
-                trackList = tracksHistoryInteractor.getTracks()
-            )
+        if (_state.value.status == SearchState.ErrorStatus.HISTORY) {
+            _state.value =
+                SearchState(
+                    status = SearchState.ErrorStatus.HISTORY,
+                    trackList = tracksHistoryInteractor.getTracks()
+                )
+        }
     }
 
     fun toggleHistory(show: Boolean) {
@@ -125,7 +129,7 @@ class SearchViewModel(
     }
 
     fun setSearchText(text: String) {
-        latestSearchText = text
+        _currentQuery.value = text
         toggleHistory(text.isEmpty())
     }
 
@@ -135,8 +139,4 @@ class SearchViewModel(
 
     fun provideTrackData(track: Track): String = Uri.encode(gson.toJson(track))
 
-    companion object {
-        private const val SEARCH_QUERY = "SEARCH_QUERY"
-
-    }
 }

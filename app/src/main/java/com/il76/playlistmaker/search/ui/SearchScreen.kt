@@ -29,10 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,8 +66,6 @@ fun SearchScreen(navController: NavController) {
     val indicatorColor = remember { ContextCompat.getColor(context, R.color.progressbar_tint) }
 
     val uiState by viewModel.state.collectAsState()
-
-    var currentQuery by rememberSaveable { mutableStateOf("") }
 
     // Показ Toast при получении события
     LaunchedEffect (Unit) {
@@ -116,7 +111,6 @@ fun SearchScreen(navController: NavController) {
                     vertical = 8.dp
                 ),
                 onSearchTextChanged = {
-                    currentQuery = it
                     viewModel.searchDebounce(it)
                 }
             )
@@ -142,7 +136,7 @@ fun SearchScreen(navController: NavController) {
                                 R.string.search_network_error
                             )
                             Button(
-                                onClick = { viewModel.doSearch(currentQuery) },
+                                onClick = { viewModel.doSearch() },
                                 modifier = Modifier
                                     .padding(16.dp).align(Alignment.CenterHorizontally)
                             ) {
@@ -210,17 +204,16 @@ fun SearchTextField(
     hint: String = stringResource(id = R.string.button_search),
     onSearchTextChanged: (String) -> Unit
 ) {
-    var searchText by rememberSaveable { mutableStateOf("") }
     val viewModel: SearchViewModel = koinViewModel()
     val context = LocalContext.current
     val cursorColor = remember { ContextCompat.getColor(context, R.color.background_main) }
     val searchBackgroundColor = remember { ContextCompat.getColor(context, R.color.search_edit_bg) }
+    val currentQuery by viewModel.currentQuery
 
     Box (
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            //.padding(horizontal = dimensionResource(id = R.dimen.pdg_root), vertical = 8.dp)
             .background(
                 color = Color(searchBackgroundColor),
                 shape = RoundedCornerShape(8.dp)
@@ -249,9 +242,8 @@ fun SearchTextField(
             )
 
             BasicTextField(
-                value = searchText,
+                value = currentQuery,
                 onValueChange = {
-                    searchText = it
                     onSearchTextChanged(it)
                 },
                 modifier = Modifier
@@ -259,7 +251,7 @@ fun SearchTextField(
                     .height(36.dp)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .onFocusChanged {
-                        if (it.isFocused && searchText.isEmpty()) {
+                        if (it.isFocused && currentQuery.isEmpty()) {
                             viewModel.toggleHistory(true)
                         }
                     },
@@ -273,7 +265,7 @@ fun SearchTextField(
 
 
                 decorationBox = { innerTextField ->
-                    if (searchText.isEmpty()) {
+                    if (currentQuery.isEmpty()) {
                         Text(
                             text = hint,
                             style = MaterialTheme.typography.labelLarge.copy(
@@ -287,10 +279,9 @@ fun SearchTextField(
             )
 
             // Clear Icon
-            if (searchText.isNotEmpty()) {
+            if (currentQuery.isNotEmpty()) {
                 IconButton(
                     onClick = {
-                        searchText = ""
                         viewModel.setSearchText("")
                     },
                     modifier = Modifier.size(16.dp)
