@@ -20,10 +20,9 @@ import com.il76.playlistmaker.databinding.FragmentPlaylistBinding
 import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.media.ui.PlaylistAddFragment
-import com.il76.playlistmaker.player.ui.PlayerFragment
 import com.il76.playlistmaker.search.domain.models.Track
-import com.il76.playlistmaker.search.ui.SearchFragment.Companion.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.search.ui.TrackAdapter
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.debounce
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -77,10 +76,12 @@ class PlaylistFragment: Fragment() {
         ) { track ->
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             bottomSheetInfoBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            findNavController().navigate(
-                R.id.action_fragment_playlist_to_playerFragment,
-                PlayerFragment.createArgs(viewModel.provideTrackData(track))
-            )
+            val args = bundleOf("trackData" to viewModel.provideTrackData(track))
+            findNavController().navigate(R.id.playerFragment, args)
+//            findNavController().navigate(
+//                R.id.action_fragment_playlist_to_playerFragment,
+//                PlayerFragment.createArgs(viewModel.provideTrackData(track))
+//            )
         }
         onTrackLongClick = {playlistTrack ->
             MaterialAlertDialogBuilder(requireContext(), R.style.DialogStyle)

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.net.ConnectivityManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -35,6 +36,7 @@ import com.il76.playlistmaker.media.domain.models.Playlist
 import com.il76.playlistmaker.media.domain.models.PlaylistTrack
 import com.il76.playlistmaker.search.domain.models.Track
 import com.il76.playlistmaker.services.PlayerService
+import com.il76.playlistmaker.ui.shared.UIConstants.CLICK_DEBOUNCE_DELAY
 import com.il76.playlistmaker.utils.InternetBroadcastReceiver
 import com.il76.playlistmaker.utils.debounce
 import kotlinx.coroutines.launch
@@ -159,7 +161,8 @@ class PlayerFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        trackData = requireArguments().getString(ARGS_TRACKDATA).orEmpty()
+        trackData = Uri.decode(requireArguments().getString(ARGS_TRACKDATA).orEmpty())
+        Log.i("pls", "аргументы прилетели"+trackData)
 
         onPlaylistClickDebounce = debounce<PlaylistTrack>(
             CLICK_DEBOUNCE_DELAY,
@@ -369,9 +372,7 @@ class PlayerFragment: Fragment() {
 
     companion object {
 
-        private const val ARGS_TRACKDATA = "track"
-
-        private const val CLICK_DEBOUNCE_DELAY = 300L
+        private const val ARGS_TRACKDATA = "trackData"
 
         fun createArgs(trackData: String): Bundle =
             bundleOf(ARGS_TRACKDATA to trackData)
